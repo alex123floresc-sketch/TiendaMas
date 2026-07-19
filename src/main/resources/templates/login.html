@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Sistema de Gestión</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+
+<div class="w-full max-w-md p-6">
+    <div class="ui raised segment p-8">
+
+        <h2 class="ui teal image header flex justify-center mb-6">
+            <i class="user shield icon"></i>
+            <div class="content">
+                Acceso al Sistema
+                <div class="sub header">Introduce tus credenciales</div>
+            </div>
+        </h2>
+
+        <div class="ui negative message" th:if="${param.error}">
+            <i class="close icon"></i>
+            <div class="header">Error de Autenticación</div>
+            <p>El usuario o la contraseña son incorrectos.</p>
+        </div>
+
+        <div class="ui info message" th:if="${param.logout}">
+            <p>Has cerrado sesión correctamente.</p>
+        </div>
+
+        <form th:action="@{/login}" method="POST" class="ui form">
+
+            <div class="field mb-4">
+                <label>Usuario</label>
+                <div class="ui left icon input">
+                    <i class="user icon"></i>
+                    <input type="text" name="username" placeholder="Nombre de usuario" required autofocus>
+                </div>
+            </div>
+
+            <div class="field mb-6">
+                <label>Contraseña</label>
+                <div class="ui left icon input">
+                    <i class="lock icon"></i>
+                    <input type="password" name="password" placeholder="Tu contraseña" required>
+                </div>
+            </div>
+
+            <button class="ui fluid large teal submit button type-submit" type="submit">
+                Ingresar
+            </button>
+        </form>
+
+    </div>
+
+    <p class="text-center text-gray-500 text-xs mt-4">
+        &copy; 2026 Facultad de Ingeniería de Sistemas - UNAJ
+    </p>
+</div>
+
+</body>
+</html>

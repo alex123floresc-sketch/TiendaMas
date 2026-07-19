@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Pedido</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css">
+    <style>
+        body { background-color: #f4f7f6; padding: 40px 0; }
+        .hint { color: #6c757d; font-size: 13px; margin-top: 10px; display: block; }
+    </style>
+</head>
+<body>
+
+<div class="ui container" style="max-width: 800px;">
+
+    <h1 class="ui dividing header" style="color: #2c3e50;">
+        <i class="shopping cart icon"></i>
+        <div class="content">
+            Nuevo Pedido
+            <div class="sub header">Gestione los productos del nuevo pedido.</div>
+        </div>
+    </h1>
+
+    <div class="ui segment" style="box-shadow: 0 2px 4px rgba(0,0,0,0.08); padding: 30px;">
+
+        <form th:object="${pedidoForm}" th:action="@{/pedidos}" method="POST" class="ui form">
+
+            <div class="field required">
+                <label>Cliente</label>
+                <select th:field="*{personaId}" class="ui search dropdown" required>
+                    <option value="">-- Selecciona un cliente --</option>
+                    <option th:each="p : ${personas}"
+                            th:value="${p.id}"
+                            th:text="${p.nombre + ' ' + p.apellido}"></option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Productos del pedido</label>
+                <table class="ui celled striped table">
+                    <thead>
+                    <tr>
+                        <th style="width:50px">#</th>
+                        <th>Producto</th>
+                        <th style="width:150px">Cantidad</th>
+                        <th style="width:80px">Acción</th>
+                    </tr>
+                    </thead>
+                    <tbody id="detalleBody">
+                    </tbody>
+                </table>
+                <button type="button" class="ui blue small button" onclick="agregarFila()">
+                    <i class="plus icon"></i> Agregar producto
+                </button>
+                <small class="hint">Agrega todos los productos que necesites. Puedes quitar filas con el botón X.</small>
+            </div>
+
+            <div class="ui divider"></div>
+
+            <div class="form-actions">
+                <button type="submit" class="ui positive button">
+                    <i class="save icon"></i> Guardar Pedido
+                </button>
+                <a href="/pedidos" class="ui button">Cancelar</a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<select id="productoRef" style="display:none">
+    <option value="">-- Selecciona un producto --</option>
+    <option th:each="p : ${productos}"
+            th:value="${p.id}"
+            th:text="${p.nombre + ' ($' + p.precio + ')'}"></option>
+</select>
+
+<script>
+    let rowIndex = 0;
+
+    function agregarFila() {
+        const tbody  = document.getElementById('detalleBody');
+        const numFila = tbody.rows.length + 1;
+        const idx    = rowIndex++;
+
+        const tr = document.createElement('tr');
+
+        // Columna #
+        const tdNum = document.createElement('td');
+        tdNum.style.textAlign = 'center';
+        tdNum.innerHTML = `<strong>${numFila}</strong>`;
+        tr.appendChild(tdNum);
+
+        // Columna producto
+        const refSelect = document.getElementById('productoRef');
+        const select = refSelect.cloneNode(true);
+        select.id = '';
+        select.style.display = 'block';
+        select.name     = 'detalles[' + idx + '].productoId';
+        select.className = 'ui fluid dropdown';
+        select.required  = true;
+        const tdSelect = document.createElement('td');
+        tdSelect.appendChild(select);
+        tr.appendChild(tdSelect);
+
+        // Columna cantidad
+        const input = document.createElement('input');
+        input.type      = 'number';
+        input.name      = 'detalles[' + idx + '].cantidad';
+        input.className = 'ui input fluid';
+        input.min       = '1';
+        input.value     = '1';
+        input.required  = true;
+        const tdCantidad = document.createElement('td');
+        tdCantidad.appendChild(input);
+        tr.appendChild(tdCantidad);
+
+        // Columna quitar
+        const btn = document.createElement('button');
+        btn.type      = 'button';
+        btn.className = 'ui red icon button';
+        btn.innerHTML = '<i class="trash icon"></i>';
+        btn.onclick   = function () { eliminarFila(this); };
+        const tdBtn = document.createElement('td');
+        tdBtn.style.textAlign = 'center';
+        tdBtn.appendChild(btn);
+        tr.appendChild(tdBtn);
+
+        tbody.appendChild(tr);
+    }
+
+    function eliminarFila(btn) {
+        btn.closest('tr').remove();
+        reindexar();
+    }
+
+    function reindexar() {
+        const rows = document.querySelectorAll('#detalleBody tr');
+        rows.forEach(function (tr, i) {
+            tr.cells[0].textContent = i + 1;
+            tr.querySelectorAll('[name]').forEach(function (el) {
+                el.name = el.name.replace(/detalles\[\d+\]/, 'detalles[' + i + ']');
+            });
+        });
+        rowIndex = rows.length;
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        agregarFila();
+    });
+</script>
+</body>
+</html>

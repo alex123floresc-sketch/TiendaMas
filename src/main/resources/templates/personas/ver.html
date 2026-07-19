@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles Persona</title>
+    <link rel="stylesheet" href="/css/estilos.css">
+</head>
+<body>
+<div class="container">
+    <h1>Detalles de Persona</h1>
+
+    <div class="details-card">
+        <div class="detail-row">
+            <span class="label">ID:</span>
+            <span th:text="${persona.id}"></span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Nombre:</span>
+            <span th:text="${persona.nombre}"></span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Apellido:</span>
+            <span th:text="${persona.apellido}"></span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Email:</span>
+            <span th:text="${persona.email}"></span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Teléfono:</span>
+            <span th:text="${persona.telefono}"></span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Dirección:</span>
+            <span th:text="${persona.direccion}"></span>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <a th:href="@{/personas/{id}/editar(id=${persona.id})}"
+           class="btn btn-warning">Editar</a>
+        <a href="/personas" class="btn btn-secondary">Volver</a>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${titulo != null} ? ${titulo} : 'Sistema de Ventas'"></title>
+  <link rel="stylesheet" href="/css/estilos.css">
+</head>
+<body>
+<div class="wrapper">
+  <!-- MENÚ LATERAL -->
+  <div th:replace="layout/fragments :: menu"></div>
+  <!-- CONTENIDO PRINCIPAL -->
+  <div class="content">
+    <div class="container">
+      <!-- AQUÍ VA EL CONTENIDO ESPECÍFICO DE CADA PÁGINA -->
+      <div th:insert="~{this :: content}"></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

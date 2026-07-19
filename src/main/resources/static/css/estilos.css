@@ -1,0 +1,102 @@
+/* --- 1. RESET Y BASE --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #8EC5FF; /* Fondo general */
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* --- 2. LAYOUT FLEXIBLE (Estructura de dos columnas) --- */
+.wrapper {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+}
+
+/* El menú lateral con paleta oscura y colores pastel */
+.menu-principal {
+    width: 260px !important;
+    flex-shrink: 0;
+    background-color: #002347 !important;
+    height: 100%;
+    overflow-y: auto;
+}
+
+/* Contenido principal (fondo claro suave) */
+.content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 40px;
+    background-color: #E6F2FF;
+}
+
+/* --- 3. CONTENEDOR CENTRAL (Caja blanca profesional) --- */
+.container {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 35, 71, 0.15);
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* --- 4. AJUSTES DE COLORES PARA SEMANTIC UI --- */
+.ui.sidebar.menu .item {
+    color: #E6F2FF !important;
+}
+
+.ui.sidebar.menu .item:hover {
+    background-color: #2E93FF !important;
+    color: white !important;
+}
+
+.ui.header {
+    color: #002347 !important;
+}
+
+/* --- 5. COMPONENTES ADICIONALES --- */
+.btn-primary {
+    background-color: #2E93FF !important;
+    color: white !important;
+}
+
+/* Estilo para los detalles */
+.details-card {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+    border-left: 5px solid #2E93FF;
+}
+
+.detail-row {
+    display: flex;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.detail-row .label {
+    font-weight: 600;
+    width: 150px;
+    color: #002347;
+}
+
+/* --- 6. RESPONSIVIDAD --- */
+@media (max-width: 768px) {
+    .wrapper {
+        flex-direction: column;
+    }
+    .menu-principal {
+        width: 100% !important;
+        height: auto !important;
+    }
+    .content {
+        padding: 20px;
+    }
+}
