@@ -41,9 +41,18 @@ public class ReporteController {
         double totalVentas = 0.0;
         Map<String, Integer> unidadesPorProducto = new LinkedHashMap<>();
         Map<String, Double> ventasPorCategoria = new LinkedHashMap<>();
+        Map<String, Double> ventasPorCanal = new LinkedHashMap<>();
+        Map<String, Double> ventasPorMetodoPago = new LinkedHashMap<>();
 
         for (Pedido pedido : pedidos) {
-            totalVentas += pedido.getTotal() != null ? pedido.getTotal() : 0.0;
+            double totalPedido = pedido.getTotal() != null ? pedido.getTotal() : 0.0;
+            totalVentas += totalPedido;
+
+            String canalNombre = pedido.getCanal() != null ? pedido.getCanal().getEtiqueta() : "Sin canal";
+            ventasPorCanal.merge(canalNombre, totalPedido, Double::sum);
+
+            String metodoPagoNombre = pedido.getMetodoPago() != null ? pedido.getMetodoPago().getEtiqueta() : "Sin especificar";
+            ventasPorMetodoPago.merge(metodoPagoNombre, totalPedido, Double::sum);
 
             for (DetallePedido detalle : pedido.getDetalles()) {
                 Producto producto = detalle.getProducto();
@@ -76,6 +85,8 @@ public class ReporteController {
         model.addAttribute("totalProductos", productos.size());
         model.addAttribute("topProductos", topProductos);
         model.addAttribute("ventasPorCategoria", ventasPorCategoria);
+        model.addAttribute("ventasPorCanal", ventasPorCanal);
+        model.addAttribute("ventasPorMetodoPago", ventasPorMetodoPago);
         model.addAttribute("bajoStock", bajoStock);
         return "reportes/index";
     }

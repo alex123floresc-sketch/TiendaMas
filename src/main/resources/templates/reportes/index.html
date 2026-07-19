@@ -76,6 +76,52 @@
 
     </div>
 
+    <div class="ui two column stackable grid" style="margin-top: 10px;">
+
+        <div class="column">
+            <h3 class="ui header"><i class="exchange icon"></i>Ventas por canal</h3>
+            <div th:if="${#maps.isEmpty(ventasPorCanal)}" class="ui info message">
+                <p>Aún no hay ventas registradas.</p>
+            </div>
+            <table class="ui celled striped table" th:unless="${#maps.isEmpty(ventasPorCanal)}">
+                <thead>
+                <tr>
+                    <th>Canal</th>
+                    <th class="right aligned">Total vendido</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="entry : ${ventasPorCanal}">
+                    <td th:text="${entry.key}" style="font-weight: bold;"></td>
+                    <td th:text="'S/ ' + ${#numbers.formatDecimal(entry.value, 1, 2)}" class="right aligned"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="column">
+            <h3 class="ui header"><i class="credit card icon"></i>Ventas por método de pago</h3>
+            <div th:if="${#maps.isEmpty(ventasPorMetodoPago)}" class="ui info message">
+                <p>Aún no hay ventas registradas.</p>
+            </div>
+            <table class="ui celled striped table" th:unless="${#maps.isEmpty(ventasPorMetodoPago)}">
+                <thead>
+                <tr>
+                    <th>Método de pago</th>
+                    <th class="right aligned">Total vendido</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="entry : ${ventasPorMetodoPago}">
+                    <td th:text="${entry.key}" style="font-weight: bold;"></td>
+                    <td th:text="'S/ ' + ${#numbers.formatDecimal(entry.value, 1, 2)}" class="right aligned"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
     <h3 class="ui header" style="margin-top: 30px;"><i class="warning sign icon"></i>Alerta de stock bajo</h3>
     <div th:if="${#lists.isEmpty(bajoStock)}" class="ui positive message">
         <p>Todos los productos tienen existencias suficientes.</p>

@@ -45,6 +45,16 @@
                 <small class="hint">Agrega todos los productos que necesites. Puedes quitar filas con el botón X.</small>
             </div>
 
+            <div class="field required">
+                <label>Método de pago</label>
+                <select th:field="*{metodoPago}" class="ui fluid dropdown" required>
+                    <option value="EFECTIVO">Efectivo</option>
+                    <option value="TARJETA">Tarjeta de crédito/débito</option>
+                    <option value="YAPE_PLIN">Yape / Plin</option>
+                    <option value="TRANSFERENCIA">Transferencia bancaria</option>
+                </select>
+            </div>
+
             <div class="ui divider"></div>
 
             <div class="form-actions">

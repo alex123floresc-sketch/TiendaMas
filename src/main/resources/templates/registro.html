@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear cuenta · TiendaMas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body class="login-page">
+
+<div class="login-box" style="max-width: 520px;">
+    <div class="ui raised segment">
+
+        <h2 class="ui header">
+            <i class="user plus icon"></i>
+            <div class="content">
+                Crear cuenta de cliente
+                <div class="sub header">Regístrate para comprar en línea y ver tu historial de pedidos.</div>
+            </div>
+        </h2>
+
+        <div class="ui negative message" th:if="${error}">
+            <p th:text="${error}"></p>
+        </div>
+
+        <form th:action="@{/registro}" th:object="${registroForm}" method="POST" class="ui form">
+
+            <div class="field required">
+                <label>Usuario</label>
+                <input type="text" th:field="*{username}" placeholder="Nombre de usuario" required>
+            </div>
+
+            <div class="field required">
+                <label>Contraseña</label>
+                <input type="password" th:field="*{password}" placeholder="Contraseña" required>
+            </div>
+
+            <div class="two fields">
+                <div class="field required">
+                    <label>Nombre</label>
+                    <input type="text" th:field="*{nombre}" placeholder="Ej. Juan" required>
+                </div>
+                <div class="field required">
+                    <label>Apellido</label>
+                    <input type="text" th:field="*{apellido}" placeholder="Ej. Pérez" required>
+                </div>
+            </div>
+
+            <div class="field required">
+                <label>Email</label>
+                <input type="email" th:field="*{email}" placeholder="juan.perez@example.com" required>
+            </div>
+
+            <div class="two fields">
+                <div class="field">
+                    <label>Teléfono</label>
+                    <input type="tel" th:field="*{telefono}" placeholder="987654321">
+                </div>
+                <div class="field">
+                    <label>Dirección</label>
+                    <input type="text" th:field="*{direccion}" placeholder="Ej. Av. Primavera 123">
+                </div>
+            </div>
+
+            <div class="two fields">
+                <div class="field required">
+                    <label>Tipo de documento</label>
+                    <select th:field="*{tipoDocumento}" class="ui fluid dropdown" required>
+                        <option value="">-- Selecciona --</option>
+                        <option value="DNI">DNI (Boleta)</option>
+                        <option value="RUC">RUC (Factura)</option>
+                    </select>
+                </div>
+                <div class="field required">
+                    <label>Número de documento</label>
+                    <input type="text" th:field="*{numeroDocumento}" placeholder="Ej. 12345678" required>
+                </div>
+            </div>
+
+            <div class="ui divider"></div>
+
+            <button class="ui fluid primary large submit button" type="submit">
+                Crear cuenta
+            </button>
+        </form>
+
+        <p style="text-align:center; margin-top: 16px;">
+            ¿Ya tienes cuenta? <a th:href="@{/login}">Inicia sesión</a>
+        </p>
+    </div>
+</div>
+
+</body>
+</html>

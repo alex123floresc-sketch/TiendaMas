@@ -29,6 +29,10 @@
             <p>Has cerrado sesión correctamente.</p>
         </div>
 
+        <div class="ui positive message" th:if="${param.registrado}">
+            <p>Cuenta creada correctamente. Ya puedes iniciar sesión.</p>
+        </div>
+
         <form th:action="@{/login}" method="POST" class="ui form">
 
             <div class="field">
@@ -51,6 +55,10 @@
                 Ingresar
             </button>
         </form>
+
+        <p style="text-align:center; margin-top: 16px;">
+            ¿Compras en línea? <a th:href="@{/registro}">Crea una cuenta de cliente</a>
+        </p>
     </div>
 
     <p class="login-footer">&copy; 2026 Facultad de Ingeniería de Sistemas - UNAJ</p>

@@ -232,6 +232,255 @@ body {
     color: var(--color-navy);
 }
 
+/* --- Punto de venta (POS) --- */
+.pos-body {
+    background-color: var(--color-cream);
+}
+.pos-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--color-navy);
+    color: var(--color-white);
+    padding: 14px 24px;
+}
+.pos-brand {
+    font-size: 1.2em;
+    font-weight: 700;
+}
+.pos-brand span {
+    color: var(--color-blue-light);
+}
+.pos-topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.pos-user {
+    color: var(--color-cream);
+    margin-right: 6px;
+}
+.pos-content {
+    padding: 30px;
+    max-width: 1300px;
+    margin: 0 auto;
+}
+.pos-grid {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+.pos-col-main {
+    flex: 1;
+    min-width: 0;
+    background: var(--color-white);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(20, 49, 93, 0.10);
+}
+.pos-col-side {
+    width: 320px;
+    flex-shrink: 0;
+    background: var(--color-white);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(20, 49, 93, 0.10);
+}
+.hint {
+    color: var(--color-text-muted);
+    font-size: 13px;
+    display: block;
+    margin-top: 10px;
+}
+
+/* --- Tienda en línea (storefront) --- */
+.tienda-body {
+    background-color: var(--color-cream);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+.tienda-navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--color-navy);
+    padding: 14px 30px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+.tienda-brand {
+    color: var(--color-white) !important;
+    font-size: 1.3em;
+    font-weight: 700;
+    text-decoration: none;
+}
+.tienda-nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--color-white);
+    font-size: 1.3em;
+    cursor: pointer;
+}
+.tienda-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.tienda-nav-links .item {
+    color: var(--color-cream) !important;
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+.tienda-nav-links .item:hover,
+.tienda-nav-links .item.active {
+    background-color: var(--color-navy-dark);
+    color: var(--color-white) !important;
+}
+.tienda-cart-link {
+    position: relative;
+}
+.tienda-cart-badge {
+    background: var(--color-blue-light);
+    color: var(--color-navy);
+    font-weight: 700;
+    font-size: 0.75em;
+    border-radius: 50%;
+    padding: 2px 6px;
+    margin-left: 4px;
+}
+.tienda-content {
+    flex: 1;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 30px;
+}
+.tienda-footer {
+    text-align: center;
+    color: var(--color-text-muted);
+    font-size: 13px;
+    padding: 20px;
+}
+.tienda-hero {
+    background: linear-gradient(135deg, var(--color-navy), var(--color-blue));
+    color: var(--color-white);
+    padding: 40px 30px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+}
+.tienda-hero h1 {
+    margin: 0 0 8px 0;
+}
+.tienda-hero p {
+    margin: 0;
+    color: var(--color-cream);
+}
+.tienda-filtros {
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.tienda-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+.tienda-card {
+    background: var(--color-white);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(20, 49, 93, 0.10);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.tienda-card-link {
+    text-decoration: none;
+    color: inherit;
+}
+.tienda-card-img {
+    background: var(--color-cream);
+    border-radius: 8px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-blue-light);
+}
+.tienda-card-cat {
+    font-size: 0.75em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    font-weight: 700;
+}
+.tienda-card-nombre {
+    font-weight: 700;
+    color: var(--color-navy);
+    margin: 4px 0;
+}
+.tienda-card-precio {
+    color: #21ba45;
+    font-weight: 700;
+    font-size: 1.1em;
+}
+
+/* --- Comprobante (boleta / factura) --- */
+.comprobante-body {
+    background-color: var(--color-cream);
+    min-height: 100vh;
+}
+.comprobante-topbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 16px 24px;
+}
+.comprobante-content {
+    max-width: 800px;
+    margin: 0 auto 40px auto;
+    padding: 0 20px;
+}
+.comprobante-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+    background: var(--color-white);
+    border-radius: 12px;
+    border-top: 4px solid var(--color-blue);
+    box-shadow: 0 8px 20px rgba(20, 49, 93, 0.10);
+    padding: 24px;
+    margin-bottom: 20px;
+}
+.comprobante-tipo {
+    font-size: 1.1em;
+    font-weight: 700;
+    color: var(--color-navy);
+    text-transform: uppercase;
+}
+.comprobante-numero {
+    font-size: 1.4em;
+    font-weight: 700;
+    color: var(--color-blue);
+}
+.comprobante-meta {
+    text-align: right;
+    color: var(--color-text-muted);
+    font-size: 0.95em;
+    line-height: 1.6;
+}
+@media print {
+    .comprobante-topbar {
+        display: none;
+    }
+}
+
 /* Página de login (sin sidebar) */
 .login-page {
     min-height: 100vh;
@@ -252,19 +501,116 @@ body {
     margin-top: 16px;
 }
 
-/* --- 6. RESPONSIVIDAD --- */
+/* --- 6. RESPONSIVIDAD (móvil + escritorio) --- */
+
+/* Barra con botón "Menú" del panel admin: solo se ve en móvil */
+.mobile-topbar {
+    display: none;
+}
+.mobile-menu-toggle {
+    width: 100%;
+    background: var(--color-navy);
+    color: var(--color-white);
+    border: none;
+    padding: 14px;
+    font-size: 1em;
+    text-align: left;
+}
+
+/* Formularios: los campos en fila pasan a columna en pantallas angostas
+   (arregla de una sola vez todos los formularios existentes). */
 @media (max-width: 768px) {
+    .ui.form .fields {
+        flex-direction: column;
+    }
+    .ui.form .fields > .field {
+        width: 100% !important;
+        margin: 0 0 1em 0 !important;
+    }
+}
+
+/* Tablas: scroll horizontal en vez de desbordar la pantalla. */
+@media (max-width: 768px) {
+    .ui.table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Panel admin: la sidebar se convierte en menú desplegable con botón hamburguesa */
+    .mobile-topbar {
+        display: block;
+    }
     .wrapper {
         flex-direction: column;
     }
     .sidebar-menu.ui.vertical.menu {
         width: 100% !important;
         flex: none;
+        display: none;
+    }
+    .sidebar-menu.ui.vertical.menu.open {
+        display: flex;
     }
     .content {
         padding: 20px;
     }
     .container {
         padding: 20px;
+    }
+
+    /* Tienda: navbar colapsa a menú desplegable */
+    .tienda-navbar {
+        position: relative;
+        flex-wrap: wrap;
+    }
+    .tienda-nav-toggle {
+        display: block;
+    }
+    .tienda-nav-links {
+        display: none;
+        flex-direction: column;
+        align-items: stretch;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--color-navy);
+        padding: 10px;
+        gap: 6px;
+    }
+    .tienda-nav-links.open {
+        display: flex;
+    }
+    .tienda-content {
+        padding: 16px;
+    }
+    .tienda-hero {
+        padding: 24px 18px;
+    }
+
+    /* POS: el panel de cobro pasa debajo del carrito en vez de al costado */
+    .pos-grid {
+        flex-direction: column;
+    }
+    .pos-col-side {
+        width: 100%;
+    }
+    .pos-content {
+        padding: 16px;
+    }
+    .pos-topbar {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    /* Comprobante */
+    .comprobante-header {
+        flex-direction: column;
+    }
+    .comprobante-meta {
+        text-align: left;
     }
 }

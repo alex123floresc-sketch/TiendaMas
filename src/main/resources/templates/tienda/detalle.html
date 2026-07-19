@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/tienda}">
+<body>
+<div th:fragment="content" style="max-width: 700px; margin: 0 auto;">
+
+    <a th:href="@{/tienda}" class="ui button" style="margin-bottom: 20px;">
+        <i class="arrow left icon"></i> Volver al catálogo
+    </a>
+
+    <div class="ui segment">
+        <span class="ui teal label" th:text="${producto.categoria != null ? producto.categoria.nombre : 'Sin categoría'}"></span>
+        <h1 class="ui header" th:text="${producto.nombre}"></h1>
+        <p th:text="${producto.descripcion}"></p>
+        <h2 style="color:#21ba45;" th:text="'S/ ' + ${producto.precio}"></h2>
+
+        <p>
+            <span th:if="${producto.stock != null and producto.stock > 0}"
+                  th:text="${producto.stock} + ' unidades disponibles'"></span>
+            <span th:unless="${producto.stock != null and producto.stock > 0}" style="color:#db2828; font-weight:bold;">Sin stock</span>
+        </p>
+
+        <form th:action="@{/tienda/carrito/agregar}" method="post" class="ui form"
+              th:if="${producto.stock != null and producto.stock > 0}">
+            <input type="hidden" name="productoId" th:value="${producto.id}">
+            <div class="fields" style="align-items: flex-end;">
+                <div class="six wide field">
+                    <label>Cantidad</label>
+                    <input type="number" name="cantidad" min="1" th:max="${producto.stock}" value="1">
+                </div>
+                <div class="ten wide field">
+                    <button type="submit" class="ui primary fluid button">
+                        <i class="cart plus icon"></i> Agregar al carrito
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

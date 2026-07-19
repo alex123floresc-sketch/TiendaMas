@@ -15,6 +15,9 @@ public class Producto {
     private Double precio;
     private Integer stock;
 
+    @Column(unique = true)
+    private String codigoBarras;
+
     @ManyToOne
     @JoinColumn(name = "categoria_id", nullable = false)
     private Categoria categoria;
@@ -47,4 +50,7 @@ public class Producto {
 
     public Categoria getCategoria() { return categoria; }
     public void setCategoria(Categoria categoria) { this.categoria = categoria; }
+
+    public String getCodigoBarras() { return codigoBarras; }
+    public void setCodigoBarras(String codigoBarras) { this.codigoBarras = codigoBarras; }
 }

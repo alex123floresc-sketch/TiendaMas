@@ -2,9 +2,12 @@ package episs.unaj.com.crudpersona.entity;
 
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
 
 @Entity
 public class Persona {
@@ -17,6 +20,14 @@ public class Persona {
     private String telefono;
     private String direccion;
 
+    @Enumerated(EnumType.STRING)
+    private TipoDocumento tipoDocumento;
+
+    private String numeroDocumento;
+
+    /** Solo aplica cuando tipoDocumento = RUC (para emitir factura). */
+    private String razonSocial;
+
     public Persona() {
     }
     public Persona(String nombre, String apellido, String email, String telefono, String direccion) {
@@ -25,6 +36,13 @@ public class Persona {
         this.email = email;
         this.telefono = telefono;
         this.direccion = direccion;
+    }
+
+    public Persona(String nombre, String apellido, String email, String telefono, String direccion,
+                    TipoDocumento tipoDocumento, String numeroDocumento) {
+        this(nombre, apellido, email, telefono, direccion);
+        this.tipoDocumento = tipoDocumento;
+        this.numeroDocumento = numeroDocumento;
     }
 
     public Long getId() {
@@ -74,6 +92,21 @@ public class Persona {
     public void setDireccion(String direccion) {
         this.direccion = direccion;
     }
+
+    public TipoDocumento getTipoDocumento() { return tipoDocumento; }
+    public void setTipoDocumento(TipoDocumento tipoDocumento) { this.tipoDocumento = tipoDocumento; }
+
+    public String getNumeroDocumento() { return numeroDocumento; }
+    public void setNumeroDocumento(String numeroDocumento) { this.numeroDocumento = numeroDocumento; }
+
+    public String getRazonSocial() { return razonSocial; }
+    public void setRazonSocial(String razonSocial) { this.razonSocial = razonSocial; }
+
+    @Transient
+    public TipoComprobante getTipoComprobanteSugerido() {
+        return tipoDocumento == TipoDocumento.RUC ? TipoComprobante.FACTURA : TipoComprobante.BOLETA;
+    }
+
     @Override
     public String toString() {
         return "Persona{" + "id=" + id + ", nombre='" + nombre + '\'' + ", apellido='" + apellido + '\'' + ", email='" + email + '\'' + ", telefono='" + telefono + '\'' + ", direccion='" + direccion + '\'' + '}';

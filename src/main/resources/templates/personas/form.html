@@ -62,6 +62,29 @@
 
             <div class="ui divider"></div>
 
+            <h4 class="ui header">Datos para boleta / factura</h4>
+            <div class="two fields">
+                <div class="field required">
+                    <label for="tipoDocumento">Tipo de documento</label>
+                    <select id="tipoDocumento" th:field="*{tipoDocumento}" class="ui fluid dropdown" required>
+                        <option value="">-- Selecciona --</option>
+                        <option value="DNI">DNI (Boleta)</option>
+                        <option value="RUC">RUC (Factura)</option>
+                    </select>
+                </div>
+                <div class="field required">
+                    <label for="numeroDocumento">Número de documento</label>
+                    <input type="text" id="numeroDocumento" th:field="*{numeroDocumento}" placeholder="Ej. 12345678" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="razonSocial">Razón social (solo si es RUC)</label>
+                <input type="text" id="razonSocial" th:field="*{razonSocial}" placeholder="Ej. Comercial Los Andes S.A.C.">
+            </div>
+
+            <div class="ui divider"></div>
+
             <div class="form-actions">
                 <button type="submit" class="ui positive button">
                     <i class="save icon"></i> Guardar

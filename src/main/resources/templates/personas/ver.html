@@ -36,6 +36,14 @@
             <span class="label">Dirección:</span>
             <span th:text="${persona.direccion}"></span>
         </div>
+        <div class="detail-row">
+            <span class="label">Documento:</span>
+            <span th:text="${persona.tipoDocumento} + ' ' + ${persona.numeroDocumento}"></span>
+        </div>
+        <div class="detail-row" th:if="${persona.razonSocial != null and !persona.razonSocial.isEmpty()}">
+            <span class="label">Razón social:</span>
+            <span th:text="${persona.razonSocial}"></span>
+        </div>
     </div>
 
     <div class="form-actions">

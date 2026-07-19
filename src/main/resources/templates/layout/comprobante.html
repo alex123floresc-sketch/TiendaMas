@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${titulo != null} ? ${titulo} + ' · TiendaMas' : 'Comprobante · TiendaMas'"></title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css">
+  <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body class="comprobante-body">
+
+<div class="comprobante-topbar">
+  <a th:href="${volverUrl != null} ? ${volverUrl} : '/'" class="ui button">
+    <i class="arrow left icon"></i> Volver
+  </a>
+  <button type="button" class="ui button" onclick="window.print()">
+    <i class="print icon"></i> Imprimir
+  </button>
+</div>
+
+<div class="comprobante-content">
+  <div th:insert="~{this :: content}"></div>
+</div>
+
+</body>
+</html>

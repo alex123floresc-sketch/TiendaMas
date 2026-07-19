@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/tienda}">
+<body>
+<div th:fragment="content" style="max-width: 700px; margin: 0 auto;">
+
+    <h1 class="ui dividing header"><i class="credit card icon"></i> Finalizar compra</h1>
+
+    <div class="ui segment">
+        <h3 class="ui header">Resumen del pedido</h3>
+        <table class="ui celled table">
+            <tbody>
+            <tr th:each="item : ${carrito.items}">
+                <td th:text="${item.nombre}"></td>
+                <td th:text="${item.cantidad} + ' x S/ ' + ${item.precioUnitario}"></td>
+                <td class="right aligned" th:text="'S/ ' + ${#numbers.formatDecimal(item.subtotal, 1, 2)}"></td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <th colspan="2" style="text-align:right;">Total:</th>
+                <th class="right aligned" style="color:#21ba45;"
+                    th:text="'S/ ' + ${#numbers.formatDecimal(carrito.total, 1, 2)}"></th>
+            </tr>
+            </tfoot>
+        </table>
+
+        <h3 class="ui header">Comprobante a nombre de</h3>
+        <p>
+            <strong th:text="${persona.nombre + ' ' + persona.apellido}"></strong><br>
+            <span th:text="${persona.tipoDocumento} + ' ' + ${persona.numeroDocumento}"></span><br>
+            <span th:text="${persona.direccion}"></span>
+        </p>
+        <a th:href="@{/tienda/perfil}" class="ui small button">Editar mis datos</a>
+
+        <div class="ui divider"></div>
+
+        <form th:action="@{/tienda/checkout}" method="post" class="ui form">
+            <div class="field required">
+                <label>Método de pago</label>
+                <select name="metodoPago" class="ui fluid dropdown" required>
+                    <option value="EFECTIVO">Efectivo (contra entrega)</option>
+                    <option value="TARJETA">Tarjeta de crédito/débito</option>
+                    <option value="YAPE_PLIN">Yape / Plin</option>
+                    <option value="TRANSFERENCIA">Transferencia bancaria</option>
+                </select>
+            </div>
+
+            <button type="submit" class="ui positive big fluid button">
+                <i class="check circle icon"></i> Confirmar pedido
+            </button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

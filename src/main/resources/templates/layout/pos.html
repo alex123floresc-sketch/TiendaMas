@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${titulo != null} ? ${titulo} + ' · TiendaMas POS' : 'TiendaMas · Punto de Venta'"></title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css">
+  <link rel="stylesheet" th:href="@{/css/estilos.css}">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.js"></script>
+</head>
+<body class="pos-body">
+
+<div class="pos-topbar">
+  <div class="pos-brand"><i class="cash register icon"></i> TiendaMas <span>POS</span></div>
+  <div class="pos-topbar-actions">
+    <span class="pos-user" th:if="${usuarioAutenticado}">
+      <i class="user icon"></i> <span th:text="${usuarioAutenticado}"></span>
+    </span>
+    <a th:href="@{/pos}" class="ui small button"><i class="cash register icon"></i> Vender</a>
+    <a th:href="@{/pos/ventas}" class="ui small button"><i class="list icon"></i> Mis ventas</a>
+    <a th:href="@{/logout}" class="ui small red button"><i class="sign out alternate icon"></i> Salir</a>
+  </div>
+</div>
+
+<div class="pos-content">
+  <div th:insert="~{this :: content}"></div>
+</div>
+
+</body>
+</html>

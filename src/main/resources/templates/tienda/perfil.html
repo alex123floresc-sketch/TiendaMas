@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/tienda}">
+<body>
+<div th:fragment="content" style="max-width: 700px; margin: 0 auto;">
+
+    <h1 class="ui dividing header"><i class="user icon"></i> Mi Perfil</h1>
+
+    <div class="ui info message">
+        <p>Completa tus datos de contacto y documento para poder emitir tu boleta o factura.</p>
+    </div>
+
+    <div class="ui segment">
+        <form th:action="@{/tienda/perfil}" th:object="${persona}" method="POST" class="ui form">
+
+            <div class="two fields">
+                <div class="field required">
+                    <label>Nombre</label>
+                    <input type="text" th:field="*{nombre}" required>
+                </div>
+                <div class="field required">
+                    <label>Apellido</label>
+                    <input type="text" th:field="*{apellido}" required>
+                </div>
+            </div>
+
+            <div class="field required">
+                <label>Email</label>
+                <input type="email" th:field="*{email}" required>
+            </div>
+
+            <div class="two fields">
+                <div class="field">
+                    <label>Teléfono</label>
+                    <input type="tel" th:field="*{telefono}">
+                </div>
+                <div class="field required">
+                    <label>Dirección de entrega</label>
+                    <input type="text" th:field="*{direccion}" required>
+                </div>
+            </div>
+
+            <div class="ui divider"></div>
+            <h4 class="ui header">Datos para boleta / factura</h4>
+
+            <div class="two fields">
+                <div class="field required">
+                    <label>Tipo de documento</label>
+                    <select th:field="*{tipoDocumento}" class="ui fluid dropdown" required>
+                        <option value="">-- Selecciona --</option>
+                        <option value="DNI">DNI (Boleta)</option>
+                        <option value="RUC">RUC (Factura)</option>
+                    </select>
+                </div>
+                <div class="field required">
+                    <label>Número de documento</label>
+                    <input type="text" th:field="*{numeroDocumento}" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Razón social (solo si es RUC)</label>
+                <input type="text" th:field="*{razonSocial}">
+            </div>
+
+            <div class="ui divider"></div>
+
+            <div class="form-actions">
+                <button type="submit" class="ui positive button">
+                    <i class="save icon"></i> Guardar datos
+                </button>
+                <a th:href="@{/tienda}" class="ui button">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

@@ -1,30 +1,39 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/comprobante}">
 <body>
-<div th:fragment="content" style="max-width: 1000px; margin: 0 auto;">
+<div th:fragment="content" style="max-width: 800px; margin: 0 auto;">
 
-    <h1 class="ui dividing header">
-        <i class="clipboard list icon"></i>
-        <div class="content">
-            Detalle del Pedido #<span th:text="${pedido.id}"></span>
-            <div class="sub header">Información detallada y resumen de productos.</div>
+    <div class="comprobante-header">
+        <div>
+            <div class="comprobante-tipo" th:text="${pedido.tipoComprobante} != null ? ${pedido.tipoComprobante} + ' DE VENTA ELECTRÓNICA' : 'COMPROBANTE DE VENTA'"></div>
+            <div class="comprobante-numero" th:text="${pedido.numeroCompleto}"></div>
         </div>
-    </h1>
+        <div class="comprobante-meta">
+            <div><strong>Fecha:</strong> <span th:text="${pedido.fechaTexto}"></span></div>
+            <div><strong>Canal:</strong> <span th:text="${pedido.canal}"></span></div>
+            <div><strong>Método de pago:</strong> <span th:text="${pedido.metodoPago}"></span></div>
+            <div th:if="${pedido.vendedorUsername != null}"><strong>Atendido por:</strong> <span th:text="${pedido.vendedorUsername}"></span></div>
+        </div>
+    </div>
 
     <div class="ui segment" style="margin-bottom: 30px;">
-        <h3 class="ui header"><i class="user icon"></i>Información del Cliente</h3>
+        <h3 class="ui header"><i class="user icon"></i>Datos del cliente</h3>
         <div class="ui list">
             <div class="item">
                 <div class="header">Cliente:</div>
                 <span th:text="${pedido.persona.nombre + ' ' + pedido.persona.apellido}"></span>
             </div>
+            <div class="item" th:if="${pedido.persona.razonSocial != null and !pedido.persona.razonSocial.isEmpty()}">
+                <div class="header">Razón social:</div>
+                <span th:text="${pedido.persona.razonSocial}"></span>
+            </div>
+            <div class="item">
+                <div class="header">Documento:</div>
+                <span th:text="${pedido.persona.tipoDocumento} + ' ' + ${pedido.persona.numeroDocumento}"></span>
+            </div>
             <div class="item">
                 <div class="header">Email:</div>
                 <span th:text="${pedido.persona.email}"></span>
-            </div>
-            <div class="item">
-                <div class="header">Fecha:</div>
-                <span th:text="${pedido.fechaTexto}"></span>
             </div>
         </div>
     </div>
@@ -42,25 +51,18 @@
         <tbody>
         <tr th:each="det : ${pedido.detalles}">
             <td th:text="${det.producto.nombre}" style="font-weight: bold;"></td>
-            <td th:text="'$' + ${det.precioUnitario}"></td>
+            <td th:text="'S/ ' + ${det.precioUnitario}"></td>
             <td th:text="${det.cantidad}"></td>
-            <td th:text="'$' + ${det.subtotal}"></td>
+            <td th:text="'S/ ' + ${det.subtotal}"></td>
         </tr>
         </tbody>
         <tfoot>
         <tr>
             <th colspan="3" style="text-align:right;">TOTAL:</th>
-            <th style="color: #21ba45; font-size: 1.2em;" th:text="'$' + ${pedido.total}"></th>
+            <th style="color: #21ba45; font-size: 1.2em;" th:text="'S/ ' + ${pedido.total}"></th>
         </tr>
         </tfoot>
     </table>
-
-    <div style="margin-top: 20px;">
-        <a href="/pedidos" class="ui secondary button">
-            <i class="arrow left icon"></i> Volver al listado
-        </a>
-    </div>
-
 </div>
 </body>
 </html>

@@ -21,6 +21,11 @@ public class ProductoService {
         return productoRepository.findById(id).orElse(null);
     }
 
+    public Producto obtenerPorCodigoBarras(String codigoBarras) {
+        if (codigoBarras == null || codigoBarras.isBlank()) return null;
+        return productoRepository.findByCodigoBarras(codigoBarras.trim()).orElse(null);
+    }
+
     public Producto guardar(Producto producto) {
         return productoRepository.save(producto);
     }

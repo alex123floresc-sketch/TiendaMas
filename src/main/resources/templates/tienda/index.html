@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/tienda}">
+<body>
+<div th:fragment="content">
+
+    <div class="tienda-hero">
+        <h1>Bienvenido a TiendaMas</h1>
+        <p>Encuentra los mejores productos al mejor precio, con envío y recojo en tienda.</p>
+    </div>
+
+    <div class="tienda-filtros">
+        <a th:href="@{/tienda}" class="ui label" th:classappend="${categoriaSeleccionada == null} ? 'blue'">Todas</a>
+        <a th:each="cat : ${categorias}" th:href="@{/tienda(categoriaId=${cat.id})}"
+           class="ui label"
+           th:classappend="${categoriaSeleccionada != null and categoriaSeleccionada == cat.id} ? 'blue'"
+           th:text="${cat.nombre}"></a>
+    </div>
+
+    <div class="ui icon warning message" th:if="${productos.isEmpty()}">
+        <i class="info circle icon"></i>
+        <div class="content">No hay productos disponibles en esta categoría por ahora.</div>
+    </div>
+
+    <div class="tienda-grid">
+        <div class="tienda-card" th:each="p : ${productos}">
+            <a th:href="@{/tienda/productos/{id}(id=${p.id})}" class="tienda-card-link">
+                <div class="tienda-card-img"><i class="box icon huge"></i></div>
+                <div class="tienda-card-body">
+                    <div class="tienda-card-cat" th:text="${p.categoria != null ? p.categoria.nombre : ''}"></div>
+                    <div class="tienda-card-nombre" th:text="${p.nombre}"></div>
+                    <div class="tienda-card-precio" th:text="'S/ ' + ${p.precio}"></div>
+                </div>
+            </a>
+            <form th:action="@{/tienda/carrito/agregar}" method="post">
+                <input type="hidden" name="productoId" th:value="${p.id}">
+                <input type="hidden" name="cantidad" value="1">
+                <button type="submit" class="ui fluid primary button" th:disabled="${p.stock == null or p.stock <= 0}">
+                    <i class="cart plus icon"></i>
+                    <span th:text="${p.stock != null and p.stock > 0} ? 'Agregar al carrito' : 'Sin stock'"></span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

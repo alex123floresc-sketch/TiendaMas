@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${titulo != null} ? ${titulo} + ' · TiendaMas' : 'TiendaMas'"></title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css">
+  <link rel="stylesheet" th:href="@{/css/estilos.css}">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.js"></script>
+</head>
+<body class="tienda-body">
+
+<nav class="tienda-navbar">
+  <a th:href="@{/tienda}" class="tienda-brand"><i class="shop icon"></i> TiendaMas</a>
+
+  <button type="button" class="tienda-nav-toggle" onclick="document.querySelector('.tienda-nav-links').classList.toggle('open')">
+    <i class="bars icon"></i>
+  </button>
+
+  <div class="tienda-nav-links">
+    <a th:href="@{/tienda}" class="item" th:classappend="${currentUri == '/tienda'} ? 'active'">Catálogo</a>
+    <a th:href="@{/tienda/pedidos}" class="item" th:if="${esCliente}"
+       th:classappend="${currentUri != null and currentUri.startsWith('/tienda/pedidos')} ? 'active'">Mis pedidos</a>
+    <a th:href="@{/tienda/carrito}" class="item tienda-cart-link">
+      <i class="shopping cart icon"></i> Carrito
+      <span class="tienda-cart-badge" th:if="${carritoCount != null and carritoCount > 0}" th:text="${carritoCount}"></span>
+    </a>
+    <a th:href="@{/login}" class="item" th:unless="${usuarioAutenticado}">Ingresar</a>
+    <a th:href="@{/registro}" class="item" th:unless="${usuarioAutenticado}">Crear cuenta</a>
+    <a th:href="@{/tienda/perfil}" class="item" th:if="${esCliente}">
+      <i class="user icon"></i> <span th:text="${usuarioAutenticado}"></span>
+    </a>
+    <a th:href="@{/logout}" class="item" th:if="${usuarioAutenticado}"><i class="sign out alternate icon"></i> Salir</a>
+  </div>
+</nav>
+
+<div class="tienda-content">
+  <div th:insert="~{this :: content}"></div>
+</div>
+
+<footer class="tienda-footer">
+  &copy; 2026 TiendaMas — Facultad de Ingeniería de Sistemas - UNAJ
+</footer>
+
+</body>
+</html>

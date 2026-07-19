@@ -1,33 +1,54 @@
 package episs.unaj.com.crudpersona.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+    @Autowired
+    private RoleBasedAuthSuccessHandler roleBasedAuthSuccessHandler;
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        // Permitir acceso a carpetas de estilos estáticos sin loguearse
-                        .requestMatchers("/css/**", "/js/**").permitAll()
-                        // Cualquier otra vista (personas, productos, categorías) requerirá Login
+                        // Recursos públicos y páginas de acceso
+                        .requestMatchers("/css/**", "/js/**", "/login", "/registro").permitAll()
+
+                        // Tienda en línea: checkout, perfil y "mis pedidos" son solo del cliente autenticado;
+                        // el resto (catálogo y carrito) es público, como en cualquier tienda grande.
+                        .requestMatchers("/tienda/checkout/**", "/tienda/pedidos/**", "/tienda/perfil/**").hasRole("CLIENTE")
+                        .requestMatchers("/tienda/**").permitAll()
+
+                        // Punto de venta: solo vendedores (y administradores, para soporte).
+                        .requestMatchers("/pos/**").hasAnyRole("VENDEDOR", "ADMIN")
+
+                        // Panel administrativo.
+                        .requestMatchers("/personas/**", "/categorias/**", "/productos/**", "/reportes/**").hasRole("ADMIN")
+                        .requestMatchers("/pedidos", "/pedidos/nuevo", "/pedidos/*/eliminar").hasRole("ADMIN")
+
+                        // Ver un comprobante puntual: cualquier autenticado; el controlador valida propiedad.
+                        .requestMatchers("/pedidos/**").authenticated()
+
                         .anyRequest().authenticated()
                 )
-                // Modifica este bloque dentro de tu securityFilterChain
                 .formLogin(form -> form
-                        .loginPage("/login")               // ⬅️ Especifica nuestra vista personalizada
-                        .defaultSuccessUrl("/", true)      // Redirección al entrar con éxito
-                        .failureUrl("/login?error=true")   // ⬅️ Si se equivoca, recarga con un parámetro de error
+                        .loginPage("/login")
+                        .successHandler(roleBasedAuthSuccessHandler)
+                        .failureUrl("/login?error=true")
                         .permitAll()
                 )
                 .logout(logout -> logout
@@ -36,17 +57,5 @@ public class SecurityConfig {
                 );
 
         return http.build();
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService() {
-        // Usuario administrador temporal en memoria para desarrollo rápido
-        UserDetails admin = User.builder()
-                .username("admin")
-                .password("{noop}admin123") // "{noop}" indica que no requiere encriptación BCrypt aún
-                .roles("ADMIN")
-                .build();
-
-        return new InMemoryUserDetailsManager(admin);
     }
 }

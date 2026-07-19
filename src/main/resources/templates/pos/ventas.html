@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/pos}">
+<body>
+<div th:fragment="content">
+
+    <h1 class="ui dividing header">
+        <i class="list icon"></i>
+        <div class="content">
+            Ventas en tienda física
+            <div class="sub header">Historial de comprobantes emitidos desde el punto de venta.</div>
+        </div>
+    </h1>
+
+    <div th:if="${pedidos.isEmpty()}" class="ui icon warning message">
+        <i class="info circle icon"></i>
+        <div class="content">
+            <div class="header">Sin ventas todavía</div>
+            <p>Cuando cobres una venta en el POS, aparecerá aquí.</p>
+        </div>
+    </div>
+
+    <table class="ui celled striped table" th:unless="${pedidos.isEmpty()}">
+        <thead>
+        <tr>
+            <th>Comprobante</th>
+            <th>Cliente</th>
+            <th>Fecha</th>
+            <th>Método de pago</th>
+            <th>Total</th>
+            <th class="center aligned">Ver</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="pedido : ${pedidos}">
+            <td th:text="${pedido.tipoComprobante} + ' ' + ${pedido.numeroCompleto}" style="font-weight:bold;"></td>
+            <td th:text="${pedido.persona.nombre + ' ' + pedido.persona.apellido}"></td>
+            <td th:text="${pedido.fechaTexto}"></td>
+            <td th:text="${pedido.metodoPago}"></td>
+            <td th:text="'S/ ' + ${pedido.total}" style="color:#21ba45; font-weight:bold;"></td>
+            <td class="center aligned">
+                <a th:href="@{/pedidos/{id}(id=${pedido.id})}" class="ui info button"><i class="eye icon"></i></a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
