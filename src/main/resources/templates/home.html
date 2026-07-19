@@ -1,35 +1,23 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Inicio - Sistema de Ventas</title>
-    <link rel="stylesheet" href="/css/estilos.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css">
-</head>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base}">
 <body>
+<div th:fragment="content">
+    <h1 class="ui header">
+        <i class="home icon"></i>
+        <div class="content">Bienvenido al Sistema de Ventas</div>
+    </h1>
 
-<div class="wrapper">
-    <div th:replace="~{layout/fragments :: menu}"></div>
-
-    <div class="content">
-        <div class="container">
-            <h1 class="ui header">
-                <i class="home icon"></i>
-                <div class="content">Bienvenido al Sistema de Ventas</div>
-            </h1>
-
-            <div class="ui segment">
-                <h2>¿Por dónde empezamos?</h2>
-                <p>Selecciona una opción del menú lateral para gestionar:</p>
-                <div class="ui bulleted list">
-                    <div class="item"><strong>Personas:</strong> Gestiona la información de clientes.</div>
-                    <div class="item"><strong>Productos:</strong> Administra tu catálogo de productos.</div>
-                    <div class="item"><strong>Reportes:</strong> Visualiza tus estadísticas de ventas.</div>
-                </div>
-            </div>
+    <div class="ui segment">
+        <h2>¿Por dónde empezamos?</h2>
+        <p>Selecciona una opción del menú lateral para gestionar:</p>
+        <div class="ui bulleted list">
+            <div class="item"><strong>Personas:</strong> Gestiona la información de clientes.</div>
+            <div class="item"><strong>Categorías:</strong> Organiza tu catálogo por familias de productos.</div>
+            <div class="item"><strong>Productos:</strong> Administra tu catálogo, precios y existencias.</div>
+            <div class="item"><strong>Pedidos:</strong> Registra las ventas realizadas a tus clientes.</div>
+            <div class="item"><strong>Reportes:</strong> Visualiza tus estadísticas de ventas.</div>
         </div>
     </div>
 </div>
-
 </body>
 </html>

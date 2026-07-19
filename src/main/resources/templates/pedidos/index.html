@@ -1,77 +1,71 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gestión de Pedidos</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css">
-</head>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base}">
 <body>
-<div class="wrapper" style="display: flex; background-color: #f4f7f6; min-height: 100vh;">
+<div th:fragment="content">
 
-  <div th:replace="~{layout/fragments :: menu}"></div>
-
-  <div class="content" style="flex: 1; padding: 40px; box-sizing: border-box;">
-    <div class="container" style="max-width: 1200px; margin: 0 auto;">
-
-      <h1 class="ui dividing header" style="color: #2c3e50; margin-bottom: 20px;">
+    <h1 class="ui dividing header">
         <i class="shopping cart icon"></i>
         <div class="content">
-          Gestión de Pedidos
-          <div class="sub header">Administra el registro de pedidos realizados en el sistema.</div>
+            Gestión de Pedidos
+            <div class="sub header">Administra el registro de pedidos realizados en el sistema.</div>
         </div>
-      </h1>
+    </h1>
 
-      <div style="margin-bottom: 25px;">
+    <div style="margin-bottom: 25px;">
         <a href="/pedidos/nuevo" class="ui primary button">
-          <i class="plus icon"></i> Nuevo Pedido
+            <i class="plus icon"></i> Nuevo Pedido
         </a>
-      </div>
+    </div>
 
-      <div th:if="${pedidos.isEmpty()}" class="ui icon warning message">
+    <div class="ui negative message" th:if="${param.error}">
+        <div class="header">No se puede eliminar</div>
+        <p>Ocurrió un problema al eliminar este pedido. Inténtalo nuevamente.</p>
+    </div>
+
+    <div th:if="${pedidos.isEmpty()}" class="ui icon warning message">
         <i class="info circle icon"></i>
         <div class="content">
-          <div class="header">Base de datos vacía</div>
-          <p>No hay pedidos registrados en el sistema actualmente.</p>
+            <div class="header">Base de datos vacía</div>
+            <p>No hay pedidos registrados en el sistema actualmente.</p>
         </div>
-      </div>
+    </div>
 
-      <table class="ui celled striped table" th:unless="${pedidos.isEmpty()}">
+    <table class="ui celled striped table" th:unless="${pedidos.isEmpty()}">
         <thead>
         <tr>
-          <th>ID</th>
-          <th>Cliente</th>
-          <th>Fecha</th>
-          <th>Items</th>
-          <th>Total</th>
-          <th class="center aligned">Acciones</th>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Fecha</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th class="center aligned">Acciones</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="pedido : ${pedidos}">
-          <td th:text="${pedido.id}"></td>
-          <td th:text="${pedido.persona.nombre + ' ' + pedido.persona.apellido}" style="font-weight: bold;"></td>
-          <td th:text="${pedido.fechaTexto}"></td>
-          <td>
-            <div class="ui label" th:text="${pedido.detalles.size()}"></div>
-          </td>
-          <td th:text="'$' + ${pedido.total}" style="color: #21ba45; font-weight: bold;"></td>
-          <td class="center aligned">
-            <div class="ui small buttons">
-              <a th:href="@{/pedidos/{id}(id=${pedido.id})}" class="ui info button" title="Ver">
-                <i class="eye icon"></i>
-              </a>
-              <a th:href="@{/pedidos/{id}/eliminar(id=${pedido.id})}" class="ui red button"
-                 th:onclick="return confirm('¿Está seguro de eliminar este pedido?')" title="Eliminar">
-                <i class="trash icon"></i>
-              </a>
-            </div>
-          </td>
+            <td th:text="${pedido.id}"></td>
+            <td th:text="${pedido.persona.nombre + ' ' + pedido.persona.apellido}" style="font-weight: bold;"></td>
+            <td th:text="${pedido.fechaTexto}"></td>
+            <td>
+                <div class="ui label" th:text="${pedido.detalles.size()}"></div>
+            </td>
+            <td th:text="'$' + ${pedido.total}" style="color: #21ba45; font-weight: bold;"></td>
+            <td class="center aligned">
+                <div class="ui small buttons">
+                    <a th:href="@{/pedidos/{id}(id=${pedido.id})}" class="ui info button" title="Ver">
+                        <i class="eye icon"></i>
+                    </a>
+                    <form th:action="@{/pedidos/{id}/eliminar(id=${pedido.id})}" method="post"
+                          style="display:contents" th:onsubmit="return confirm('¿Está seguro de eliminar este pedido?')">
+                        <button type="submit" class="ui red button" title="Eliminar">
+                            <i class="trash icon"></i>
+                        </button>
+                    </form>
+                </div>
+            </td>
         </tr>
         </tbody>
-      </table>
-    </div>
-  </div>
+    </table>
 </div>
 </body>
 </html>

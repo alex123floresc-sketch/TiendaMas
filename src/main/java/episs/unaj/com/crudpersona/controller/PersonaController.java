@@ -3,6 +3,7 @@ package episs.unaj.com.crudpersona.controller;
 import episs.unaj.com.crudpersona.entity.Persona;
 import episs.unaj.com.crudpersona.service.PersonaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,38 +28,57 @@ public class PersonaController {
             lista = new java.util.ArrayList<>();
         }
         model.addAttribute("personas", lista);
-        return "personas/index"; // Busca en templates/personas/index.html
+        model.addAttribute("titulo", "Personas");
+        return "personas/index";
     }
 
-    // 2. MOSTRAR FORMULARIO DE NUEVA PERSONA (¡Esto arregla el error 404!)
+    // 2. MOSTRAR FORMULARIO DE NUEVA PERSONA
     @GetMapping("/nuevo")
     public String mostrarFormularioCrear(Model model) {
         model.addAttribute("persona", new Persona());
-        return "personas/form"; // Busca en templates/personas/form.html
+        model.addAttribute("titulo", "Nueva Persona");
+        return "personas/form";
     }
 
     // 3. GUARDAR PERSONA (CREAR O ACTUALIZAR)
     @PostMapping
     public String guardar(Persona persona) {
-        personaService.guardar(persona); // Asegúrate de que tu servicio tenga el método guardar
+        personaService.guardar(persona);
         return "redirect:/personas";
     }
 
-    // 4. MOSTRAR FORMULARIO DE EDICIÓN
+    // 4. VER DETALLE DE UNA PERSONA
+    @GetMapping("/{id}")
+    public String ver(@PathVariable("id") Long id, Model model) {
+        Persona persona = personaService.obtenerPorId(id);
+        if (persona == null) {
+            return "redirect:/personas";
+        }
+        model.addAttribute("persona", persona);
+        model.addAttribute("titulo", "Detalle de Persona");
+        return "personas/ver";
+    }
+
+    // 5. MOSTRAR FORMULARIO DE EDICIÓN
     @GetMapping("/{id}/editar")
     public String mostrarFormularioEditar(@PathVariable("id") Long id, Model model) {
-        Persona persona = personaService.obtenerPorId(id); // Asegúrate de que tu servicio tenga este método
+        Persona persona = personaService.obtenerPorId(id);
         if (persona != null) {
             model.addAttribute("persona", persona);
+            model.addAttribute("titulo", "Editar Persona");
             return "personas/form";
         }
         return "redirect:/personas";
     }
 
-    // 5. ELIMINAR PERSONA
-    @GetMapping("/{id}/eliminar")
+    // 6. ELIMINAR PERSONA (POST para evitar borrados accidentales vía GET/CSRF)
+    @PostMapping("/{id}/eliminar")
     public String eliminar(@PathVariable("id") Long id) {
-        personaService.eliminar(id); // Asegúrate de que tu servicio tenga el método eliminar
+        try {
+            personaService.eliminar(id);
+        } catch (DataIntegrityViolationException e) {
+            return "redirect:/personas?error=conRelaciones";
+        }
         return "redirect:/personas";
     }
 }

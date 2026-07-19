@@ -1,14 +1,15 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalles Persona</title>
-    <link rel="stylesheet" href="/css/estilos.css">
-</head>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base}">
 <body>
-<div class="container">
-    <h1>Detalles de Persona</h1>
+<div th:fragment="content" style="max-width: 700px; margin: 0 auto;">
+
+    <h1 class="ui dividing header">
+        <i class="user icon"></i>
+        <div class="content">
+            Detalles de Persona
+            <div class="sub header">Información completa del cliente registrado.</div>
+        </div>
+    </h1>
 
     <div class="details-card">
         <div class="detail-row">
@@ -38,10 +39,14 @@
     </div>
 
     <div class="form-actions">
-        <a th:href="@{/personas/{id}/editar(id=${persona.id})}"
-           class="btn btn-warning">Editar</a>
-        <a href="/personas" class="btn btn-secondary">Volver</a>
+        <a th:href="@{/personas/{id}/editar(id=${persona.id})}" class="ui yellow button">
+            <i class="edit icon"></i> Editar
+        </a>
+        <a href="/personas" class="ui button">
+            <i class="arrow left icon"></i> Volver
+        </a>
     </div>
 </div>
+
 </body>
 </html>

@@ -1,79 +1,66 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalle del Pedido</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css">
-</head>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base}">
 <body>
-<div class="wrapper" style="display: flex; background-color: #f4f7f6; min-height: 100vh;">
+<div th:fragment="content" style="max-width: 1000px; margin: 0 auto;">
 
-    <div th:replace="~{layout/fragments :: menu}"></div>
+    <h1 class="ui dividing header">
+        <i class="clipboard list icon"></i>
+        <div class="content">
+            Detalle del Pedido #<span th:text="${pedido.id}"></span>
+            <div class="sub header">Información detallada y resumen de productos.</div>
+        </div>
+    </h1>
 
-    <div class="content" style="flex: 1; padding: 40px; box-sizing: border-box;">
-        <div class="container" style="max-width: 1000px; margin: 0 auto;">
-
-            <h1 class="ui dividing header" style="color: #2c3e50; margin-bottom: 20px;">
-                <i class="clipboard list icon"></i>
-                <div class="content">
-                    Detalle del Pedido #<span th:text="${pedido.id}"></span>
-                    <div class="sub header">Información detallada y resumen de productos.</div>
-                </div>
-            </h1>
-
-            <div class="ui segment" style="margin-bottom: 30px;">
-                <h3 class="ui header"><i class="user icon"></i>Información del Cliente</h3>
-                <div class="ui list">
-                    <div class="item">
-                        <div class="header">Cliente:</div>
-                        <span th:text="${pedido.persona.nombre + ' ' + pedido.persona.apellido}"></span>
-                    </div>
-                    <div class="item">
-                        <div class="header">Email:</div>
-                        <span th:text="${pedido.persona.email}"></span>
-                    </div>
-                    <div class="item">
-                        <div class="header">Fecha:</div>
-                        <span th:text="${pedido.fechaTexto}"></span>
-                    </div>
-                </div>
+    <div class="ui segment" style="margin-bottom: 30px;">
+        <h3 class="ui header"><i class="user icon"></i>Información del Cliente</h3>
+        <div class="ui list">
+            <div class="item">
+                <div class="header">Cliente:</div>
+                <span th:text="${pedido.persona.nombre + ' ' + pedido.persona.apellido}"></span>
             </div>
-
-            <h3 class="ui header"><i class="shopping basket icon"></i>Productos del pedido</h3>
-            <table class="ui celled striped table">
-                <thead>
-                <tr>
-                    <th>Producto</th>
-                    <th>Precio Unitario</th>
-                    <th>Cantidad</th>
-                    <th>Subtotal</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="det : ${pedido.detalles}">
-                    <td th:text="${det.producto.nombre}" style="font-weight: bold;"></td>
-                    <td th:text="'$' + ${det.precioUnitario}"></td>
-                    <td th:text="${det.cantidad}"></td>
-                    <td th:text="'$' + ${det.subtotal}"></td>
-                </tr>
-                </tbody>
-                <tfoot>
-                <tr>
-                    <th colspan="3" style="text-align:right;">TOTAL:</th>
-                    <th style="color: #21ba45; font-size: 1.2em;" th:text="'$' + ${pedido.total}"></th>
-                </tr>
-                </tfoot>
-            </table>
-
-            <div style="margin-top: 20px;">
-                <a href="/pedidos" class="ui secondary button">
-                    <i class="arrow left icon"></i> Volver al listado
-                </a>
+            <div class="item">
+                <div class="header">Email:</div>
+                <span th:text="${pedido.persona.email}"></span>
             </div>
-
+            <div class="item">
+                <div class="header">Fecha:</div>
+                <span th:text="${pedido.fechaTexto}"></span>
+            </div>
         </div>
     </div>
+
+    <h3 class="ui header"><i class="shopping basket icon"></i>Productos del pedido</h3>
+    <table class="ui celled striped table">
+        <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Precio Unitario</th>
+            <th>Cantidad</th>
+            <th>Subtotal</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="det : ${pedido.detalles}">
+            <td th:text="${det.producto.nombre}" style="font-weight: bold;"></td>
+            <td th:text="'$' + ${det.precioUnitario}"></td>
+            <td th:text="${det.cantidad}"></td>
+            <td th:text="'$' + ${det.subtotal}"></td>
+        </tr>
+        </tbody>
+        <tfoot>
+        <tr>
+            <th colspan="3" style="text-align:right;">TOTAL:</th>
+            <th style="color: #21ba45; font-size: 1.2em;" th:text="'$' + ${pedido.total}"></th>
+        </tr>
+        </tfoot>
+    </table>
+
+    <div style="margin-top: 20px;">
+        <a href="/pedidos" class="ui secondary button">
+            <i class="arrow left icon"></i> Volver al listado
+        </a>
+    </div>
+
 </div>
 </body>
 </html>

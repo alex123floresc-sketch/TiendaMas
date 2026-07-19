@@ -1,73 +1,50 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Formulario Categoría</title>
-    <!-- Mantenemos tu hoja de estilos original -->
-    <link rel="stylesheet" th:href="@{/static.css/estilos.css}">
-
-    <!-- Añadimos Semantic UI para mejorar la interfaz sin alterar la estructura -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css">
-</head>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base}">
 <body>
-<div class="wrapper" style="display: flex; background-color: #f4f7f6; min-height: 100vh;">
+<div th:fragment="content" style="max-width: 700px; margin: 0 auto;">
 
-    <!-- Tu fragmento original se mantiene exactamente igual -->
-    <div th:replace="layout/fragments :: menu"></div>
-
-    <div class="content" style="flex: 1; padding: 40px; box-sizing: border-box;">
-        <div class="container" style="max-width: 600px; margin: 0 auto;">
-
-            <!-- Encabezado Semántico Dinámico -->
-            <h1 class="ui dividing header" style="color: #2c3e50; margin-bottom: 25px;">
-                <i class="tag icon"></i>
-                <div class="content">
-                    <span th:text="${categoria.id != null} ? 'Editar Categoría' : 'Nueva Categoría'"></span>
-                    <div class="sub header">Establezca los parámetros de clasificación para los artículos comerciales.</div>
-                </div>
-            </h1>
-
-            <!-- Contenedor tipo Tarjeta (Segment) elegante -->
-            <div class="ui segment" style="box-shadow: 0 2px 4px rgba(0,0,0,0.08); padding: 30px;">
-
-                <form th:object="${categoria}"
-                      th:action="${categoria.id == null} ? @{/categorias} : @{/categorias/{id}(id=${categoria.id})}"
-                      method="POST" class="ui form">
-
-                    <!-- Campo: Nombre -->
-                    <div class="field required">
-                        <label for="nombre">Nombre:</label>
-                        <div class="ui left icon input">
-                            <i class="font icon"></i>
-                            <input type="text" id="nombre" th:field="*{nombre}" placeholder="Ej. Lácteos, Tecnología, Ropa" required>
-                        </div>
-                    </div>
-
-                    <!-- Campo: Descripción -->
-                    <div class="field">
-                        <label for="descripcion">Descripción:</label>
-                        <div class="ui left icon input">
-                            <i class="file text icon"></i>
-                            <input type="text" id="descripcion" th:field="*{descripcion}" placeholder="Detalla los productos de esta categoría">
-                        </div>
-                    </div>
-
-                    <!-- Línea divisoria interna -->
-                    <div class="ui divider" style="margin: 25px 0;"></div>
-
-                    <!-- Acciones del Formulario con colores semánticos (Teal para mantener armonía) -->
-                    <div class="form-actions">
-                        <button type="submit" class="ui teal button">
-                            <i class="save icon"></i> Guardar
-                        </button>
-                        <a href="/categorias" class="ui button">
-                            Cancelar
-                        </a>
-                    </div>
-                </form>
-
-            </div>
+    <h1 class="ui dividing header">
+        <i class="tag icon"></i>
+        <div class="content">
+            <span th:text="${categoria.id != null} ? 'Editar Categoría' : 'Nueva Categoría'"></span>
+            <div class="sub header">Establezca los parámetros de clasificación para los artículos comerciales.</div>
         </div>
+    </h1>
+
+    <div class="ui segment">
+
+        <form th:object="${categoria}"
+              th:action="${categoria.id == null} ? @{/categorias} : @{/categorias/{id}(id=${categoria.id})}"
+              method="POST" class="ui form">
+
+            <div class="field required">
+                <label for="nombre">Nombre:</label>
+                <div class="ui left icon input">
+                    <i class="font icon"></i>
+                    <input type="text" id="nombre" th:field="*{nombre}" placeholder="Ej. Lácteos, Tecnología, Ropa" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="descripcion">Descripción:</label>
+                <div class="ui left icon input">
+                    <i class="file text icon"></i>
+                    <input type="text" id="descripcion" th:field="*{descripcion}" placeholder="Detalla los productos de esta categoría">
+                </div>
+            </div>
+
+            <div class="ui divider"></div>
+
+            <div class="form-actions">
+                <button type="submit" class="ui teal button">
+                    <i class="save icon"></i> Guardar
+                </button>
+                <a href="/categorias" class="ui button">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+
     </div>
 </div>
 </body>

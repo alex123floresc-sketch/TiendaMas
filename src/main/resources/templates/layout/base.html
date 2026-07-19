@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title th:text="${titulo != null} ? ${titulo} : 'Sistema de Ventas'"></title>
-  <link rel="stylesheet" href="/css/estilos.css">
+  <title th:text="${titulo != null} ? ${titulo} + ' · TiendaMas' : 'TiendaMas · Sistema de Ventas'"></title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css">
+  <link rel="stylesheet" th:href="@{/css/estilos.css}">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.js"></script>
 </head>
 <body>
 <div class="wrapper">
-  <!-- MENÚ LATERAL -->
-  <div th:replace="layout/fragments :: menu"></div>
-  <!-- CONTENIDO PRINCIPAL -->
+  <div th:replace="~{layout/fragments :: menu}"></div>
   <div class="content">
     <div class="container">
-      <!-- AQUÍ VA EL CONTENIDO ESPECÍFICO DE CADA PÁGINA -->
       <div th:insert="~{this :: content}"></div>
     </div>
   </div>

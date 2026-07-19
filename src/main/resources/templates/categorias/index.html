@@ -1,71 +1,65 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Categorías</title>
-    <link rel="stylesheet" th:href="@{/static.css/estilos.css}">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css">
-</head>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base}">
 <body>
-<div class="wrapper" style="display: flex; background-color: #f4f7f6; min-height: 100vh;">
+<div th:fragment="content">
 
-    <div th:replace="layout/fragments :: menu"></div>
+    <h1 class="ui dividing header">
+        <i class="tags icon"></i>
+        <div class="content">
+            Gestión de Categorías
+            <div class="sub header">Agrupa tus productos por familias o tipos para organizar mejor el inventario.</div>
+        </div>
+    </h1>
 
-    <div class="content" style="flex: 1; padding: 40px; box-sizing: border-box;">
-        <div class="container" style="max-width: 1200px; margin: 0 auto;">
+    <div style="margin-bottom: 25px;">
+        <a href="/categorias/nuevo" class="ui teal button">
+            <i class="plus icon"></i> Nueva Categoría
+        </a>
+    </div>
 
-            <h1 class="ui dividing header" style="color: #2c3e50; margin-bottom: 20px;">
-                <i class="tags icon"></i>
-                <div class="content">
-                    Gestión de Categorías
-                    <div class="sub header">Agrupa tus productos por familias o tipos para organizar mejor el inventario.</div>
-                </div>
-            </h1>
+    <div class="ui negative message" th:if="${param.error}">
+        <div class="header">No se puede eliminar</div>
+        <p>Esta categoría tiene productos asociados y no puede eliminarse mientras existan.</p>
+    </div>
 
-            <div style="margin-bottom: 25px;">
-                <a href="/categorias/nuevo" class="ui teal button">
-                    <i class="plus icon"></i> Nueva Categoría
-                </a>
-            </div>
-
-            <div th:if="${categorias.isEmpty()}" class="ui icon warning message">
-                <i class="info circle icon"></i>
-                <div class="content">
-                    <div class="header">Base de datos vacía</div>
-                    <p>No hay categorías registradas en el sistema actualmente.</p>
-                </div>
-            </div>
-
-            <table class="ui celled striped table" th:unless="${categorias.isEmpty()}">
-                <thead>
-                <tr>
-                    <th class="one wide">ID</th>
-                    <th class="five wide">Nombre</th>
-                    <th class="seven wide">Descripción</th>
-                    <th class="three wide center aligned">Acciones</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="categoria : ${categorias}">
-                    <td th:text="${categoria.id}"></td>
-                    <td th:text="${categoria.nombre}" style="font-weight: bold; color: #008080;"></td>
-                    <td th:text="${categoria.descripcion}"></td>
-                    <td class="center aligned">
-                        <div class="ui small buttons">
-                            <a th:href="@{/categorias/{id}/editar(id=${categoria.id})}" class="ui yellow button" title="Editar">
-                                <i class="edit icon"></i>
-                            </a>
-                            <a th:href="@{/categorias/{id}/eliminar(id=${categoria.id})}" class="ui red button" onclick="return confirm('¿Está seguro?')" title="Eliminar">
-                                <i class="trash icon"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+    <div th:if="${categorias.isEmpty()}" class="ui icon warning message">
+        <i class="info circle icon"></i>
+        <div class="content">
+            <div class="header">Base de datos vacía</div>
+            <p>No hay categorías registradas en el sistema actualmente.</p>
         </div>
     </div>
+
+    <table class="ui celled striped table" th:unless="${categorias.isEmpty()}">
+        <thead>
+        <tr>
+            <th class="one wide">ID</th>
+            <th class="five wide">Nombre</th>
+            <th class="seven wide">Descripción</th>
+            <th class="three wide center aligned">Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="categoria : ${categorias}">
+            <td th:text="${categoria.id}"></td>
+            <td th:text="${categoria.nombre}" style="font-weight: bold;"></td>
+            <td th:text="${categoria.descripcion}"></td>
+            <td class="center aligned">
+                <div class="ui small buttons">
+                    <a th:href="@{/categorias/{id}/editar(id=${categoria.id})}" class="ui yellow button" title="Editar">
+                        <i class="edit icon"></i>
+                    </a>
+                    <form th:action="@{/categorias/{id}/eliminar(id=${categoria.id})}" method="post"
+                          style="display:contents" th:onsubmit="return confirm('¿Está seguro de eliminar esta categoría?')">
+                        <button type="submit" class="ui red button" title="Eliminar">
+                            <i class="trash icon"></i>
+                        </button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </div>
 </body>
 </html>

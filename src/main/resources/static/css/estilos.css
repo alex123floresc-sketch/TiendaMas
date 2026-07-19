@@ -1,90 +1,255 @@
+/* =========================================================
+   TiendaMas — Paleta: blanco, crema, beige, azul y azul marino
+   ========================================================= */
+
+:root {
+    --color-navy: #14315D;        /* azul marino — menú lateral, títulos */
+    --color-navy-dark: #0B2140;   /* azul marino oscuro — hover del menú */
+    --color-blue: #2E6DA4;        /* azul — acciones primarias */
+    --color-blue-light: #6FA3D2;  /* azul claro — acentos, focos */
+    --color-cream: #FBF7EE;       /* crema — fondo general */
+    --color-beige: #EFE4CE;       /* beige — superficies secundarias, hover */
+    --color-beige-dark: #DFCFA8;  /* beige oscuro — bordes, franjas */
+    --color-white: #FFFFFF;       /* blanco — tarjetas y formularios */
+    --color-text: #2C3A4B;        /* texto principal */
+    --color-text-muted: #6B7A8F;  /* texto secundario */
+}
+
 /* --- 1. RESET Y BASE --- */
 * {
-    margin: 0;
-    padding: 0;
     box-sizing: border-box;
 }
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #8EC5FF; /* Fondo general */
-    height: 100vh;
-    overflow: hidden;
+    background-color: var(--color-cream);
+    color: var(--color-text);
+    margin: 0;
+    min-height: 100vh;
 }
 
 /* --- 2. LAYOUT FLEXIBLE (Estructura de dos columnas) --- */
 .wrapper {
     display: flex;
     width: 100%;
-    height: 100vh;
+    min-height: 100vh;
+    align-items: stretch;
 }
 
-/* El menú lateral con paleta oscura y colores pastel */
-.menu-principal {
+/* Menú lateral — azul marino */
+.sidebar-menu.ui.vertical.menu {
     width: 260px !important;
-    flex-shrink: 0;
-    background-color: #002347 !important;
-    height: 100%;
-    overflow-y: auto;
+    flex: 0 0 260px;
+    border-radius: 0 !important;
+    background-color: var(--color-navy) !important;
+    box-shadow: none !important;
 }
 
-/* Contenido principal (fondo claro suave) */
+.sidebar-menu .brand-item {
+    padding: 24px 20px !important;
+    text-align: center;
+}
+
+.sidebar-menu .brand-header.ui.header {
+    color: var(--color-white) !important;
+}
+
+.sidebar-menu .brand-header .sub.header {
+    color: var(--color-beige) !important;
+}
+
+.sidebar-menu.ui.menu .item {
+    color: var(--color-cream) !important;
+}
+
+.sidebar-menu.ui.menu .item:hover,
+.sidebar-menu.ui.menu .item.active-link {
+    background-color: var(--color-navy-dark) !important;
+    color: var(--color-white) !important;
+    border-left: 4px solid var(--color-blue-light);
+}
+
+.sidebar-menu .item.logout-item {
+    margin-top: auto;
+}
+
+/* Contenido principal */
 .content {
     flex: 1;
-    overflow-y: auto;
     padding: 40px;
-    background-color: #E6F2FF;
+    background-color: var(--color-cream);
 }
 
-/* --- 3. CONTENEDOR CENTRAL (Caja blanca profesional) --- */
+/* --- 3. CONTENEDOR CENTRAL (Caja blanca) --- */
 .container {
-    background: white;
+    background: var(--color-white);
     padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 8px 20px rgba(0, 35, 71, 0.15);
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(20, 49, 93, 0.10);
     max-width: 1200px;
     margin: 0 auto;
 }
 
 /* --- 4. AJUSTES DE COLORES PARA SEMANTIC UI --- */
-.ui.sidebar.menu .item {
-    color: #E6F2FF !important;
+.ui.header,
+.ui.header .sub.header {
+    color: var(--color-navy);
+}
+.ui.header .sub.header {
+    color: var(--color-text-muted);
 }
 
-.ui.sidebar.menu .item:hover {
-    background-color: #2E93FF !important;
-    color: white !important;
+.ui.dividing.header {
+    border-bottom-color: var(--color-beige-dark);
 }
 
-.ui.header {
-    color: #002347 !important;
+.ui.divider {
+    border-top-color: var(--color-beige-dark) !important;
+}
+
+/* Botones: se remapean los colores semánticos al esquema de la tienda */
+.ui.button.primary,
+.ui.button.blue {
+    background-color: var(--color-blue) !important;
+    color: var(--color-white) !important;
+}
+.ui.button.primary:hover,
+.ui.button.blue:hover {
+    background-color: var(--color-navy) !important;
+}
+
+.ui.button.teal {
+    background-color: var(--color-navy) !important;
+    color: var(--color-white) !important;
+}
+.ui.button.teal:hover {
+    background-color: var(--color-navy-dark) !important;
+}
+
+.ui.button.yellow {
+    background-color: var(--color-beige-dark) !important;
+    color: var(--color-navy) !important;
+}
+.ui.button.yellow:hover {
+    background-color: var(--color-beige) !important;
+}
+
+.ui.button.info {
+    background-color: var(--color-blue-light) !important;
+    color: var(--color-white) !important;
+}
+
+.ui.button.positive {
+    background-color: var(--color-blue) !important;
+    color: var(--color-white) !important;
+}
+.ui.button.positive:hover {
+    background-color: var(--color-navy) !important;
+}
+
+/* El rojo se conserva deliberadamente para "Eliminar": es la
+   convención universal de acción destructiva y no debe camuflarse. */
+
+.ui.label.teal {
+    background-color: var(--color-blue) !important;
+    color: var(--color-white) !important;
+}
+
+/* Tablas */
+.ui.table thead th {
+    background: var(--color-navy) !important;
+    color: var(--color-white) !important;
+}
+.ui.striped.table > tbody > tr:nth-child(2n) {
+    background-color: var(--color-cream) !important;
+}
+.ui.celled.table td,
+.ui.celled.table th {
+    border-left-color: var(--color-beige-dark);
+}
+
+/* Mensajes */
+.ui.warning.message {
+    background-color: var(--color-beige) !important;
+    color: var(--color-navy) !important;
+    border-top: none;
+    box-shadow: 0 0 0 1px var(--color-beige-dark) inset;
+}
+.ui.info.message {
+    background-color: #EAF2F8 !important;
+    color: var(--color-navy) !important;
+    box-shadow: 0 0 0 1px var(--color-blue-light) inset;
+}
+
+/* Formularios */
+.ui.form input:focus,
+.ui.form select:focus,
+.ui.selection.dropdown:focus {
+    border-color: var(--color-blue) !important;
+}
+.ui.form .field.required > label:after {
+    color: var(--color-blue);
+}
+
+/* Segmentos / tarjetas */
+.ui.segment {
+    border-top: 3px solid var(--color-beige-dark);
+}
+
+/* Estadísticas (reportes) */
+.ui.statistics .statistic > .value {
+    color: var(--color-navy) !important;
+}
+.ui.statistics .statistic > .label {
+    color: var(--color-text-muted) !important;
 }
 
 /* --- 5. COMPONENTES ADICIONALES --- */
-.btn-primary {
-    background-color: #2E93FF !important;
-    color: white !important;
+.form-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
 }
 
-/* Estilo para los detalles */
+/* Estilo para los detalles (vistas "ver") */
 .details-card {
-    background: #f9f9f9;
+    background: var(--color-cream);
     padding: 20px;
     border-radius: 10px;
     margin: 20px 0;
-    border-left: 5px solid #2E93FF;
+    border-left: 5px solid var(--color-blue);
 }
 
 .detail-row {
     display: flex;
     padding: 10px 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--color-beige-dark);
 }
 
 .detail-row .label {
     font-weight: 600;
     width: 150px;
-    color: #002347;
+    color: var(--color-navy);
+}
+
+/* Página de login (sin sidebar) */
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-cream);
+    padding: 20px;
+}
+.login-box {
+    width: 100%;
+    max-width: 420px;
+}
+.login-footer {
+    text-align: center;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    margin-top: 16px;
 }
 
 /* --- 6. RESPONSIVIDAD --- */
@@ -92,11 +257,14 @@ body {
     .wrapper {
         flex-direction: column;
     }
-    .menu-principal {
+    .sidebar-menu.ui.vertical.menu {
         width: 100% !important;
-        height: auto !important;
+        flex: none;
     }
     .content {
+        padding: 20px;
+    }
+    .container {
         padding: 20px;
     }
 }

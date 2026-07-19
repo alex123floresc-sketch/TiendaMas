@@ -1,70 +1,73 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Productos</title>
-    <link rel="stylesheet" th:href="@{/static.css/estilos.css}">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css">
-</head>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base}">
 <body>
-<div class="wrapper" style="display: flex; background-color: #f4f7f6; min-height: 100vh;">
+<div th:fragment="content">
 
-    <div th:replace="layout/fragments :: menu"></div>
+    <h1 class="ui dividing header">
+        <i class="box icon"></i>
+        <div class="content">
+            Gestión de Productos
+            <div class="sub header">Controla el inventario general, precios, existencias y clasificaciones de venta.</div>
+        </div>
+    </h1>
 
-    <div class="content" style="flex: 1; padding: 40px; box-sizing: border-box;">
-        <div class="container" style="max-width: 1200px; margin: 0 auto;">
+    <div style="margin-bottom: 25px;">
+        <a href="/productos/nuevo" class="ui blue button">
+            <i class="plus icon"></i> Nuevo Producto
+        </a>
+    </div>
 
-            <h1 class="ui dividing header" style="color: #2c3e50; margin-bottom: 20px;">
-                <i class="box icon"></i>
-                <div class="content">
-                    Gestión de Productos
-                    <div class="sub header">Controla el inventario general, precios, existencias y clasificaciones de venta.</div>
+    <div class="ui negative message" th:if="${param.error}">
+        <div class="header">No se puede eliminar</div>
+        <p>Este producto tiene pedidos asociados y no puede eliminarse mientras existan.</p>
+    </div>
+
+    <div th:if="${productos.isEmpty()}" class="ui icon warning message">
+        <i class="info circle icon"></i>
+        <div class="content">
+            <div class="header">Sin existencias</div>
+            <p>No hay productos registrados en el sistema actualmente.</p>
+        </div>
+    </div>
+
+    <table class="ui celled striped table" th:unless="${productos.isEmpty()}">
+        <thead>
+        <tr>
+            <th class="one wide">ID</th>
+            <th class="three wide">Nombre</th>
+            <th class="four wide">Descripción</th>
+            <th class="one wide">Precio</th>
+            <th class="one wide">Stock</th>
+            <th class="three wide">Categoría</th>
+            <th class="three wide center aligned">Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="producto : ${productos}">
+            <td th:text="${producto.id}"></td>
+            <td th:text="${producto.nombre}" style="font-weight: bold;"></td>
+            <td th:text="${producto.descripcion}"></td>
+            <td th:text="'S/ ' + ${producto.precio}" style="font-weight: bold; color: #21ba45;"></td>
+            <td th:text="${producto.stock}" class="center aligned"></td>
+            <td>
+                <span class="ui teal tiny label" th:text="${producto.categoria.nombre}"></span>
+            </td>
+            <td class="center aligned">
+                <div class="ui small buttons">
+                    <a th:href="@{/productos/{id}/editar(id=${producto.id})}" class="ui yellow button" title="Editar">
+                        <i class="edit icon"></i>
+                    </a>
+                    <form th:action="@{/productos/{id}/eliminar(id=${producto.id})}" method="post"
+                          style="display:contents" th:onsubmit="return confirm('¿Está seguro de eliminar este producto?')">
+                        <button type="submit" class="ui red button" title="Eliminar">
+                            <i class="trash icon"></i>
+                        </button>
+                    </form>
                 </div>
-            </h1>
-
-            <div style="margin-bottom: 25px;">
-                <a href="/productos/nuevo" class="ui blue button">
-                    <i class="plus icon"></i> Nuevo Producto
-                </a>
-            </div>
-
-            <div th:if="${productos.isEmpty()}" class="ui icon warning message">
-                <i class="info circle icon"></i>
-                <div class="content">
-                    <div class="header">Sin existencias</div>
-                    <p>No hay productos registrados en el sistema actualmente.</p>
-                </div>
-            </div>
-
-            <table class="ui celled striped table" th:unless="${productos.isEmpty()}">
-                <thead>
-                <tr>
-                    <th class="one wide">ID</th>
-                    <th class="three wide">Nombre</th>
-                    <th class="four wide">Descripción</th>
-                    <th class="one wide">Precio</th>
-                    <th class="one wide">Stock</th>
-                    <th class="three wide">Categoría</th>
-                    <th class="three wide center aligned">Acciones</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="producto : ${productos}">
-                    <td th:text="${producto.id}"></td>
-                    <td th:text="${producto.nombre}" style="font-weight: bold; color: #2c3e50;"></td>
-                    <td th:text="${producto.descripcion}"></td>
-                    <td th:text="'S/ ' + ${producto.precio}" style="font-weight: bold; color: #21ba45;"></td>
-                    <td th:text="${producto.stock}" class="center aligned"></td>
-                    <td>
-                        <span class="ui teal tiny label" th:text="${producto.categoria.nombre}"></span>
-                    </td>
-                    <td class="center aligned">
-                        <div class="ui small buttons">
-                            <a th:href="@{/productos/{id}/editar(id=${producto.id})}" class="ui yellow button" title="Editar">
-                                <i class="edit icon"></i>
-                            </a>
-                            <a th:href="@{/productos/{id}/eliminar(id=${producto.id})}" class="ui red button" onclick="return confirm('¿Está seguro?')" title="Eliminar">
-                                <i class="trash icon"></i>
-                            </a>
-                        </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

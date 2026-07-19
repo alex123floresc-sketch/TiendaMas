@@ -1,20 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nuevo Pedido</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css">
-    <style>
-        body { background-color: #f4f7f6; padding: 40px 0; }
-        .hint { color: #6c757d; font-size: 13px; margin-top: 10px; display: block; }
-    </style>
-</head>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base}">
 <body>
+<div th:fragment="content" style="max-width: 900px; margin: 0 auto;">
 
-<div class="ui container" style="max-width: 800px;">
-
-    <h1 class="ui dividing header" style="color: #2c3e50;">
+    <h1 class="ui dividing header">
         <i class="shopping cart icon"></i>
         <div class="content">
             Nuevo Pedido
@@ -22,7 +11,7 @@
         </div>
     </h1>
 
-    <div class="ui segment" style="box-shadow: 0 2px 4px rgba(0,0,0,0.08); padding: 30px;">
+    <div class="ui segment">
 
         <form th:object="${pedidoForm}" th:action="@{/pedidos}" method="POST" class="ui form">
 
@@ -76,6 +65,10 @@
             th:text="${p.nombre + ' ($' + p.precio + ')'}"></option>
 </select>
 
+<style>
+    .hint { color: var(--color-text-muted); font-size: 13px; margin-top: 10px; display: block; }
+</style>
+
 <script>
     let rowIndex = 0;
 
@@ -128,6 +121,8 @@
         tr.appendChild(tdBtn);
 
         tbody.appendChild(tr);
+
+        $(tdSelect).find('.ui.dropdown').dropdown();
     }
 
     function eliminarFila(btn) {
@@ -148,6 +143,7 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         agregarFila();
+        $('.ui.search.dropdown').dropdown();
     });
 </script>
 </body>

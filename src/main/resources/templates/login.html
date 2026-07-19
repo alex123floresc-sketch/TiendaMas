@@ -3,27 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión - Sistema de Gestión</title>
-
+    <title>Iniciar Sesión · TiendaMas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
+<body class="login-page">
 
-<div class="w-full max-w-md p-6">
-    <div class="ui raised segment p-8">
+<div class="login-box">
+    <div class="ui raised segment">
 
-        <h2 class="ui teal image header flex justify-center mb-6">
-            <i class="user shield icon"></i>
+        <h2 class="ui header">
+            <i class="shop icon"></i>
             <div class="content">
-                Acceso al Sistema
-                <div class="sub header">Introduce tus credenciales</div>
+                TiendaMas
+                <div class="sub header">Introduce tus credenciales para continuar</div>
             </div>
         </h2>
 
         <div class="ui negative message" th:if="${param.error}">
-            <i class="close icon"></i>
-            <div class="header">Error de Autenticación</div>
+            <div class="header">Error de autenticación</div>
             <p>El usuario o la contraseña son incorrectos.</p>
         </div>
 
@@ -33,7 +31,7 @@
 
         <form th:action="@{/login}" method="POST" class="ui form">
 
-            <div class="field mb-4">
+            <div class="field">
                 <label>Usuario</label>
                 <div class="ui left icon input">
                     <i class="user icon"></i>
@@ -41,7 +39,7 @@
                 </div>
             </div>
 
-            <div class="field mb-6">
+            <div class="field">
                 <label>Contraseña</label>
                 <div class="ui left icon input">
                     <i class="lock icon"></i>
@@ -49,16 +47,13 @@
                 </div>
             </div>
 
-            <button class="ui fluid large teal submit button type-submit" type="submit">
+            <button class="ui fluid primary large submit button" type="submit">
                 Ingresar
             </button>
         </form>
-
     </div>
 
-    <p class="text-center text-gray-500 text-xs mt-4">
-        &copy; 2026 Facultad de Ingeniería de Sistemas - UNAJ
-    </p>
+    <p class="login-footer">&copy; 2026 Facultad de Ingeniería de Sistemas - UNAJ</p>
 </div>
 
 </body>

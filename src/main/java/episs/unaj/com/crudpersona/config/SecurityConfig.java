@@ -19,7 +19,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         // Permitir acceso a carpetas de estilos estáticos sin loguearse
-                        .requestMatchers("/static.css/**", "/css/**", "/js/**", "/estilos.css").permitAll()
+                        .requestMatchers("/css/**", "/js/**").permitAll()
                         // Cualquier otra vista (personas, productos, categorías) requerirá Login
                         .anyRequest().authenticated()
                 )

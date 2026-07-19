@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base}">
+<body>
+<div th:fragment="content">
+
+    <h1 class="ui dividing header">
+        <i class="chart bar icon"></i>
+        <div class="content">
+            Reportes
+            <div class="sub header">Resumen general de la actividad de ventas del sistema.</div>
+        </div>
+    </h1>
+
+    <div class="ui four stackable statistics" style="margin-bottom: 30px;">
+        <div class="statistic">
+            <div class="value" th:text="'$' + ${#numbers.formatDecimal(totalVentas, 1, 2)}"></div>
+            <div class="label">Ventas totales</div>
+        </div>
+        <div class="statistic">
+            <div class="value" th:text="${totalPedidos}"></div>
+            <div class="label">Pedidos</div>
+        </div>
+        <div class="statistic">
+            <div class="value" th:text="${totalClientes}"></div>
+            <div class="label">Clientes</div>
+        </div>
+        <div class="statistic">
+            <div class="value" th:text="${totalProductos}"></div>
+            <div class="label">Productos</div>
+        </div>
+    </div>
+
+    <div class="ui two column stackable grid">
+
+        <div class="column">
+            <h3 class="ui header"><i class="star icon"></i>Productos más vendidos</h3>
+            <div th:if="${#lists.isEmpty(topProductos)}" class="ui info message">
+                <p>Aún no hay ventas registradas.</p>
+            </div>
+            <table class="ui celled striped table" th:unless="${#lists.isEmpty(topProductos)}">
+                <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th class="right aligned">Unidades vendidas</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="entry : ${topProductos}">
+                    <td th:text="${entry.key}" style="font-weight: bold;"></td>
+                    <td th:text="${entry.value}" class="right aligned"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="column">
+            <h3 class="ui header"><i class="tags icon"></i>Ventas por categoría</h3>
+            <div th:if="${#maps.isEmpty(ventasPorCategoria)}" class="ui info message">
+                <p>Aún no hay ventas registradas.</p>
+            </div>
+            <table class="ui celled striped table" th:unless="${#maps.isEmpty(ventasPorCategoria)}">
+                <thead>
+                <tr>
+                    <th>Categoría</th>
+                    <th class="right aligned">Total vendido</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="entry : ${ventasPorCategoria}">
+                    <td th:text="${entry.key}" style="font-weight: bold;"></td>
+                    <td th:text="'$' + ${#numbers.formatDecimal(entry.value, 1, 2)}" class="right aligned"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <h3 class="ui header" style="margin-top: 30px;"><i class="warning sign icon"></i>Alerta de stock bajo</h3>
+    <div th:if="${#lists.isEmpty(bajoStock)}" class="ui positive message">
+        <p>Todos los productos tienen existencias suficientes.</p>
+    </div>
+    <table class="ui celled striped table" th:unless="${#lists.isEmpty(bajoStock)}">
+        <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Categoría</th>
+            <th class="right aligned">Stock restante</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="producto : ${bajoStock}">
+            <td th:text="${producto.nombre}" style="font-weight: bold;"></td>
+            <td th:text="${producto.categoria != null ? producto.categoria.nombre : 'Sin categoría'}"></td>
+            <td class="right aligned">
+                <span class="ui red label" th:text="${producto.stock}"></span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
