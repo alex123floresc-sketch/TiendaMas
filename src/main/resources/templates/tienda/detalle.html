@@ -8,6 +8,10 @@
     </a>
 
     <div class="ui segment">
+        <div class="tienda-detalle-img">
+            <img th:if="${producto.imagenUrl != null}" th:src="@{${producto.imagenUrl}}" alt="Imagen del producto">
+            <i th:unless="${producto.imagenUrl != null}" class="box icon massive"></i>
+        </div>
         <span class="ui teal label" th:text="${producto.categoria != null ? producto.categoria.nombre : 'Sin categoría'}"></span>
         <span class="ui label" th:if="${producto.marca != null and !producto.marca.isEmpty()}" th:text="${producto.marca}"></span>
 
@@ -49,7 +53,10 @@
         <div class="tienda-grid">
             <div class="tienda-card" th:each="p : ${relacionados}">
                 <a th:href="@{/tienda/productos/{id}(id=${p.id})}" class="tienda-card-link">
-                    <div class="tienda-card-img"><i class="box icon huge"></i></div>
+                    <div class="tienda-card-img">
+                    <img th:if="${p.imagenUrl != null}" th:src="@{${p.imagenUrl}}" alt="Imagen del producto">
+                    <i th:unless="${p.imagenUrl != null}" class="box icon huge"></i>
+                </div>
                     <div class="tienda-card-body">
                         <div class="tienda-card-cat" th:text="${p.categoria != null ? p.categoria.nombre : ''}"></div>
                         <div class="tienda-card-nombre" th:text="${p.nombre}"></div>

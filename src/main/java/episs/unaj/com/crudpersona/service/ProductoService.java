@@ -44,6 +44,7 @@ public class ProductoService {
             p.setCodigoBarras(producto.getCodigoBarras());
             p.setMarca(producto.getMarca());
             p.setUnidadMedida(producto.getUnidadMedida());
+            p.setImagenUrl(producto.getImagenUrl());
             return productoRepository.save(p);
         }
         return null;

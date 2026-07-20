@@ -23,6 +23,9 @@ public class Producto {
     /** Ej. "kg", "unidad", "paquete", "litro". */
     private String unidadMedida;
 
+    /** Ruta pública de la imagen (ej. "/uploads/productos/archivo.jpg"). */
+    private String imagenUrl;
+
     @ManyToOne
     @JoinColumn(name = "categoria_id", nullable = false)
     private Categoria categoria;
@@ -64,4 +67,7 @@ public class Producto {
 
     public String getUnidadMedida() { return unidadMedida; }
     public void setUnidadMedida(String unidadMedida) { this.unidadMedida = unidadMedida; }
+
+    public String getImagenUrl() { return imagenUrl; }
+    public void setImagenUrl(String imagenUrl) { this.imagenUrl = imagenUrl; }
 }

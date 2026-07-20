@@ -34,6 +34,7 @@
         <thead>
         <tr>
             <th class="one wide">ID</th>
+            <th class="one wide">Imagen</th>
             <th class="three wide">Nombre</th>
             <th class="four wide">Descripción</th>
             <th class="one wide">Precio</th>
@@ -45,6 +46,12 @@
         <tbody>
         <tr th:each="producto : ${productos}">
             <td th:text="${producto.id}"></td>
+            <td>
+                <div class="producto-thumb">
+                    <img th:if="${producto.imagenUrl != null}" th:src="@{${producto.imagenUrl}}" alt="Imagen del producto">
+                    <i th:unless="${producto.imagenUrl != null}" class="image icon"></i>
+                </div>
+            </td>
             <td>
                 <div style="font-weight: bold;" th:text="${producto.nombre}"></div>
                 <div class="hint" th:if="${producto.marca != null and !producto.marca.isEmpty()}"

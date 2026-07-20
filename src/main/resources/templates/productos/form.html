@@ -15,9 +15,19 @@
 
         <form th:object="${producto}"
               th:action="${producto.id == null} ? @{/productos} : @{/productos/{id}(id=${producto.id})}"
-              method="POST" class="ui form">
+              method="POST" enctype="multipart/form-data" class="ui form">
 
             <input type="hidden" th:field="*{id}" />
+
+            <div class="field">
+                <label>Imagen del producto</label>
+                <div class="producto-imagen-preview">
+                    <img th:if="${producto.imagenUrl != null}" th:src="@{${producto.imagenUrl}}" alt="Imagen actual del producto">
+                    <i th:unless="${producto.imagenUrl != null}" class="image icon huge"></i>
+                </div>
+                <input type="file" name="imagen" accept="image/*">
+                <small class="hint" th:if="${producto.imagenUrl != null}">Selecciona un archivo solo si quieres reemplazar la imagen actual.</small>
+            </div>
 
             <div class="field required">
                 <label for="nombre">Nombre del Producto</label>
