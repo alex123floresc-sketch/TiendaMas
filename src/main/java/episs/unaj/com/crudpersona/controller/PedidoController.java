@@ -36,7 +36,7 @@ public class PedidoController {
     @GetMapping
     public String listar(Model model) {
         model.addAttribute("pedidos", pedidoService.obtenerTodos());
-        model.addAttribute("titulo", "Pedidos");
+        model.addAttribute("titulo", "Ventas");
         return "pedidos/index";
     }
 
@@ -45,7 +45,7 @@ public class PedidoController {
         model.addAttribute("pedidoForm", new PedidoForm());
         model.addAttribute("personas", personaService.obtenerTodas());
         model.addAttribute("productos", productoService.obtenerTodos());
-        model.addAttribute("titulo", "Nuevo Pedido");
+        model.addAttribute("titulo", "Nueva Venta");
         return "pedidos/form";
     }
 

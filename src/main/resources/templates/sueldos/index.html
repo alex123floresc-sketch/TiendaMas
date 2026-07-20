@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base}">
+<body>
+<div th:fragment="content">
+
+    <h1 class="ui dividing header">
+        <i class="id badge icon"></i>
+        <div class="content">
+            Sueldos
+            <div class="sub header">Registra los pagos a vendedores y administradores.</div>
+        </div>
+    </h1>
+
+    <div style="margin-bottom: 25px;">
+        <a href="/sueldos/nuevo" class="ui primary button">
+            <i class="plus icon"></i> Nuevo Sueldo
+        </a>
+    </div>
+
+    <div class="ui negative message" th:if="${param.error}">
+        <p>Selecciona un empleado válido de la lista.</p>
+    </div>
+
+    <div th:if="${sueldos.isEmpty()}" class="ui icon warning message">
+        <i class="info circle icon"></i>
+        <div class="content">
+            <div class="header">Sin sueldos registrados</div>
+            <p>Aún no has registrado ningún pago de sueldo.</p>
+        </div>
+    </div>
+
+    <table class="ui celled striped table" th:unless="${sueldos.isEmpty()}">
+        <thead>
+        <tr>
+            <th>Empleado</th>
+            <th>Periodo</th>
+            <th>Fecha de pago</th>
+            <th class="right aligned">Monto</th>
+            <th>Estado</th>
+            <th class="center aligned">Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="sueldo : ${sueldos}">
+            <td style="font-weight:bold;" th:text="${sueldo.usuario.nombre + ' ' + sueldo.usuario.apellido}"></td>
+            <td th:text="${sueldo.periodo}"></td>
+            <td th:text="${sueldo.fechaPago}"></td>
+            <td class="right aligned" th:text="'S/ ' + ${#numbers.formatDecimal(sueldo.monto, 1, 2)}"></td>
+            <td>
+                <span class="ui label" th:classappend="${sueldo.estado.name() == 'PAGADO'} ? 'green' : 'yellow'"
+                      th:text="${sueldo.estado}"></span>
+            </td>
+            <td class="center aligned">
+                <div class="ui small buttons">
+                    <form th:if="${sueldo.estado.name() == 'PENDIENTE'}" th:action="@{/sueldos/{id}/pagar(id=${sueldo.id})}" method="post" style="display:contents">
+                        <button type="submit" class="ui green button" title="Marcar como pagado">
+                            <i class="check icon"></i>
+                        </button>
+                    </form>
+                    <form th:action="@{/sueldos/{id}/eliminar(id=${sueldo.id})}" method="post" style="display:contents"
+                          th:onsubmit="return confirm('¿Está seguro de eliminar este registro de sueldo?')">
+                        <button type="submit" class="ui red button" title="Eliminar">
+                            <i class="trash icon"></i>
+                        </button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

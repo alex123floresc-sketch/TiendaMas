@@ -12,14 +12,16 @@
 <body class="pos-body">
 
 <div class="pos-topbar">
-  <div class="pos-brand"><i class="cash register icon"></i> TiendaMas <span>POS</span></div>
+  <a th:href="@{/pos}" class="pos-brand"><i class="cash register icon"></i> TiendaMas <span>POS</span></a>
   <div class="pos-topbar-actions">
     <span class="pos-user" th:if="${usuarioAutenticado}">
       <i class="user icon"></i> <span th:text="${usuarioAutenticado}"></span>
     </span>
-    <a th:href="@{/pos}" class="ui small button"><i class="cash register icon"></i> Vender</a>
     <a th:href="@{/pos/ventas}" class="ui small button"><i class="list icon"></i> Mis ventas</a>
-    <a th:href="@{/logout}" class="ui small red button"><i class="sign out alternate icon"></i> Salir</a>
+    <a th:href="@{/perfil}" class="ui small button"><i class="user icon"></i> Mi perfil</a>
+    <form th:action="@{/logout}" method="post" style="display:contents">
+      <button type="submit" class="ui small red button"><i class="sign out alternate icon"></i> Salir</button>
+    </form>
   </div>
 </div>
 

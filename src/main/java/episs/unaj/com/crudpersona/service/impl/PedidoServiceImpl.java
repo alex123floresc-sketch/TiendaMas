@@ -19,8 +19,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class PedidoServiceImpl implements PedidoService {
@@ -115,6 +119,43 @@ public class PedidoServiceImpl implements PedidoService {
 
         pedido.setTotal(total);
         return pedidoRepository.save(pedido);
+    }
+
+    @Override
+    public List<Producto> obtenerMasVendidos(int limite) {
+        Map<Long, Integer> unidadesPorProductoId = new LinkedHashMap<>();
+        Map<Long, Producto> productoPorId = new LinkedHashMap<>();
+
+        for (Pedido pedido : pedidoRepository.findAll()) {
+            for (DetallePedido detalle : pedido.getDetalles()) {
+                Producto producto = detalle.getProducto();
+                if (producto == null) continue;
+                int cantidad = detalle.getCantidad() != null ? detalle.getCantidad() : 0;
+                unidadesPorProductoId.merge(producto.getId(), cantidad, Integer::sum);
+                productoPorId.putIfAbsent(producto.getId(), producto);
+            }
+        }
+
+        return unidadesPorProductoId.entrySet().stream()
+                .sorted((a, b) -> b.getValue() - a.getValue())
+                .limit(limite)
+                .map(entry -> productoPorId.get(entry.getKey()))
+                .toList();
+    }
+
+    @Override
+    public Map<Long, Integer> obtenerUnidadesVendidasDesde(LocalDateTime desde) {
+        Map<Long, Integer> unidadesPorProductoId = new HashMap<>();
+        for (Pedido pedido : pedidoRepository.findAll()) {
+            if (pedido.getFecha() == null || pedido.getFecha().isBefore(desde)) continue;
+            for (DetallePedido detalle : pedido.getDetalles()) {
+                Producto producto = detalle.getProducto();
+                if (producto == null) continue;
+                int cantidad = detalle.getCantidad() != null ? detalle.getCantidad() : 0;
+                unidadesPorProductoId.merge(producto.getId(), cantidad, Integer::sum);
+            }
+        }
+        return unidadesPorProductoId;
     }
 
     @Override

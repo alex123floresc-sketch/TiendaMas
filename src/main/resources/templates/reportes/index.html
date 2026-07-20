@@ -30,14 +30,47 @@
         </div>
     </div>
 
-    <div class="ui two column stackable grid">
+    <h3 class="ui header"><i class="chart line icon"></i>Resumen financiero (últimos 6 meses)</h3>
+    <div class="finanzas-grid">
+        <div class="finanzas-mes" th:each="r : ${resumenMensual}">
+            <div class="finanzas-mes-label" th:text="${r.mes}"></div>
+
+            <div class="finanzas-barra-fila">
+                <span class="finanzas-barra-etiqueta">Ventas</span>
+                <div class="finanzas-barra-track">
+                    <div class="finanzas-barra ventas" th:style="'width:' + ${(r.ventas / maxResumenMensual) * 100} + '%'"></div>
+                </div>
+                <span class="finanzas-barra-valor" th:text="'S/ ' + ${#numbers.formatDecimal(r.ventas, 1, 0)}"></span>
+            </div>
+            <div class="finanzas-barra-fila">
+                <span class="finanzas-barra-etiqueta">Gastos</span>
+                <div class="finanzas-barra-track">
+                    <div class="finanzas-barra gastos" th:style="'width:' + ${(r.gastos / maxResumenMensual) * 100} + '%'"></div>
+                </div>
+                <span class="finanzas-barra-valor" th:text="'S/ ' + ${#numbers.formatDecimal(r.gastos, 1, 0)}"></span>
+            </div>
+            <div class="finanzas-barra-fila">
+                <span class="finanzas-barra-etiqueta">Sueldos</span>
+                <div class="finanzas-barra-track">
+                    <div class="finanzas-barra sueldos" th:style="'width:' + ${(r.sueldos / maxResumenMensual) * 100} + '%'"></div>
+                </div>
+                <span class="finanzas-barra-valor" th:text="'S/ ' + ${#numbers.formatDecimal(r.sueldos, 1, 0)}"></span>
+            </div>
+
+            <div class="finanzas-utilidad" th:classappend="${r.utilidad >= 0} ? 'positiva' : 'negativa'">
+                Utilidad: <strong th:text="'S/ ' + ${#numbers.formatDecimal(r.utilidad, 1, 2)}"></strong>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui two column stackable grid" style="margin-top: 10px;">
 
         <div class="column">
             <h3 class="ui header"><i class="star icon"></i>Productos más vendidos</h3>
-            <div th:if="${#lists.isEmpty(topProductos)}" class="ui info message">
+            <div th:if="${#lists.isEmpty(masVendidos)}" class="ui info message">
                 <p>Aún no hay ventas registradas.</p>
             </div>
-            <table class="ui celled striped table" th:unless="${#lists.isEmpty(topProductos)}">
+            <table class="ui celled striped table" th:unless="${#lists.isEmpty(masVendidos)}">
                 <thead>
                 <tr>
                     <th>Producto</th>
@@ -45,9 +78,9 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="entry : ${topProductos}">
-                    <td th:text="${entry.key}" style="font-weight: bold;"></td>
-                    <td th:text="${entry.value}" class="right aligned"></td>
+                <tr th:each="producto : ${masVendidos}">
+                    <td th:text="${producto.nombre}" style="font-weight: bold;"></td>
+                    <td th:text="${unidadesPorProducto.get(producto.nombre)}" class="right aligned"></td>
                 </tr>
                 </tbody>
             </table>
@@ -122,24 +155,33 @@
 
     </div>
 
-    <h3 class="ui header" style="margin-top: 30px;"><i class="warning sign icon"></i>Alerta de stock bajo</h3>
-    <div th:if="${#lists.isEmpty(bajoStock)}" class="ui positive message">
-        <p>Todos los productos tienen existencias suficientes.</p>
+    <h3 class="ui header" style="margin-top: 30px;"><i class="warning sign icon"></i>Recomendaciones de reabastecimiento</h3>
+    <p class="hint" style="margin-bottom: 10px;">
+        Calculado según ventas de los últimos 30 días: no es solo "stock bajo", sino cuántos días de inventario quedan a ese ritmo de venta.
+    </p>
+    <div th:if="${#lists.isEmpty(recomendacionesReabastecimiento)}" class="ui positive message">
+        <p>Todos los productos tienen existencias suficientes para su ritmo de venta actual.</p>
     </div>
-    <table class="ui celled striped table" th:unless="${#lists.isEmpty(bajoStock)}">
+    <table class="ui celled striped table" th:unless="${#lists.isEmpty(recomendacionesReabastecimiento)}">
         <thead>
         <tr>
             <th>Producto</th>
             <th>Categoría</th>
-            <th class="right aligned">Stock restante</th>
+            <th class="right aligned">Stock actual</th>
+            <th class="right aligned">Vendidos (30 días)</th>
+            <th class="right aligned">Días restantes</th>
+            <th class="center aligned">Urgencia</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="producto : ${bajoStock}">
-            <td th:text="${producto.nombre}" style="font-weight: bold;"></td>
-            <td th:text="${producto.categoria != null ? producto.categoria.nombre : 'Sin categoría'}"></td>
-            <td class="right aligned">
-                <span class="ui red label" th:text="${producto.stock}"></span>
+        <tr th:each="r : ${recomendacionesReabastecimiento}">
+            <td th:text="${r.producto.nombre}" style="font-weight: bold;"></td>
+            <td th:text="${r.producto.categoria != null ? r.producto.categoria.nombre : 'Sin categoría'}"></td>
+            <td class="right aligned" th:text="${r.producto.stock}"></td>
+            <td class="right aligned" th:text="${r.unidadesVendidas30d}"></td>
+            <td class="right aligned" th:text="${r.diasRestantes != null} ? ${#numbers.formatDecimal(r.diasRestantes, 1, 1)} : 'Sin ventas recientes'"></td>
+            <td class="center aligned">
+                <span class="ui label" th:classappend="${r.nivel == 'URGENTE'} ? 'red' : 'yellow'" th:text="${r.nivel}"></span>
             </td>
         </tr>
         </tbody>

@@ -1,5 +1,6 @@
 package episs.unaj.com.crudpersona.controller;
 
+import episs.unaj.com.crudpersona.dto.CambioPasswordForm;
 import episs.unaj.com.crudpersona.dto.ItemVenta;
 import episs.unaj.com.crudpersona.entity.CanalVenta;
 import episs.unaj.com.crudpersona.entity.MetodoPago;
@@ -66,6 +67,7 @@ public class TiendaController {
             return "redirect:/tienda";
         }
         model.addAttribute("producto", producto);
+        model.addAttribute("relacionados", productoService.obtenerRelacionados(producto));
         model.addAttribute("titulo", producto.getNombre());
         return "tienda/detalle";
     }
@@ -81,7 +83,16 @@ public class TiendaController {
 
     @GetMapping("/carrito")
     public String verCarrito(Model model) {
+        List<Long> productosEnCarrito = carrito.getItems().stream()
+                .map(item -> item.getProductoId())
+                .toList();
+        List<Producto> recomendados = pedidoService.obtenerMasVendidos(8).stream()
+                .filter(p -> !productosEnCarrito.contains(p.getId()))
+                .limit(4)
+                .toList();
+
         model.addAttribute("carrito", carrito);
+        model.addAttribute("recomendados", recomendados);
         model.addAttribute("titulo", "Mi Carrito");
         return "tienda/carrito";
     }
@@ -143,6 +154,7 @@ public class TiendaController {
     public String perfil(Model model, Principal principal) {
         Persona persona = personaDelUsuario(principal);
         model.addAttribute("persona", persona != null ? persona : new Persona());
+        model.addAttribute("cambioPasswordForm", new CambioPasswordForm());
         model.addAttribute("titulo", "Mi Perfil");
         return "tienda/perfil";
     }

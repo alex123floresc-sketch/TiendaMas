@@ -6,7 +6,7 @@
     <h1 class="ui dividing header">
         <i class="users icon"></i>
         <div class="content">
-            Gestión de Personas
+            Clientes
             <div class="sub header">Administra el registro de clientes del sistema.</div>
         </div>
     </h1>
@@ -34,9 +34,10 @@
         <thead>
         <tr>
             <th class="one wide">ID</th>
-            <th class="four wide">Nombre</th>
-            <th class="four wide">Email</th>
+            <th class="three wide">Nombre</th>
+            <th class="three wide">Email</th>
             <th class="two wide">Teléfono</th>
+            <th class="two wide right aligned">Total comprado</th>
             <th class="three wide center aligned">Acciones</th>
         </tr>
         </thead>
@@ -46,6 +47,8 @@
             <td th:text="${persona.nombre + ' ' + persona.apellido}" style="font-weight: bold;"></td>
             <td th:text="${persona.email}"></td>
             <td th:text="${persona.telefono}"></td>
+            <td class="right aligned" style="color:#21ba45; font-weight:bold;"
+                th:text="'S/ ' + ${#numbers.formatDecimal(totalPorPersona.get(persona.id) != null ? totalPorPersona.get(persona.id) : 0, 1, 2)}"></td>
             <td class="center aligned">
                 <div class="ui small buttons">
                     <a th:href="@{/personas/{id}(id=${persona.id})}" class="ui info button" title="Ver">

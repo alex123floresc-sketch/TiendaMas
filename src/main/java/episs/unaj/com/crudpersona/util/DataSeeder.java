@@ -1,22 +1,31 @@
 package episs.unaj.com.crudpersona.util;
 
 import episs.unaj.com.crudpersona.entity.Categoria;
+import episs.unaj.com.crudpersona.entity.CategoriaGasto;
+import episs.unaj.com.crudpersona.entity.EstadoSueldo;
+import episs.unaj.com.crudpersona.entity.FrecuenciaGasto;
+import episs.unaj.com.crudpersona.entity.Gasto;
 import episs.unaj.com.crudpersona.entity.Persona;
 import episs.unaj.com.crudpersona.entity.Producto;
 import episs.unaj.com.crudpersona.entity.RolUsuario;
 import episs.unaj.com.crudpersona.entity.SerieCorrelativo;
+import episs.unaj.com.crudpersona.entity.Sueldo;
 import episs.unaj.com.crudpersona.entity.TipoComprobante;
 import episs.unaj.com.crudpersona.entity.TipoDocumento;
 import episs.unaj.com.crudpersona.repository.CategoriaRepository;
+import episs.unaj.com.crudpersona.repository.GastoRepository;
 import episs.unaj.com.crudpersona.repository.PersonaRepository;
 import episs.unaj.com.crudpersona.repository.ProductoRepository;
 import episs.unaj.com.crudpersona.repository.SerieCorrelativoRepository;
+import episs.unaj.com.crudpersona.repository.SueldoRepository;
 import episs.unaj.com.crudpersona.repository.UsuarioRepository;
 import episs.unaj.com.crudpersona.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,6 +50,10 @@ public class DataSeeder implements CommandLineRunner {
     private UsuarioRepository usuarioRepository;
     @Autowired
     private UsuarioService usuarioService;
+    @Autowired
+    private GastoRepository gastoRepository;
+    @Autowired
+    private SueldoRepository sueldoRepository;
 
     @Override
     public void run(String... args) {
@@ -52,6 +65,14 @@ public class DataSeeder implements CommandLineRunner {
 
         if (usuarioRepository.count() <= 0) {
             sembrarUsuariosDemo();
+        }
+
+        if (gastoRepository.count() <= 0) {
+            sembrarGastosDemo();
+        }
+
+        if (sueldoRepository.count() <= 0) {
+            sembrarSueldosDemo();
         }
     }
 
@@ -131,6 +152,60 @@ public class DataSeeder implements CommandLineRunner {
                 });
         usuarioService.crearUsuario("cliente2", "cliente123", RolUsuario.CLIENTE,
                 personaCliente2.getNombre(), personaCliente2.getApellido(), personaCliente2);
+    }
+
+    private void sembrarGastosDemo() {
+        Gasto alquiler = new Gasto();
+        alquiler.setConcepto("Alquiler del local");
+        alquiler.setCategoria(CategoriaGasto.ALQUILER);
+        alquiler.setMonto(1200.0);
+        alquiler.setFecha(LocalDate.now().withDayOfMonth(1));
+        alquiler.setRecurrente(true);
+        alquiler.setFrecuencia(FrecuenciaGasto.MENSUAL);
+        gastoRepository.save(alquiler);
+
+        Gasto servicios = new Gasto();
+        servicios.setConcepto("Luz, agua e internet");
+        servicios.setCategoria(CategoriaGasto.SERVICIOS);
+        servicios.setMonto(280.0);
+        servicios.setFecha(LocalDate.now().withDayOfMonth(Math.min(5, LocalDate.now().lengthOfMonth())));
+        servicios.setRecurrente(true);
+        servicios.setFrecuencia(FrecuenciaGasto.MENSUAL);
+        gastoRepository.save(servicios);
+
+        Gasto insumos = new Gasto();
+        insumos.setConcepto("Reposición de mercadería");
+        insumos.setCategoria(CategoriaGasto.INSUMOS);
+        insumos.setMonto(650.0);
+        insumos.setFecha(LocalDate.now().withDayOfMonth(Math.min(10, LocalDate.now().lengthOfMonth())));
+        insumos.setRecurrente(false);
+        insumos.setFrecuencia(FrecuenciaGasto.UNICO);
+        gastoRepository.save(insumos);
+    }
+
+    private void sembrarSueldosDemo() {
+        String periodoActual = YearMonth.now().toString();
+        LocalDate fechaPago = LocalDate.now().withDayOfMonth(Math.min(28, LocalDate.now().lengthOfMonth()));
+
+        usuarioRepository.findByUsername("vendedor1").ifPresent(vendedor -> {
+            Sueldo sueldo = new Sueldo();
+            sueldo.setUsuario(vendedor);
+            sueldo.setMonto(1200.0);
+            sueldo.setPeriodo(periodoActual);
+            sueldo.setFechaPago(fechaPago);
+            sueldo.setEstado(EstadoSueldo.PAGADO);
+            sueldoRepository.save(sueldo);
+        });
+
+        usuarioRepository.findByUsername("vendedor2").ifPresent(vendedor -> {
+            Sueldo sueldo = new Sueldo();
+            sueldo.setUsuario(vendedor);
+            sueldo.setMonto(1100.0);
+            sueldo.setPeriodo(periodoActual);
+            sueldo.setFechaPago(fechaPago);
+            sueldo.setEstado(EstadoSueldo.PENDIENTE);
+            sueldoRepository.save(sueldo);
+        });
     }
 
     private Optional<Persona> personaConDocumento(TipoDocumento tipo) {

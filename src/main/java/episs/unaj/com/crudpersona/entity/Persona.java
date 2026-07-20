@@ -9,6 +9,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 
+import java.time.LocalDate;
+
 @Entity
 public class Persona {
     @Id
@@ -27,6 +29,14 @@ public class Persona {
 
     /** Solo aplica cuando tipoDocumento = RUC (para emitir factura). */
     private String razonSocial;
+
+    private LocalDate fechaNacimiento;
+
+    @Enumerated(EnumType.STRING)
+    private Genero genero;
+
+    /** Notas libres: preferencias de contacto, alergias, forma de pago preferida, etc. */
+    private String preferencias;
 
     public Persona() {
     }
@@ -101,6 +111,15 @@ public class Persona {
 
     public String getRazonSocial() { return razonSocial; }
     public void setRazonSocial(String razonSocial) { this.razonSocial = razonSocial; }
+
+    public LocalDate getFechaNacimiento() { return fechaNacimiento; }
+    public void setFechaNacimiento(LocalDate fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
+
+    public Genero getGenero() { return genero; }
+    public void setGenero(Genero genero) { this.genero = genero; }
+
+    public String getPreferencias() { return preferencias; }
+    public void setPreferencias(String preferencias) { this.preferencias = preferencias; }
 
     @Transient
     public TipoComprobante getTipoComprobanteSugerido() {

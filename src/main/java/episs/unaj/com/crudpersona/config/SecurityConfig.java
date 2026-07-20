@@ -37,7 +37,8 @@ public class SecurityConfig {
                         .requestMatchers("/pos/**").hasAnyRole("VENDEDOR", "ADMIN")
 
                         // Panel administrativo.
-                        .requestMatchers("/personas/**", "/categorias/**", "/productos/**", "/reportes/**").hasRole("ADMIN")
+                        .requestMatchers("/personas/**", "/categorias/**", "/productos/**", "/reportes/**",
+                                "/gastos/**", "/sueldos/**").hasRole("ADMIN")
                         .requestMatchers("/pedidos", "/pedidos/nuevo", "/pedidos/*/eliminar").hasRole("ADMIN")
 
                         // Ver un comprobante puntual: cualquier autenticado; el controlador valida propiedad.

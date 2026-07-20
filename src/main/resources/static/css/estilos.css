@@ -48,6 +48,21 @@ body {
 .sidebar-menu .brand-item {
     padding: 24px 20px !important;
     text-align: center;
+    text-decoration: none !important;
+}
+.sidebar-menu .brand-item:hover {
+    background-color: transparent !important;
+    border-left: none !important;
+}
+
+.sidebar-menu .menu-section-label {
+    padding: 14px 20px 4px 20px !important;
+    font-size: 0.72em;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-blue-light) !important;
+    cursor: default;
 }
 
 .sidebar-menu .brand-header.ui.header {
@@ -71,6 +86,25 @@ body {
 
 .sidebar-menu .item.logout-item {
     margin-top: auto;
+    padding: 0 !important;
+}
+
+/* Botón "Salir" disfrazado de enlace de menú (el logout real es un POST). */
+.logout-link-button {
+    background: none;
+    border: none;
+    color: inherit;
+    font: inherit;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    padding: 0.92857143em 1.14285714em;
+}
+.logout-link-form {
+    padding: 0 !important;
+}
+.logout-link-form .logout-link-button {
+    color: inherit;
 }
 
 /* Contenido principal */
@@ -247,6 +281,8 @@ body {
 .pos-brand {
     font-size: 1.2em;
     font-weight: 700;
+    color: var(--color-white) !important;
+    text-decoration: none !important;
 }
 .pos-brand span {
     color: var(--color-blue-light);
@@ -344,6 +380,12 @@ body {
 .tienda-cart-link {
     position: relative;
 }
+.tienda-cuenta-dropdown {
+    cursor: pointer;
+}
+.tienda-cuenta-dropdown .menu {
+    color: var(--color-text);
+}
 .tienda-cart-badge {
     background: var(--color-blue-light);
     color: var(--color-navy);
@@ -429,6 +471,65 @@ body {
     font-weight: 700;
     font-size: 1.1em;
 }
+
+/* --- Resumen financiero mensual (reportes) --- */
+.finanzas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+.finanzas-mes {
+    background: var(--color-white);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(20, 49, 93, 0.08);
+    padding: 16px;
+}
+.finanzas-mes-label {
+    font-weight: 700;
+    color: var(--color-navy);
+    margin-bottom: 10px;
+}
+.finanzas-barra-fila {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 0.85em;
+}
+.finanzas-barra-etiqueta {
+    width: 52px;
+    flex-shrink: 0;
+    color: var(--color-text-muted);
+}
+.finanzas-barra-track {
+    flex: 1;
+    background: var(--color-cream);
+    border-radius: 6px;
+    height: 10px;
+    overflow: hidden;
+}
+.finanzas-barra {
+    height: 100%;
+    border-radius: 6px;
+}
+.finanzas-barra.ventas { background: var(--color-blue); }
+.finanzas-barra.gastos { background: #DB9A55; }
+.finanzas-barra.sueldos { background: var(--color-navy); }
+.finanzas-barra-valor {
+    width: 70px;
+    flex-shrink: 0;
+    text-align: right;
+    color: var(--color-text-muted);
+}
+.finanzas-utilidad {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--color-beige-dark);
+    font-size: 0.9em;
+}
+.finanzas-utilidad.positiva { color: #21ba45; }
+.finanzas-utilidad.negativa { color: #db2828; }
 
 /* --- Comprobante (boleta / factura) --- */
 .comprobante-body {

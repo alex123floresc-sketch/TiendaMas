@@ -5,14 +5,23 @@ import episs.unaj.com.crudpersona.dto.PedidoForm;
 import episs.unaj.com.crudpersona.entity.CanalVenta;
 import episs.unaj.com.crudpersona.entity.MetodoPago;
 import episs.unaj.com.crudpersona.entity.Pedido;
+import episs.unaj.com.crudpersona.entity.Producto;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public interface PedidoService {
     List<Pedido> obtenerTodos();
     List<Pedido> obtenerPorCanal(CanalVenta canal);
     List<Pedido> obtenerPorPersona(Long personaId);
     Pedido obtenerPorId(Long id);
+
+    /** Productos más vendidos (por unidades), fuente única reutilizada por reportes y por las recomendaciones de la tienda. */
+    List<Producto> obtenerMasVendidos(int limite);
+
+    /** Unidades vendidas por producto desde una fecha dada (para calcular velocidad de venta / reabastecimiento). */
+    Map<Long, Integer> obtenerUnidadesVendidasDesde(LocalDateTime desde);
 
     /** Alta manual desde el panel de administrador. */
     Pedido crearPedido(PedidoForm form, String creadoPor);

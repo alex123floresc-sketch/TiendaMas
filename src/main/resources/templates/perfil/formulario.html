@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="contenido" style="max-width: 600px; margin: 0 auto;">
+
+    <h1 class="ui dividing header">
+        <i class="user icon"></i>
+        <div class="content">
+            Mi Perfil
+            <div class="sub header">Administra tus datos de cuenta y tu contraseña.</div>
+        </div>
+    </h1>
+
+    <div class="ui positive message" th:if="${param.actualizado}">
+        <p>Tus datos se actualizaron correctamente.</p>
+    </div>
+    <div class="ui positive message" th:if="${param.passwordActualizada}">
+        <p>Tu contraseña se actualizó correctamente.</p>
+    </div>
+    <div class="ui negative message" th:if="${param.error}">
+        <p th:switch="${param.error[0]}">
+            <span th:case="'noCoincide'">La nueva contraseña y su confirmación no coinciden.</span>
+            <span th:case="'passwordIncorrecta'">La contraseña actual no es correcta.</span>
+            <span th:case="*">Ocurrió un error, inténtalo de nuevo.</span>
+        </p>
+    </div>
+
+    <div class="ui segment">
+        <h3 class="ui header">Datos de la cuenta</h3>
+        <form th:action="@{/perfil/datos}" method="post" class="ui form">
+            <div class="two fields">
+                <div class="field">
+                    <label>Usuario</label>
+                    <input type="text" th:value="${usuario.username}" disabled>
+                </div>
+                <div class="field">
+                    <label>Rol</label>
+                    <input type="text" th:value="${usuario.rol}" disabled>
+                </div>
+            </div>
+            <div class="two fields">
+                <div class="field required">
+                    <label>Nombre</label>
+                    <input type="text" name="nombre" th:value="${usuario.nombre}" required>
+                </div>
+                <div class="field required">
+                    <label>Apellido</label>
+                    <input type="text" name="apellido" th:value="${usuario.apellido}" required>
+                </div>
+            </div>
+            <button type="submit" class="ui primary button"><i class="save icon"></i> Guardar datos</button>
+        </form>
+    </div>
+
+    <div class="ui segment">
+        <h3 class="ui header">Cambiar contraseña</h3>
+        <form th:action="@{/perfil/password}" th:object="${cambioPasswordForm}" method="post" class="ui form">
+            <div class="field required">
+                <label>Contraseña actual</label>
+                <input type="password" th:field="*{passwordActual}" required>
+            </div>
+            <div class="two fields">
+                <div class="field required">
+                    <label>Nueva contraseña</label>
+                    <input type="password" th:field="*{passwordNueva}" required minlength="4">
+                </div>
+                <div class="field required">
+                    <label>Confirmar nueva contraseña</label>
+                    <input type="password" th:field="*{confirmarPassword}" required minlength="4">
+                </div>
+            </div>
+            <button type="submit" class="ui button"><i class="lock icon"></i> Cambiar contraseña</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/tienda}">
 <body>
-<div th:fragment="content" style="max-width: 700px; margin: 0 auto;">
+<div th:fragment="content" style="max-width: 900px; margin: 0 auto;">
 
     <a th:href="@{/tienda}" class="ui button" style="margin-bottom: 20px;">
         <i class="arrow left icon"></i> Volver al catálogo
@@ -9,9 +9,17 @@
 
     <div class="ui segment">
         <span class="ui teal label" th:text="${producto.categoria != null ? producto.categoria.nombre : 'Sin categoría'}"></span>
+        <span class="ui label" th:if="${producto.marca != null and !producto.marca.isEmpty()}" th:text="${producto.marca}"></span>
+
         <h1 class="ui header" th:text="${producto.nombre}"></h1>
         <p th:text="${producto.descripcion}"></p>
-        <h2 style="color:#21ba45;" th:text="'S/ ' + ${producto.precio}"></h2>
+
+        <h2 style="color:#21ba45;">
+            S/ <span th:text="${producto.precio}"></span>
+            <span class="hint" style="display:inline; font-size: 0.5em;"
+                  th:if="${producto.unidadMedida != null and !producto.unidadMedida.isEmpty()}"
+                  th:text="'/ ' + ${producto.unidadMedida}"></span>
+        </h2>
 
         <p>
             <span th:if="${producto.stock != null and producto.stock > 0}"
@@ -34,6 +42,29 @@
                 </div>
             </div>
         </form>
+    </div>
+
+    <div th:if="${relacionados != null and not #lists.isEmpty(relacionados)}">
+        <h3 class="ui header"><i class="thumbs up icon"></i> También te puede interesar</h3>
+        <div class="tienda-grid">
+            <div class="tienda-card" th:each="p : ${relacionados}">
+                <a th:href="@{/tienda/productos/{id}(id=${p.id})}" class="tienda-card-link">
+                    <div class="tienda-card-img"><i class="box icon huge"></i></div>
+                    <div class="tienda-card-body">
+                        <div class="tienda-card-cat" th:text="${p.categoria != null ? p.categoria.nombre : ''}"></div>
+                        <div class="tienda-card-nombre" th:text="${p.nombre}"></div>
+                        <div class="tienda-card-precio" th:text="'S/ ' + ${p.precio}"></div>
+                    </div>
+                </a>
+                <form th:action="@{/tienda/carrito/agregar}" method="post">
+                    <input type="hidden" name="productoId" th:value="${p.id}">
+                    <input type="hidden" name="cantidad" value="1">
+                    <button type="submit" class="ui fluid primary button" th:disabled="${p.stock == null or p.stock <= 0}">
+                        <i class="cart plus icon"></i> Agregar
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 </body>

@@ -6,7 +6,7 @@
     <h1 class="ui dividing header">
         <i class="user plus icon"></i>
         <div class="content">
-            <span th:text="${persona.id != null} ? 'Editar Persona' : 'Crear Nueva Persona'"></span>
+            <span th:text="${persona.id != null} ? 'Editar Cliente' : 'Nuevo Cliente'"></span>
             <div class="sub header">Complete la información requerida para el registro en el sistema.</div>
         </div>
     </h1>
@@ -81,6 +81,32 @@
             <div class="field">
                 <label for="razonSocial">Razón social (solo si es RUC)</label>
                 <input type="text" id="razonSocial" th:field="*{razonSocial}" placeholder="Ej. Comercial Los Andes S.A.C.">
+            </div>
+
+            <div class="ui divider"></div>
+
+            <h4 class="ui header">Datos adicionales</h4>
+            <div class="two fields">
+                <div class="field">
+                    <label for="fechaNacimiento">Fecha de nacimiento</label>
+                    <input type="date" id="fechaNacimiento" th:field="*{fechaNacimiento}">
+                </div>
+                <div class="field">
+                    <label for="genero">Género</label>
+                    <select id="genero" th:field="*{genero}" class="ui fluid dropdown">
+                        <option value="">-- Prefiere no decir --</option>
+                        <option value="MASCULINO">Masculino</option>
+                        <option value="FEMENINO">Femenino</option>
+                        <option value="OTRO">Otro</option>
+                        <option value="PREFIERO_NO_DECIR">Prefiero no decir</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="preferencias">Preferencias / notas</label>
+                <textarea id="preferencias" th:field="*{preferencias}" rows="2"
+                          placeholder="Ej. Prefiere pagar con Yape, entregar en horario de tarde, etc."></textarea>
             </div>
 
             <div class="ui divider"></div>

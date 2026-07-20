@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base}">
+<body>
+<div th:fragment="content">
+
+    <h1 class="ui dividing header">
+        <i class="money bill wave icon"></i>
+        <div class="content">
+            Gastos
+            <div class="sub header">Registra los gastos operativos del negocio (alquiler, servicios, insumos, etc.).</div>
+        </div>
+    </h1>
+
+    <div style="margin-bottom: 25px;">
+        <a href="/gastos/nuevo" class="ui primary button">
+            <i class="plus icon"></i> Nuevo Gasto
+        </a>
+    </div>
+
+    <div th:if="${gastos.isEmpty()}" class="ui icon warning message">
+        <i class="info circle icon"></i>
+        <div class="content">
+            <div class="header">Sin gastos registrados</div>
+            <p>Aún no has registrado ningún gasto.</p>
+        </div>
+    </div>
+
+    <table class="ui celled striped table" th:unless="${gastos.isEmpty()}">
+        <thead>
+        <tr>
+            <th>Concepto</th>
+            <th>Categoría</th>
+            <th>Fecha</th>
+            <th class="right aligned">Monto</th>
+            <th>Recurrencia</th>
+            <th class="center aligned">Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="gasto : ${gastos}">
+            <td th:text="${gasto.concepto}" style="font-weight:bold;"></td>
+            <td><span class="ui teal tiny label" th:text="${gasto.categoria}"></span></td>
+            <td th:text="${gasto.fecha}"></td>
+            <td class="right aligned" th:text="'S/ ' + ${#numbers.formatDecimal(gasto.monto, 1, 2)}"></td>
+            <td>
+                <span th:if="${gasto.recurrente}" class="ui small label" th:text="${gasto.frecuencia}"></span>
+                <span th:unless="${gasto.recurrente}" class="hint" style="margin:0;">Único</span>
+            </td>
+            <td class="center aligned">
+                <div class="ui small buttons">
+                    <a th:href="@{/gastos/{id}/editar(id=${gasto.id})}" class="ui yellow button" title="Editar">
+                        <i class="edit icon"></i>
+                    </a>
+                    <form th:if="${gasto.recurrente}" th:action="@{/gastos/{id}/duplicar(id=${gasto.id})}" method="post" style="display:contents">
+                        <button type="submit" class="ui blue button" title="Repetir este mes">
+                            <i class="redo icon"></i>
+                        </button>
+                    </form>
+                    <form th:action="@{/gastos/{id}/eliminar(id=${gasto.id})}" method="post" style="display:contents"
+                          th:onsubmit="return confirm('¿Está seguro de eliminar este gasto?')">
+                        <button type="submit" class="ui red button" title="Eliminar">
+                            <i class="trash icon"></i>
+                        </button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

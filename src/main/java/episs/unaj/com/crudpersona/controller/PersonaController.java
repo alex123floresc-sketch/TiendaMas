@@ -1,6 +1,8 @@
 package episs.unaj.com.crudpersona.controller;
 
+import episs.unaj.com.crudpersona.entity.Pedido;
 import episs.unaj.com.crudpersona.entity.Persona;
+import episs.unaj.com.crudpersona.service.PedidoService;
 import episs.unaj.com.crudpersona.service.PersonaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -11,7 +13,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/personas")
@@ -20,6 +24,9 @@ public class PersonaController {
     @Autowired
     private PersonaService personaService;
 
+    @Autowired
+    private PedidoService pedidoService;
+
     // 1. LISTAR PERSONAS
     @GetMapping
     public String listar(Model model) {
@@ -27,8 +34,17 @@ public class PersonaController {
         if (lista == null) {
             lista = new java.util.ArrayList<>();
         }
+
+        Map<Long, Double> totalPorPersona = new HashMap<>();
+        for (Pedido pedido : pedidoService.obtenerTodos()) {
+            if (pedido.getPersona() == null) continue;
+            double total = pedido.getTotal() != null ? pedido.getTotal() : 0.0;
+            totalPorPersona.merge(pedido.getPersona().getId(), total, Double::sum);
+        }
+
         model.addAttribute("personas", lista);
-        model.addAttribute("titulo", "Personas");
+        model.addAttribute("totalPorPersona", totalPorPersona);
+        model.addAttribute("titulo", "Clientes");
         return "personas/index";
     }
 
@@ -36,7 +52,7 @@ public class PersonaController {
     @GetMapping("/nuevo")
     public String mostrarFormularioCrear(Model model) {
         model.addAttribute("persona", new Persona());
-        model.addAttribute("titulo", "Nueva Persona");
+        model.addAttribute("titulo", "Nuevo Cliente");
         return "personas/form";
     }
 
@@ -47,15 +63,22 @@ public class PersonaController {
         return "redirect:/personas";
     }
 
-    // 4. VER DETALLE DE UNA PERSONA
+    // 4. VER DETALLE DE UNA PERSONA (+ resumen de compras)
     @GetMapping("/{id}")
     public String ver(@PathVariable("id") Long id, Model model) {
         Persona persona = personaService.obtenerPorId(id);
         if (persona == null) {
             return "redirect:/personas";
         }
+
+        List<Pedido> pedidos = pedidoService.obtenerPorPersona(id);
+        double totalGastado = pedidos.stream().mapToDouble(p -> p.getTotal() != null ? p.getTotal() : 0.0).sum();
+
         model.addAttribute("persona", persona);
-        model.addAttribute("titulo", "Detalle de Persona");
+        model.addAttribute("titulo", "Detalle de Cliente");
+        model.addAttribute("cantidadPedidos", pedidos.size());
+        model.addAttribute("totalGastado", totalGastado);
+        model.addAttribute("ultimaCompra", pedidos.isEmpty() ? null : pedidos.get(0));
         return "personas/ver";
     }
 
@@ -65,7 +88,7 @@ public class PersonaController {
         Persona persona = personaService.obtenerPorId(id);
         if (persona != null) {
             model.addAttribute("persona", persona);
-            model.addAttribute("titulo", "Editar Persona");
+            model.addAttribute("titulo", "Editar Cliente");
             return "personas/form";
         }
         return "redirect:/personas";

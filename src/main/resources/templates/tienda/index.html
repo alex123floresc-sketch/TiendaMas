@@ -28,7 +28,12 @@
                 <div class="tienda-card-body">
                     <div class="tienda-card-cat" th:text="${p.categoria != null ? p.categoria.nombre : ''}"></div>
                     <div class="tienda-card-nombre" th:text="${p.nombre}"></div>
-                    <div class="tienda-card-precio" th:text="'S/ ' + ${p.precio}"></div>
+                    <div class="hint" style="margin:0 0 4px 0;" th:if="${p.marca != null and !p.marca.isEmpty()}" th:text="${p.marca}"></div>
+                    <div class="tienda-card-precio">
+                        S/ <span th:text="${p.precio}"></span>
+                        <span th:if="${p.unidadMedida != null and !p.unidadMedida.isEmpty()}"
+                              style="font-size:0.6em; color: var(--color-text-muted);" th:text="'/' + ${p.unidadMedida}"></span>
+                    </div>
                 </div>
             </a>
             <form th:action="@{/tienda/carrito/agregar}" method="post">

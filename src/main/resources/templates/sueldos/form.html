@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base}">
+<body>
+<div th:fragment="content" style="max-width: 700px; margin: 0 auto;">
+
+    <h1 class="ui dividing header">
+        <i class="id badge icon"></i>
+        <div class="content">
+            Nuevo Sueldo
+            <div class="sub header">Registra el pago de un sueldo a un vendedor o administrador.</div>
+        </div>
+    </h1>
+
+    <div class="ui segment">
+        <form th:action="@{/sueldos}" th:object="${sueldo}" method="POST" class="ui form">
+
+            <div class="field required">
+                <label>Empleado</label>
+                <select name="usuarioId" class="ui fluid dropdown" required>
+                    <option value="">-- Selecciona un empleado --</option>
+                    <option th:each="u : ${empleados}" th:value="${u.id}"
+                            th:text="${u.nombre + ' ' + u.apellido + ' (' + u.rol + ')'}"></option>
+                </select>
+            </div>
+
+            <div class="two fields">
+                <div class="field required">
+                    <label>Monto (S/)</label>
+                    <input type="number" step="0.01" min="0" th:field="*{monto}" placeholder="0.00" required>
+                </div>
+                <div class="field required">
+                    <label>Periodo</label>
+                    <input type="text" th:field="*{periodo}" placeholder="Ej. 2026-07" required>
+                </div>
+            </div>
+
+            <div class="field required">
+                <label>Fecha de pago</label>
+                <input type="date" th:field="*{fechaPago}" required>
+            </div>
+
+            <div class="field">
+                <label>Notas</label>
+                <textarea th:field="*{notas}" rows="2" placeholder="Detalles adicionales (opcional)"></textarea>
+            </div>
+
+            <div class="ui divider"></div>
+
+            <div class="form-actions">
+                <button type="submit" class="ui positive button">
+                    <i class="save icon"></i> Guardar
+                </button>
+                <a href="/sueldos" class="ui button">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

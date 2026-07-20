@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -56,5 +57,33 @@ public class UsuarioServiceImpl implements UsuarioService {
         Usuario usuario = new Usuario(username, passwordEncoder.encode(rawPassword), rol, nombre, apellido);
         usuario.setPersona(persona);
         return usuarioRepository.save(usuario);
+    }
+
+    @Override
+    public List<Usuario> obtenerEmpleados() {
+        return usuarioRepository.findByRolIn(List.of(RolUsuario.VENDEDOR, RolUsuario.ADMIN));
+    }
+
+    @Override
+    @Transactional
+    public Usuario actualizarPerfil(String username, String nombre, String apellido) {
+        Usuario usuario = usuarioRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado: " + username));
+        usuario.setNombre(nombre);
+        usuario.setApellido(apellido);
+        return usuarioRepository.save(usuario);
+    }
+
+    @Override
+    @Transactional
+    public boolean cambiarPassword(String username, String passwordActual, String passwordNueva) {
+        Usuario usuario = usuarioRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado: " + username));
+        if (!passwordEncoder.matches(passwordActual, usuario.getPassword())) {
+            return false;
+        }
+        usuario.setPassword(passwordEncoder.encode(passwordNueva));
+        usuarioRepository.save(usuario);
+        return true;
     }
 }

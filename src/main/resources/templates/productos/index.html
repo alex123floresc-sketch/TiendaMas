@@ -47,6 +47,8 @@
             <td th:text="${producto.id}"></td>
             <td>
                 <div style="font-weight: bold;" th:text="${producto.nombre}"></div>
+                <div class="hint" th:if="${producto.marca != null and !producto.marca.isEmpty()}"
+                     th:text="${producto.marca} + (${producto.unidadMedida != null and !producto.unidadMedida.isEmpty()} ? ' · ' + ${producto.unidadMedida} : '')"></div>
                 <div class="hint" th:if="${producto.codigoBarras != null and !producto.codigoBarras.isEmpty()}"
                      th:text="'Código: ' + ${producto.codigoBarras}"></div>
             </td>

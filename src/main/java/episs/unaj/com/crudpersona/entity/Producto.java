@@ -18,6 +18,11 @@ public class Producto {
     @Column(unique = true)
     private String codigoBarras;
 
+    private String marca;
+
+    /** Ej. "kg", "unidad", "paquete", "litro". */
+    private String unidadMedida;
+
     @ManyToOne
     @JoinColumn(name = "categoria_id", nullable = false)
     private Categoria categoria;
@@ -53,4 +58,10 @@ public class Producto {
 
     public String getCodigoBarras() { return codigoBarras; }
     public void setCodigoBarras(String codigoBarras) { this.codigoBarras = codigoBarras; }
+
+    public String getMarca() { return marca; }
+    public void setMarca(String marca) { this.marca = marca; }
+
+    public String getUnidadMedida() { return unidadMedida; }
+    public void setUnidadMedida(String unidadMedida) { this.unidadMedida = unidadMedida; }
 }
