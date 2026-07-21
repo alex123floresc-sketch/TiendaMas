@@ -1,0 +1,165 @@
+package com.tiendamas.service.impl;
+
+import com.tiendamas.dto.DetalleForm;
+import com.tiendamas.dto.ItemVenta;
+import com.tiendamas.dto.PedidoForm;
+import com.tiendamas.entity.CanalVenta;
+import com.tiendamas.entity.DetallePedido;
+import com.tiendamas.entity.MetodoPago;
+import com.tiendamas.entity.Pedido;
+import com.tiendamas.entity.Persona;
+import com.tiendamas.entity.Producto;
+import com.tiendamas.entity.TipoComprobante;
+import com.tiendamas.repository.PedidoRepository;
+import com.tiendamas.service.PedidoService;
+import com.tiendamas.service.PersonaService;
+import com.tiendamas.service.ProductoService;
+import com.tiendamas.service.SerieCorrelativoService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+@Service
+public class PedidoServiceImpl implements PedidoService {
+
+    @Autowired
+    private PedidoRepository pedidoRepository;
+
+    @Autowired
+    private PersonaService personaService;
+
+    @Autowired
+    private ProductoService productoService;
+
+    @Autowired
+    private SerieCorrelativoService serieCorrelativoService;
+
+    @Override
+    public List<Pedido> obtenerTodos() {
+        return pedidoRepository.findAll();
+    }
+
+    @Override
+    public List<Pedido> obtenerPorCanal(CanalVenta canal) {
+        return pedidoRepository.findByCanalOrderByFechaDesc(canal);
+    }
+
+    @Override
+    public List<Pedido> obtenerPorPersona(Long personaId) {
+        return pedidoRepository.findByPersonaIdOrderByFechaDesc(personaId);
+    }
+
+    @Override
+    public Pedido obtenerPorId(Long id) {
+        return pedidoRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    @Transactional
+    public Pedido crearPedido(PedidoForm form, String creadoPor) {
+        List<ItemVenta> items = new ArrayList<>();
+        for (DetalleForm df : form.getDetalles()) {
+            if (df == null) continue;
+            items.add(new ItemVenta(df.getProductoId(), df.getCantidad()));
+        }
+        return crearVenta(form.getPersonaId(), items, CanalVenta.TIENDA_FISICA, form.getMetodoPago(), creadoPor);
+    }
+
+    @Override
+    @Transactional
+    public Pedido crearVenta(Long personaId, List<ItemVenta> items, CanalVenta canal,
+                              MetodoPago metodoPago, String vendedorUsername) {
+        Persona persona = personaService.obtenerPorId(personaId);
+        if (persona == null) {
+            throw new IllegalArgumentException("Cliente no encontrado");
+        }
+
+        Pedido pedido = new Pedido();
+        pedido.setPersona(persona);
+        pedido.setCanal(canal);
+        pedido.setMetodoPago(metodoPago);
+        pedido.setVendedorUsername(vendedorUsername);
+
+        TipoComprobante tipoComprobante = persona.getTipoComprobanteSugerido();
+        pedido.setTipoComprobante(tipoComprobante);
+        pedido.setSerie(tipoComprobante.getSerie());
+        pedido.setNumero(serieCorrelativoService.siguienteNumero(tipoComprobante));
+
+        double total = 0.0;
+        if (items != null) {
+            for (ItemVenta iv : items) {
+                if (iv == null || iv.getCantidad() == null || iv.getCantidad() <= 0
+                        || iv.getProductoId() == null) {
+                    continue;
+                }
+                Producto producto = productoService.obtenerPorId(iv.getProductoId());
+                if (producto == null) continue;
+
+                DetallePedido detalle = new DetallePedido();
+                detalle.setProducto(producto);
+                detalle.setCantidad(iv.getCantidad());
+                detalle.setPrecioUnitario(producto.getPrecio());
+                detalle.setSubtotal(producto.getPrecio() * iv.getCantidad());
+
+                pedido.agregarDetalle(detalle);
+                total += detalle.getSubtotal();
+            }
+        }
+
+        if (pedido.getDetalles().isEmpty()) {
+            throw new IllegalArgumentException("El carrito está vacío");
+        }
+
+        pedido.setTotal(total);
+        return pedidoRepository.save(pedido);
+    }
+
+    @Override
+    public List<Producto> obtenerMasVendidos(int limite) {
+        Map<Long, Integer> unidadesPorProductoId = new LinkedHashMap<>();
+        Map<Long, Producto> productoPorId = new LinkedHashMap<>();
+
+        for (Pedido pedido : pedidoRepository.findAll()) {
+            for (DetallePedido detalle : pedido.getDetalles()) {
+                Producto producto = detalle.getProducto();
+                if (producto == null) continue;
+                int cantidad = detalle.getCantidad() != null ? detalle.getCantidad() : 0;
+                unidadesPorProductoId.merge(producto.getId(), cantidad, Integer::sum);
+                productoPorId.putIfAbsent(producto.getId(), producto);
+            }
+        }
+
+        return unidadesPorProductoId.entrySet().stream()
+                .sorted((a, b) -> b.getValue() - a.getValue())
+                .limit(limite)
+                .map(entry -> productoPorId.get(entry.getKey()))
+                .toList();
+    }
+
+    @Override
+    public Map<Long, Integer> obtenerUnidadesVendidasDesde(LocalDateTime desde) {
+        Map<Long, Integer> unidadesPorProductoId = new HashMap<>();
+        for (Pedido pedido : pedidoRepository.findAll()) {
+            if (pedido.getFecha() == null || pedido.getFecha().isBefore(desde)) continue;
+            for (DetallePedido detalle : pedido.getDetalles()) {
+                Producto producto = detalle.getProducto();
+                if (producto == null) continue;
+                int cantidad = detalle.getCantidad() != null ? detalle.getCantidad() : 0;
+                unidadesPorProductoId.merge(producto.getId(), cantidad, Integer::sum);
+            }
+        }
+        return unidadesPorProductoId;
+    }
+
+    @Override
+    public void eliminar(Long id) {
+        pedidoRepository.deleteById(id);
+    }
+}

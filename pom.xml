@@ -7,11 +7,11 @@
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>4.0.6</version>
         <relativePath/> </parent>
-    <groupId>episs.unaj.com</groupId>
-    <artifactId>crudPersona</artifactId>
+    <groupId>com.tiendamas</groupId>
+    <artifactId>tiendaMas</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>crudPersona</name>
-    <description>crudPersona</description>
+    <name>tiendaMas</name>
+    <description>TiendaMas - Sistema de ventas e inventario</description>
     <url/>
     <licenses>
         <license/>
