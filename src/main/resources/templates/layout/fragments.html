@@ -1,54 +1,70 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-<nav th:fragment="menu" class="ui vertical inverted menu sidebar-menu"
-     th:with="uri=${currentUri}">
+<nav th:fragment="menu" class="admin-navbar" th:with="uri=${currentUri}">
+  <div class="admin-navbar-bar">
 
-  <a href="/" class="item brand-item">
-    <h2 class="ui inverted header brand-header">
-      <span class="brand-icon-badge"><i class="shop icon"></i></span>
-      <div class="content">
-        TiendaMas
-        <div class="sub header">Panel Administrador</div>
+    <a href="/" class="admin-brand">
+      <span class="admin-brand-badge"><i class="shop icon"></i></span>
+      <span class="admin-brand-text">TiendaMas <small>Panel Administrador</small></span>
+    </a>
+
+    <button type="button" class="admin-nav-toggle" onclick="document.querySelector('.admin-nav-links').classList.toggle('open')">
+      <i class="bars icon"></i>
+    </button>
+
+    <div class="admin-nav-links">
+
+      <div class="ui dropdown admin-nav-item" th:classappend="${uri != null and (uri.startsWith('/productos') or uri.startsWith('/categorias'))} ? 'active'">
+        <i class="cube icon"></i> Catálogo <i class="dropdown icon"></i>
+        <div class="menu">
+          <a href="/productos" class="item"><i class="cube icon"></i> Productos</a>
+          <a href="/categorias" class="item"><i class="tags icon"></i> Categorías</a>
+        </div>
       </div>
-    </h2>
-  </a>
 
-  <div class="menu-scroll">
+      <div class="ui dropdown admin-nav-item" th:classappend="${uri != null and (uri.startsWith('/pedidos') or uri.startsWith('/reportes'))} ? 'active'">
+        <i class="shopping cart icon"></i> Ventas <i class="dropdown icon"></i>
+        <div class="menu">
+          <a href="/pedidos" class="item"><i class="list icon"></i> Pedidos</a>
+          <a href="/reportes" class="item"><i class="chart bar icon"></i> Reportes</a>
+        </div>
+      </div>
 
-    <div class="item menu-section-label">Catálogo</div>
-    <a href="/productos" class="item" th:classappend="${uri != null and uri.startsWith('/productos')} ? 'active-link'">
-      <span class="menu-icon"><i class="cube icon"></i></span> Productos</a>
-    <a href="/categorias" class="item" th:classappend="${uri != null and uri.startsWith('/categorias')} ? 'active-link'">
-      <span class="menu-icon"><i class="tags icon"></i></span> Categorías</a>
+      <div class="ui dropdown admin-nav-item" th:classappend="${uri != null and (uri.startsWith('/gastos') or uri.startsWith('/sueldos'))} ? 'active'">
+        <i class="money bill wave icon"></i> Finanzas <i class="dropdown icon"></i>
+        <div class="menu">
+          <a href="/gastos" class="item"><i class="money bill wave icon"></i> Gastos</a>
+          <a href="/sueldos" class="item"><i class="id badge icon"></i> Sueldos</a>
+        </div>
+      </div>
 
-    <div class="item menu-section-label">Ventas</div>
-    <a href="/pedidos" class="item" th:classappend="${uri != null and uri.startsWith('/pedidos')} ? 'active-link'">
-      <span class="menu-icon"><i class="shopping cart icon"></i></span> Ventas</a>
-    <a href="/reportes" class="item" th:classappend="${uri != null and uri.startsWith('/reportes')} ? 'active-link'">
-      <span class="menu-icon"><i class="chart bar icon"></i></span> Reportes</a>
+      <a href="/personas" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/personas')} ? 'active'">
+        <i class="users icon"></i> Clientes
+      </a>
 
-    <div class="item menu-section-label">Finanzas</div>
-    <a href="/gastos" class="item" th:classappend="${uri != null and uri.startsWith('/gastos')} ? 'active-link'">
-      <span class="menu-icon"><i class="money bill wave icon"></i></span> Gastos</a>
-    <a href="/sueldos" class="item" th:classappend="${uri != null and uri.startsWith('/sueldos')} ? 'active-link'">
-      <span class="menu-icon"><i class="id badge icon"></i></span> Sueldos</a>
+      <div class="admin-nav-spacer"></div>
 
-    <div class="item menu-section-label">Clientes</div>
-    <a href="/personas" class="item" th:classappend="${uri != null and uri.startsWith('/personas')} ? 'active-link'">
-      <span class="menu-icon"><i class="users icon"></i></span> Clientes</a>
+      <div class="ui dropdown admin-nav-item admin-nav-account" th:classappend="${uri != null and uri.startsWith('/perfil')} ? 'active'">
+        <i class="user icon"></i> <span th:text="${usuarioAutenticado}">Usuario</span> <i class="dropdown icon"></i>
+        <div class="menu">
+          <a href="/perfil" class="item"><i class="id card icon"></i> Mi perfil</a>
+          <a href="/pos" class="item"><i class="cash register icon"></i> Punto de venta</a>
+          <div class="divider"></div>
+          <form th:action="@{/logout}" method="post" class="item logout-link-form">
+            <button type="submit" class="logout-link-button"><i class="sign out alternate icon"></i> Salir</button>
+          </form>
+        </div>
+      </div>
 
+    </div>
   </div>
 
-  <div class="menu-bottom">
-    <a href="/perfil" class="item" th:classappend="${uri != null and uri.startsWith('/perfil')} ? 'active-link'">
-      <span class="menu-icon"><i class="user icon"></i></span> Mi perfil</a>
-
-    <form th:action="@{/logout}" method="post" class="item logout-item">
-      <button type="submit" class="logout-link-button">
-        <span class="menu-icon"><i class="sign out alternate icon"></i></span> Salir</button>
-    </form>
-  </div>
+  <script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+      $('.admin-navbar .ui.dropdown').dropdown();
+    });
+  </script>
 </nav>
 </body>
 </html>

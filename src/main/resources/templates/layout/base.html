@@ -10,18 +10,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.js"></script>
   <script th:src="@{/js/main.js}"></script>
 </head>
-<body>
-<div class="mobile-topbar">
-  <button type="button" class="mobile-menu-toggle" onclick="document.querySelector('.sidebar-menu').classList.toggle('open')">
-    <i class="bars icon"></i> Menú
-  </button>
-</div>
-<div class="wrapper">
-  <div th:replace="~{layout/fragments :: menu}"></div>
-  <div class="content">
-    <div class="container">
-      <div th:insert="~{this :: content}"></div>
-    </div>
+<body class="admin-body">
+<div th:replace="~{layout/fragments :: menu}"></div>
+<div class="admin-content">
+  <div class="container">
+    <div th:insert="~{this :: content}"></div>
   </div>
 </div>
 </body>

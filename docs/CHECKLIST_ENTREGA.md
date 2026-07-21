@@ -50,9 +50,11 @@ Lista de verificación genérica para un proyecto integrador de carrera. Como no
 
 Estos son gaps concretos que noté al leer el código y que conviene que decidas si los resolvés antes de entregar o los dejás documentados como "trabajo futuro" en el informe (sección 15):
 
-- [ ] No hay pruebas automatizadas más allá del test de contexto por defecto (`TiendaMasApplicationTests`). Si tu cátedra evalúa testing, considerá agregar al menos algunos tests de `PedidoServiceImpl`.
+- [x] ~~Run Configuration de IntelliJ apuntaba a una clase inexistente (`episs.unaj.com.TiendaMasApplication`)~~ — corregido a `com.tiendamas.TiendaMasApplication`.
+- [ ] No hay pruebas automatizadas más allá del test de contexto por defecto (`TiendaMasApplicationTests`). Si tu cátedra evalúa testing, considerá agregar al menos algunos tests de `PedidoServiceImpl`. Se compensó parcialmente con pruebas manuales por HTTP (ver informe, sección 10), pero no reemplazan tests automatizados.
 - [ ] `application.yml` tiene usuario y contraseña de MySQL en texto plano dentro del repositorio.
 - [ ] `ddl-auto: update` no es apto para producción real (está bien para un proyecto académico, pero conviene mencionarlo como limitación conocida en el informe).
+- [ ] Falta verificación visual en navegador (con capturas) del rediseño de interfaz: navbar superior del panel admin, pie de página de la tienda y nueva paleta de colores — verificado por HTTP (sin errores), pero no visualmente.
 
 ---
 

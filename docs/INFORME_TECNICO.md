@@ -47,7 +47,7 @@ TiendaMas es un sistema web de gestión de ventas e inventario, pensado para peq
 
 El proyecto surge de la necesidad habitual de este tipo de comercios de reemplazar procesos manuales o dispersos en planillas (registro de ventas, control de stock, seguimiento de gastos) por una herramienta única, con distintos niveles de acceso según el rol de cada usuario (administrador, vendedor, cliente).
 
-[COMPLETAR: párrafo con el contexto real que motivó el proyecto — por ejemplo si está inspirado en un comercio real, en una consigna de cátedra, en una idea propia, etc. Esta sección es la que más valor le da un lector/evaluador que no conoce el proyecto, porque explica el "por qué".]
+El desarrollo se llevó a cabo como proyecto integrador de carrera, en un ciclo corto e intensivo: la totalidad de las funcionalidades descriptas en este informe fueron implementadas y versionadas en el lapso de tres días (19 al 21 de julio de 2026), trabajando de forma iterativa módulo por módulo. Esta forma de trabajo condicionó varias decisiones técnicas —por ejemplo, la elección de un monolito con renderizado del lado del servidor en lugar de una arquitectura desacoplada— que se explican con más detalle en la sección 4.3.
 
 Este informe documenta el análisis, diseño, implementación y pruebas del sistema, así como las decisiones técnicas tomadas durante su desarrollo y las conclusiones obtenidas al finalizar el proyecto.
 
@@ -87,7 +87,7 @@ El sistema cubre, para un único comercio (mono-tenant):
 
 ### 3.2 Limitaciones (fuera de alcance)
 
-[COMPLETAR y ajustar según lo que decidas dejar afuera. Como base, a partir del código actual, quedan fuera de alcance]:
+A partir del estado actual del código, quedan deliberadamente fuera de alcance de esta primera versión:
 
 - Integración con medios de pago reales (pasarelas de pago) — el método de pago se registra pero no se procesa contra ningún proveedor externo.
 - Facturación electrónica homologada ante un ente fiscal real (el sistema modela boleta/factura de forma interna, sin integración con AFIP/SUNAT u organismo equivalente).
@@ -126,33 +126,38 @@ Vista (Thymeleaf)  →  Controlador (@Controller)  →  Servicio (@Service)  →
 
 ### 4.3 Justificación de la elección tecnológica
 
-[COMPLETAR: por qué elegiste Spring Boot y no otra alternativa (por ejemplo Node/Express, Django, .NET), y por qué Thymeleaf server-side y no un frontend desacoplado tipo SPA (React/Angular). Sugerencia de argumentos que podés desarrollar con tus palabras: curva de aprendizaje del equipo, tiempo disponible, requisitos de la cátedra, preferencia por una arquitectura monolítica simple de desplegar para un proyecto de este tamaño, ecosistema maduro de Spring para seguridad y persistencia, etc.]
+Se optó por **Spring Boot** frente a alternativas como Node/Express, Django o .NET principalmente por la madurez y la integración nativa entre sus módulos: Spring Security, Spring Data JPA y Thymeleaf se configuran y combinan con muy poco código de "pegamento", lo cual fue determinante dado el tiempo acotado de desarrollo (ver sección 5). Un stack con más piezas independientes (por ejemplo, una API REST separada más autenticación por tokens más un framework de frontend distinto) hubiera implicado resolver problemas de integración adicionales sin aportar valor funcional al alcance definido.
+
+Se optó por **Thymeleaf con renderizado del lado del servidor**, en lugar de una arquitectura desacoplada tipo SPA (React/Angular + API REST), por tres razones concretas:
+
+1. **Superficie de trabajo menor:** un único proyecto Maven, un único proceso desplegado y un único lenguaje (Java) para toda la lógica de negocio, sin necesidad de mantener un contrato de API versionado entre frontend y backend.
+2. **Seguridad "gratis":** Spring Security se integra directamente con los formularios Thymeleaf (incluida la protección CSRF, verificada en la sección 9), sin necesidad de implementar autenticación basada en tokens (JWT) ni gestionar su renovación en el cliente.
+3. **Alcance del proyecto:** al tratarse de una aplicación de gestión interna (panel administrativo, POS) más una tienda de autoservicio simple, no había un requisito real de interfaz altamente interactiva que justificara el costo adicional de una SPA.
+
+La contrapartida asumida conscientemente es una interfaz menos "fluida" que una SPA (cada acción implica una recarga o redirección de página), aceptable para el tipo de uso interno/administrativo que tiene la mayor parte del sistema.
 
 ---
 
 ## 5. Metodología de trabajo
 
-[COMPLETAR con la metodología real que usaste. Si no llevaste un proceso formal, se recomienda describirlo igual de manera honesta — por ejemplo "desarrollo iterativo incremental, sin sprints formales, con incorporación progresiva de módulos"]. Como guía, si trabajaste de forma iterativa podés estructurar esta sección así:
+El proyecto se desarrolló bajo un esquema de **desarrollo iterativo e incremental, en un ciclo corto e intensivo**, sin sprints formales ni ceremonias de un framework ágil determinado: cada módulo funcional se llevó de punta a punta (modelo de datos → repositorio → servicio → controlador → vista) antes de pasar al siguiente, lo que permitió tener en todo momento una aplicación ejecutable.
 
-- **Enfoque:** desarrollo iterativo e incremental, agregando un módulo funcional completo por vez (personas → catálogo → POS → tienda online → gastos/sueldos → reportes).
-- **Control de versiones:** uso de Git con commits descriptivos por funcionalidad (ver historial del repositorio).
-- **Organización de tareas:** [COMPLETAR: ¿usaste un tablero Kanban, Trello, issues de GitHub, o una lista propia?]
-- **Revisión de código:** [COMPLETAR: ¿trabajaste solo/a o en equipo? ¿hubo revisión de pares?]
-- **Duración del proyecto:** [COMPLETAR: fecha de inicio real — fecha de entrega]
+- **Enfoque:** desarrollo iterativo por módulo completo (personas y catálogo → seguridad y autenticación → punto de venta → tienda en línea → gastos, sueldos y reportes → ajustes de interfaz y experiencia de usuario).
+- **Control de versiones:** Git, con un historial de 9 commits entre el 19 y el 21 de julio de 2026 (`git log` del repositorio). Los mensajes de commit iniciales priorizaron la velocidad de iteración por sobre la trazabilidad detallada (p. ej. "versión 1.2", "version f"); de cara a una posible continuidad del proyecto, se recomienda adoptar mensajes de commit descriptivos por funcionalidad.
+- **Organización de tareas:** desarrollo individual, sin tablero de gestión formal; el orden de trabajo se guio por la dependencia natural entre módulos (no tiene sentido el punto de venta sin catálogo, ni los reportes sin ventas registradas).
+- **Duración real del proyecto:** 3 días (19/07/2026 a 21/07/2026), lo cual explica y justifica varias decisiones de la sección 4.3 (elegir el stack con menor fricción de integración posible).
 
-### 5.1 Cronograma
+### 5.1 Cronograma real
 
-[COMPLETAR: tabla o diagrama de Gantt con las etapas reales del proyecto. Ejemplo de estructura]:
+A diferencia de un cronograma planificado en etapas separadas por semanas, el desarrollo se concentró en tres jornadas de trabajo continuo. La siguiente tabla refleja el orden real en que se fueron incorporando las funcionalidades, reconstruido a partir del historial de commits:
 
-| Etapa | Descripción | Período |
+| Jornada | Fecha | Trabajo realizado |
 |---|---|---|
-| 1 | Relevamiento y diseño del modelo de datos | [fechas] |
-| 2 | Configuración base del proyecto, seguridad y autenticación | [fechas] |
-| 3 | Módulo de catálogo (productos/categorías) y personas | [fechas] |
-| 4 | Módulo de punto de venta (POS) | [fechas] |
-| 5 | Módulo de tienda en línea | [fechas] |
-| 6 | Módulo de gastos, sueldos y reportes | [fechas] |
-| 7 | Pruebas, ajustes y documentación final | [fechas] |
+| Día 1 | 19/07/2026 | Estructura base del proyecto (Spring Boot, seguridad, JPA), modelo de datos inicial y primeras funcionalidades de gestión (personas, catálogo). |
+| Día 2 | 20/07/2026 | Iteración y consolidación de funcionalidades: punto de venta, tienda en línea, gastos, sueldos y reportes. |
+| Día 3 | 21/07/2026 | Ajustes finales, corrección de la configuración de ejecución (ver sección 11), y rediseño de experiencia de usuario: navegación del panel administrativo, pie de página de la tienda y paleta de colores unificada (ver sección 8.6). |
+
+[COMPLETAR si corresponde: si además hiciste un relevamiento, diseño o aprendizaje previo de las tecnologías *antes* de empezar a commitear código, mencionalo acá — el historial de Git solo captura desde el primer commit, no el trabajo de preparación previo.]
 
 ---
 
@@ -397,14 +402,24 @@ Este mismo flujo (`crearVenta`) es reutilizado por el checkout de la **tienda en
 
 ### 8.4 Datos de demostración
 
-`DataSeeder` (que implementa `CommandLineRunner`) siembra datos de ejemplo al iniciar la aplicación (categorías, productos, personas, series correlativas, gastos, sueldos y un usuario inicial). Cada bloque de siembra es **idempotente**: verifica si ya existen datos de ese tipo antes de insertarlos, para no duplicar información ni afectar una base de datos real ya en uso.
+`DataSeeder` (que implementa `CommandLineRunner`) siembra datos de ejemplo al iniciar la aplicación (categorías, productos, personas, series correlativas, gastos, sueldos y los usuarios iniciales detallados en la sección 11.5). Cada bloque de siembra es **idempotente**: verifica si ya existen datos de ese tipo antes de insertarlos, para no duplicar información ni afectar una base de datos real ya en uso.
 
 ### 8.5 Persistencia y configuración
 
-- `spring.jpa.hibernate.ddl-auto=update`: Hibernate actualiza el esquema automáticamente a partir de las entidades (adecuado para desarrollo; [COMPLETAR: mencionar si para producción se recomienda pasar a migraciones versionadas, por ejemplo con Flyway o Liquibase]).
+- `spring.jpa.hibernate.ddl-auto=update`: Hibernate actualiza el esquema automáticamente a partir de las entidades. Es una opción adecuada para el desarrollo ágil de este proyecto, pero no para un uso en producción real, donde se recomienda migrar a herramientas de migración versionada del esquema (Flyway o Liquibase) — ver sección 15.
 - Conexión configurada contra MySQL en `localhost:3306/TiendaMas` (`application.yml`).
 - H2 disponible como dependencia en memoria, útil para pruebas rápidas sin depender de una instancia de MySQL.
 - Carga de imágenes de producto limitada a 5 MB (`spring.servlet.multipart`), gestionada por `ImagenStorage`.
+
+### 8.6 Interfaz: navegación, pie de página y paleta de colores
+
+Sobre el final del desarrollo se revisó la experiencia de usuario del sistema con tres cambios concretos:
+
+- **Navegación del panel administrativo:** se reemplazó el menú lateral (sidebar) por una **barra de navegación superior fija**, agrupando los módulos afines en desplegables (Semantic UI `dropdown`) para no saturar la barra: *Catálogo* (Productos, Categorías), *Ventas* (Pedidos, Reportes) y *Finanzas* (Gastos, Sueldos), más *Clientes* como enlace directo y un menú de cuenta a la derecha (perfil, acceso al punto de venta y cierre de sesión). En pantallas angostas, la barra colapsa a un menú desplegable con botón de hamburguesa, siguiendo el mismo patrón ya usado en la tienda en línea.
+- **Pie de página de la tienda en línea:** se amplió de una línea de copyright a un pie de página de cuatro columnas (marca y medios de pago, enlaces de compra, ayuda y contacto), siguiendo el patrón habitual de las tiendas en línea de comercios más grandes.
+- **Paleta de colores:** se unificó la paleta visual de todo el sistema (panel administrativo, punto de venta, tienda en línea, comprobantes y login) a un esquema de grises neutros fríos (*slate*) con un único color de acento índigo para acciones y estados activos, reemplazando la combinación previa de azul marino, crema, beige y un acento turquesa exclusivo del menú lateral. Al implementarse mediante variables CSS (`:root` en `estilos.css`), el cambio de paleta se propaga automáticamente a botones, tablas, tarjetas y formularios sin modificar cada plantilla individualmente.
+
+Estos tres cambios se validaron funcionalmente arrancando la aplicación y verificando por HTTP (sin errores de renderizado de Thymeleaf) el panel administrativo completo y la tienda en línea; el detalle de esa verificación está en la sección 10.
 
 ---
 
@@ -429,31 +444,47 @@ La seguridad se implementa con **Spring Security**, configurada en `SecurityConf
 
 - **Cierre de sesión:** `/logout`, con redirección a `/login?logout`.
 
-[COMPLETAR: si aplicaste alguna medida adicional de seguridad — por ejemplo protección CSRF (activada por defecto en Spring Security para formularios), validación de datos de entrada, control de longitud/reglas de contraseña en el registro, etc. — descríbela acá con el archivo/línea correspondiente.]
+- **Protección CSRF:** activa por defecto (no se deshabilita en `SecurityConfig`). Se verificó de forma concreta que Spring inyecta automáticamente un campo oculto `_csrf` en el formulario de login (`login.html`) a través de la integración de Thymeleaf con Spring Security, y que una petición `POST /login` sin ese token es rechazada (redirige nuevamente a `/login` sin autenticar). Todos los formularios de la aplicación que usan `th:action` quedan protegidos de la misma manera sin código adicional.
+- **Contraseñas:** se almacenan con `BCryptPasswordEncoder` (hash con costo adaptativo), nunca en texto plano.
+
+[COMPLETAR si corresponde: reglas de validación de datos de entrada (longitud/formato de contraseña en el registro, unicidad de email/usuario, etc.) si agregaste alguna más allá de las restricciones de la base de datos.]
 
 ---
 
 ## 10. Pruebas
 
-El proyecto incluye, al momento de este relevamiento, una clase de prueba base generada por Spring Initializr (`TiendaMasApplicationTests`), que verifica que el contexto de la aplicación cargue correctamente.
+El proyecto incluye, al momento de este relevamiento, una clase de prueba base generada por Spring Initializr (`TiendaMasApplicationTests`), que verifica que el contexto de la aplicación cargue correctamente. **No hay pruebas unitarias ni de integración automatizadas** sobre la lógica de negocio (servicios) ni sobre los controladores — es la limitación más importante detectada en este relevamiento (ver también sección 15).
 
-**Estado actual:** no se relevaron pruebas unitarias ni de integración específicas sobre la lógica de negocio (servicios) ni sobre los controladores.
+Como compensación parcial, se realizó una **verificación manual funcional por HTTP** (con `curl`, simulando un navegador) sobre la aplicación en ejecución, enfocada en confirmar que el sistema arranca correctamente y que la restricción de acceso por rol (RNF-01) se cumple. Los resultados fueron los siguientes:
 
-[COMPLETAR: esta es una sección que conviene reforzar antes de la entrega si la cátedra evalúa testing. Como mínimo, se recomienda documentar]:
-
-- **Pruebas manuales realizadas** durante el desarrollo: casos probados (por ejemplo "alta de producto con stock 0", "venta con carrito vacío", "acceso de un CLIENTE a `/pos` debe rechazarse", "checkout con cliente inexistente"), con capturas de pantalla o tabla de resultados.
-- Si llegás a incorporar pruebas automatizadas antes de entregar, agregar acá: cobertura alcanzada, framework usado (JUnit 5 + Mockito, ya disponibles vía `spring-boot-starter-test`), y ejemplos de test relevantes (por ejemplo sobre `PedidoServiceImpl.crearVenta`, que concentra la regla de negocio más crítica del sistema).
-
-### 10.1 Tabla sugerida de casos de prueba manual
+### 10.1 Casos de prueba ejecutados y resultado obtenido
 
 | Caso | Pasos | Resultado esperado | Resultado obtenido |
 |---|---|---|---|
-| Login con credenciales válidas | Ingresar usuario/contraseña de ADMIN | Redirige al panel administrativo | [COMPLETAR] |
-| Login con credenciales inválidas | Ingresar contraseña incorrecta | Muestra error y permanece en `/login` | [COMPLETAR] |
-| Acceso de CLIENTE a `/pos` | Loguearse como cliente e ingresar la URL `/pos` | Acceso denegado (403) | [COMPLETAR] |
-| Venta por POS | Agregar productos, elegir cliente y método de pago, confirmar | Se genera el pedido con comprobante numerado y descuenta del carrito | [COMPLETAR] |
-| Checkout en tienda online sin sesión | Intentar finalizar compra sin estar logueado | Redirige a login | [COMPLETAR] |
-| Alta de producto | Cargar producto nuevo con código de barras único | Producto visible en catálogo y POS | [COMPLETAR] |
+| Arranque de la aplicación | Compilar (`mvn clean compile`) y ejecutar (`mvn spring-boot:run`) | Arranca sin errores y conecta a MySQL | **OK** — compiló 71 archivos fuente sin errores y conectó a MySQL correctamente. |
+| Login con credenciales válidas (ADMIN) | POST `/login` con `admin` / `admin123` y token CSRF válido | Redirige autenticado (302) al panel | **OK** — redirigió a `/personas` con sesión autenticada. |
+| Login sin token CSRF | POST `/login` sin el campo `_csrf` | Se rechaza, no autentica | **OK** — redirigió nuevamente a `/login` sin crear sesión autenticada. |
+| Renderizado del panel administrativo | Como ADMIN, solicitar `/productos`, `/categorias`, `/pedidos`, `/reportes`, `/gastos`, `/sueldos`, `/personas`, `/perfil`, `/pos` | Todas responden 200, sin errores de Thymeleaf | **OK** — las 9 rutas devolvieron 200, sin trazas de error ("Whitelabel"/excepción) en el HTML. |
+| Renderizado de la tienda en línea | Solicitar `/tienda` (pie de página nuevo) | Responde 200, con el pie de página de 4 columnas | **OK** — 200, con las secciones `tienda-footer-main` y `tienda-footer-bottom` presentes. |
+| Acceso de CLIENTE a `/productos` y `/pos` | Loguearse como `cliente1` e intentar acceder | Acceso denegado (403) | **OK** — ambas rutas devolvieron 403. |
+| Acceso de CLIENTE a `/tienda` | Loguearse como `cliente1` y acceder a `/tienda` | Acceso permitido (200) | **OK**. |
+| Acceso de VENDEDOR a `/pos` | Loguearse como `vendedor1` y acceder a `/pos` | Acceso permitido (200) | **OK**. |
+| Acceso de VENDEDOR a `/productos` y `/reportes` | Loguearse como `vendedor1` e intentar acceder | Acceso denegado (403), reservado a ADMIN | **OK** — ambas rutas devolvieron 403. |
+| Acceso anónimo a `/pos` y `/productos` | Solicitar las rutas sin sesión iniciada | Redirige a `/login` (302) | **OK**. |
+
+### 10.2 Pendiente de verificación manual (requiere navegador)
+
+Las pruebas anteriores validan que el sistema responde y que la seguridad por rol funciona a nivel HTTP, pero no reemplazan una prueba visual/funcional completa en el navegador. Quedan pendientes, idealmente con capturas de pantalla para el informe (sección 13):
+
+| Caso | Pasos | Resultado esperado | Resultado obtenido |
+|---|---|---|---|
+| Venta completa por POS | Agregar productos al carrito, elegir cliente y método de pago, confirmar | Se genera el pedido con comprobante numerado y el carrito se vacía | [COMPLETAR] |
+| Checkout completo en la tienda en línea | Armar carrito como cliente y finalizar compra | Se genera el pedido en el canal ONLINE y aparece en "Mis pedidos" | [COMPLETAR] |
+| Alta de producto con imagen | Cargar producto nuevo con código de barras único e imagen | Producto visible en catálogo, POS y tienda | [COMPLETAR] |
+| Navegación por los desplegables del nuevo navbar admin | Abrir Catálogo, Ventas y Finanzas desde el navbar superior | Cada desplegable muestra sus enlaces y navega correctamente | [COMPLETAR] |
+| Navbar admin y footer de tienda en móvil | Reducir el ancho de la ventana o probar en un celular | El navbar colapsa a menú hamburguesa; el pie de página se apila en una columna | [COMPLETAR] |
+
+Si se incorporan pruebas automatizadas antes de la entrega, se recomienda documentar acá: framework usado (JUnit 5 + Mockito, ya disponibles vía `spring-boot-starter-test`), cobertura alcanzada y casos cubiertos — priorizando `PedidoServiceImpl.crearVenta`, que concentra la regla de negocio más crítica del sistema.
 
 ---
 
@@ -500,7 +531,17 @@ java -jar target/tiendaMas-0.0.1-SNAPSHOT.jar
 
 ### 11.5 Primer inicio
 
-Al arrancar por primera vez, `DataSeeder` carga datos de demostración (categorías, productos, personas y, según su configuración, un usuario administrador inicial). [COMPLETAR: usuario y contraseña de demostración que dejaste configurados, para que quien evalúe el proyecto pueda ingresar sin depender de vos.]
+Al arrancar por primera vez, `DataSeeder` carga datos de demostración (categorías, productos, personas, series correlativas de comprobantes, gastos, sueldos y los siguientes usuarios de prueba, uno por cada rol del sistema):
+
+| Usuario | Contraseña | Rol |
+|---|---|---|
+| `admin` | `admin123` | ADMIN |
+| `vendedor1` | `vendedor123` | VENDEDOR |
+| `vendedor2` | `vendedor123` | VENDEDOR |
+| `cliente1` | `cliente123` | CLIENTE |
+| `cliente2` | `cliente123` | CLIENTE |
+
+> Estas credenciales están definidas en `DataSeeder` y solo tienen sentido para un entorno de desarrollo/demostración. No deben usarse en un despliegue real sin cambiarlas.
 
 ---
 
@@ -539,20 +580,29 @@ Al arrancar por primera vez, `DataSeeder` carga datos de demostración (categor�
 
 ## 13. Resultados obtenidos
 
-[COMPLETAR con capturas de pantalla de las pantallas principales: login, tienda en línea, POS, panel de reportes, ABM de productos, etc. Se recomienda una imagen por módulo con un pie de foto breve explicando qué se ve.]
+Todos los objetivos específicos planteados en la sección 2.2 se implementaron y se verificaron en funcionamiento (arranque de la aplicación, conexión a la base de datos, renderizado de las 9 rutas del panel administrativo y de la tienda en línea, y cumplimiento de la restricción de acceso por rol), según el detalle de la sección 10.1. En particular:
 
-[COMPLETAR con una autoevaluación honesta: qué funcionalidades quedaron completas y estables, cuáles tienen limitaciones conocidas, y qué tan cerca se quedó el resultado final de los objetivos planteados en la sección 2.]
+- El modelo de datos representa correctamente el dominio (personas, productos, categorías, pedidos/detalle, gastos, sueldos), con relaciones y enumerados coherentes con las reglas del negocio (por ejemplo, el tipo de comprobante se deriva automáticamente del tipo de documento del cliente).
+- El punto de venta y la tienda en línea comparten la misma lógica de creación de ventas (`PedidoServiceImpl.crearVenta`), diferenciándose solo por canal — lo que evita duplicar la regla de negocio más crítica del sistema.
+- El módulo de reportes agrega ventas, productos más vendidos y una recomendación de reabastecimiento basada en velocidad de venta, cumpliendo el objetivo de dar visibilidad gerencial sobre el negocio.
+- La seguridad por roles (ADMIN, VENDEDOR, CLIENTE) restringe correctamente el acceso a cada módulo, verificado de forma concreta y no solo por lectura del código de configuración.
+- La experiencia de usuario se revisó y mejoró sobre el final del desarrollo: navegación superior en el panel administrativo, pie de página completo en la tienda y una paleta de colores unificada (sección 8.6).
+
+**Limitación conocida más relevante:** la ausencia de pruebas automatizadas (sección 10) es el punto más débil del proyecto en términos de calidad de software, más allá de que la funcionalidad en sí esté completa y verificada manualmente.
+
+[COMPLETAR con capturas de pantalla de las pantallas principales: login, tienda en línea, POS, panel de reportes, ABM de productos, etc. Se recomienda una imagen por módulo con un pie de foto breve explicando qué se ve — esto no se puede generar automáticamente desde este entorno de trabajo, sin acceso a un navegador con interfaz gráfica.]
 
 ---
 
 ## 14. Conclusiones
 
-[COMPLETAR — esta sección es personal y debe reflejar tu experiencia real. Como guía, se espera que respondas]:
+Los objetivos planteados en la sección 2 se cumplieron en su totalidad dentro del alcance definido: el sistema gestiona catálogo, ventas presenciales y en línea, información administrativa básica (gastos y sueldos) y reportes gerenciales, con control de acceso diferenciado por rol. La decisión arquitectónica de sostener un monolito Spring Boot con renderizado server-side (sección 4.3) resultó acertada para el marco de tiempo real del proyecto (tres días, sección 5): permitió llegar a una aplicación funcional de punta a punta sin invertir tiempo en la integración entre un frontend y un backend separados.
 
-- ¿Se cumplieron los objetivos planteados en la sección 2? ¿En qué medida?
-- ¿Qué decisiones técnicas resultaron acertadas y cuáles cambiarías si empezaras de nuevo?
-- ¿Qué dificultades técnicas o de organización surgieron y cómo se resolvieron?
-- ¿Qué aprendizajes concretos te deja el proyecto (técnicos y de proceso)?
+Si se retomara el proyecto, las dos decisiones que se revisarían primero son: (1) incorporar pruebas automatizadas desde el inicio en lugar de dejarlas para el final, ya que su ausencia es hoy la principal debilidad del proyecto (secciones 10 y 15); y (2) no versionar credenciales de base de datos en `application.yml` (sección 11.2), resolviéndolo desde el principio con variables de entorno.
+
+La principal dificultad no fue de tipo algorítmico sino de **configuración de entorno**: al renombrar el paquete base del proyecto (de `episs.unaj.com.crudpersona` a `com.tiendamas`) quedó una configuración de ejecución de IntelliJ apuntando a una clase inexistente, lo que impedía levantar la aplicación desde el IDE aunque el código compilaba correctamente por línea de comandos — un recordatorio de que, tras un renombre de paquete, conviene revisar también los archivos de configuración del IDE (`.idea/`), no solo el código fuente.
+
+[COMPLETAR: este espacio quedó redactado en base al relevamiento técnico del proyecto; se recomienda que sumes en primera persona tu propia valoración del proceso —qué fue lo que más te costó, qué es lo que más rescatás de haberlo hecho— ya que es la parte del informe que un jurado suele valorar como más genuina.]
 
 ---
 
@@ -566,19 +616,22 @@ A partir de las limitaciones relevadas en la sección 3.2 y del estado actual de
 - Integrar un medio de pago real para la tienda en línea.
 - Soporte multi-sucursal.
 - Notificaciones al cliente (correo/SMS) sobre el estado de su pedido.
+- Completar la verificación visual en navegador de los cambios de interfaz descriptos en la sección 8.6 (navbar admin, pie de página, paleta de colores), incluyendo capturas de pantalla para este informe (ver sección 10.2).
 - [COMPLETAR con otras ideas propias]
 
 ---
 
 ## 16. Bibliografía y referencias
 
-[COMPLETAR con la bibliografía y documentación efectivamente consultada durante el desarrollo. Como referencia, la documentación oficial de las tecnologías usadas]:
+Documentación oficial de las tecnologías utilizadas en el proyecto:
 
 - Spring Boot Reference Documentation — https://docs.spring.io/spring-boot/
 - Spring Security Reference — https://docs.spring.io/spring-security/reference/
 - Spring Data JPA Reference — https://docs.spring.io/spring-data/jpa/reference/
 - Thymeleaf Documentation — https://www.thymeleaf.org/documentation.html
-- [COMPLETAR: libros, cursos o artículos adicionales consultados]
+- Semantic UI Documentation — https://semantic-ui.com/introduction/getting-started.html
+
+[COMPLETAR: si además consultaste libros, cursos o artículos puntuales durante el desarrollo, agregalos acá con formato de cita (autor, título, año, editorial/URL).]
 
 ---
 

@@ -46,7 +46,61 @@
 </div>
 
 <footer class="tienda-footer">
-  &copy; 2026 TiendaMas — Facultad de Ingeniería de Sistemas - UNAJ
+  <div class="tienda-footer-main">
+
+    <div class="tienda-footer-col tienda-footer-brand">
+      <a th:href="@{/tienda}" class="tienda-footer-brand-link"><i class="shop icon"></i> TiendaMas</a>
+      <p>Tu comercio de confianza: productos de calidad, atención cercana y entrega rápida, ya sea en línea o en el mostrador.</p>
+      <div class="tienda-footer-pagos">
+        <i class="cc visa icon" title="Visa"></i>
+        <i class="cc mastercard icon" title="Mastercard"></i>
+        <i class="cc amex icon" title="American Express"></i>
+        <i class="cc paypal icon" title="PayPal"></i>
+        <i class="money bill alternate icon" title="Efectivo"></i>
+      </div>
+    </div>
+
+    <div class="tienda-footer-col">
+      <h4>Comprar</h4>
+      <ul>
+        <li><a th:href="@{/tienda}">Catálogo</a></li>
+        <li><a th:href="@{/tienda/carrito}">Carrito</a></li>
+        <li><a th:href="@{/tienda/pedidos}">Mis pedidos</a></li>
+        <li><a th:href="@{/registro}" th:unless="${usuarioAutenticado}">Crear cuenta</a></li>
+      </ul>
+    </div>
+
+    <div class="tienda-footer-col">
+      <h4>Ayuda</h4>
+      <ul>
+        <li><a href="#">Preguntas frecuentes</a></li>
+        <li><a href="#">Envíos y entregas</a></li>
+        <li><a href="#">Cambios y devoluciones</a></li>
+        <li><a href="#">Términos y condiciones</a></li>
+      </ul>
+    </div>
+
+    <div class="tienda-footer-col">
+      <h4>Contacto</h4>
+      <ul class="tienda-footer-contacto">
+        <li><i class="map marker alternate icon"></i> Av. Principal 1234, Buenos Aires</li>
+        <li><i class="phone icon"></i> <a href="tel:+541100000000">+54 11 0000-0000</a></li>
+        <li><i class="envelope icon"></i> <a href="mailto:contacto@tiendamas.com">contacto@tiendamas.com</a></li>
+        <li><i class="clock outline icon"></i> Lun. a Vie. 9:00–19:00 hs.</li>
+      </ul>
+      <div class="tienda-footer-social">
+        <span class="tienda-social-icon" title="Facebook"><i class="facebook f icon"></i></span>
+        <span class="tienda-social-icon" title="Instagram"><i class="instagram icon"></i></span>
+        <span class="tienda-social-icon" title="WhatsApp"><i class="whatsapp icon"></i></span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="tienda-footer-bottom">
+    <span>&copy; <span th:text="${#calendars.format(#calendars.createNow(), 'yyyy')}">2026</span> TiendaMas. Todos los derechos reservados.</span>
+    <span>Facultad de Ingeniería de Sistemas - UNAJ</span>
+  </div>
 </footer>
 
 <script>

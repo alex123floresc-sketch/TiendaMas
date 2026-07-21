@@ -1,18 +1,19 @@
 /* =========================================================
-   TiendaMas — Paleta: blanco, crema, beige, azul y azul marino
+   TiendaMas — Paleta limpia: base slate (neutros fríos) + acento índigo
    ========================================================= */
 
 :root {
-    --color-navy: #14315D;        /* azul marino — menú lateral, títulos */
-    --color-navy-dark: #0B2140;   /* azul marino oscuro — hover del menú */
-    --color-blue: #2E6DA4;        /* azul — acciones primarias */
-    --color-blue-light: #6FA3D2;  /* azul claro — acentos, focos */
-    --color-cream: #FBF7EE;       /* crema — fondo general */
-    --color-beige: #EFE4CE;       /* beige — superficies secundarias, hover */
-    --color-beige-dark: #DFCFA8;  /* beige oscuro — bordes, franjas */
+    --color-navy: #1E293B;        /* slate-800 — texto fuerte, cabeceras de tabla, navbar */
+    --color-navy-dark: #0F172A;   /* slate-900 — fondo navbar, hover oscuro */
+    --color-blue: #4F46E5;        /* índigo-600 — acento primario, acciones */
+    --color-blue-light: #818CF8;  /* índigo-400 — acentos suaves, focos, badges */
+    --color-cream: #F8FAFC;       /* slate-50 — fondo general */
+    --color-beige: #F1F5F9;       /* slate-100 — superficies secundarias, hover */
+    --color-beige-dark: #E2E8F0;  /* slate-200 — bordes, franjas */
     --color-white: #FFFFFF;       /* blanco — tarjetas y formularios */
-    --color-text: #2C3A4B;        /* texto principal */
-    --color-text-muted: #6B7A8F;  /* texto secundario */
+    --color-text: #1E293B;        /* texto principal */
+    --color-text-muted: #64748B;  /* texto secundario */
+    --color-success: #059669;     /* verde — precios, valores positivos */
 }
 
 /* --- 1. RESET Y BASE --- */
@@ -28,246 +29,169 @@ body {
     min-height: 100vh;
 }
 
-/* --- 2. LAYOUT FLEXIBLE (Estructura de dos columnas) --- */
-.wrapper {
-    display: flex;
-    width: 100%;
-    min-height: 100vh;
-    align-items: stretch;
-}
+/* --- 2. LAYOUT DEL PANEL DE ADMINISTRACIÓN (navbar superior + contenido) --- */
 
-/* Menú lateral de administración — rediseño con acento turquesa sobre fondo carbón-navy */
+/* Navbar superior del panel de administración — diseño plano y limpio */
 :root {
-    --menu-bg-top: #0D1B2E;
-    --menu-bg-bottom: #16283F;
-    --menu-accent: #2FD9C4;        /* turquesa — acento del panel admin */
-    --menu-accent-dark: #1BA893;
-    --menu-text: #C7D3E3;
-    --menu-text-dim: #7C8CA6;
+    --admin-nav-bg: var(--color-navy-dark);
+    --admin-nav-text: #CBD5E1;
+    --admin-nav-text-dim: #94A3B8;
 }
 
-.sidebar-menu.ui.vertical.menu {
-    width: 268px !important;
-    flex: 0 0 268px;
-    border-radius: 0 !important;
-    background: linear-gradient(195deg, var(--menu-bg-top) 0%, var(--menu-bg-bottom) 100%) !important;
-    box-shadow: 4px 0 24px -6px rgba(0, 0, 0, 0.45) !important;
+.admin-navbar {
+    background: var(--admin-nav-bg);
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.25);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+.admin-navbar-bar {
+    max-width: 1400px;
+    margin: 0 auto;
     display: flex;
-    flex-direction: column;
-    padding: 0 !important;
+    align-items: center;
+    gap: 6px;
+    padding: 0 24px;
 }
 
 /* --- Marca --- */
-.sidebar-menu .brand-item {
-    padding: 26px 20px !important;
-    text-align: left;
-    text-decoration: none !important;
-    position: relative;
-    background: rgba(255, 255, 255, 0.03) !important;
-    border-bottom: 1px solid rgba(47, 217, 196, 0.18);
-    overflow: hidden;
-    flex-shrink: 0;
-}
-.sidebar-menu .brand-item:hover {
-    border-left: none !important;
-}
-.sidebar-menu .brand-header.ui.header {
+.admin-brand {
     display: flex;
     align-items: center;
-    gap: 14px;
-    color: var(--color-white) !important;
-    letter-spacing: 0.02em;
+    gap: 12px;
+    padding: 14px 16px 14px 0;
+    text-decoration: none !important;
+    flex-shrink: 0;
 }
-.sidebar-menu .brand-header .sub.header {
-    color: var(--menu-text-dim) !important;
-    font-size: 0.8em;
-}
-.brand-icon-badge {
+.admin-brand-badge {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 42px;
-    height: 42px;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--color-blue);
     flex-shrink: 0;
-    border-radius: 12px;
-    background: linear-gradient(150deg, var(--menu-accent), var(--menu-accent-dark));
-    box-shadow: 0 0 0 0 rgba(47, 217, 196, 0.55);
-    animation: brandPulse 2.6s ease-in-out infinite;
-    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.brand-icon-badge .icon {
-    color: var(--menu-bg-top) !important;
+.admin-brand-badge .icon {
     margin: 0 !important;
-    font-size: 1.15em;
+    color: var(--color-white) !important;
 }
-.sidebar-menu .brand-item:hover .brand-icon-badge {
-    transform: rotate(-8deg) scale(1.1);
-}
-@keyframes brandPulse {
-    0%   { box-shadow: 0 0 0 0 rgba(47, 217, 196, 0.45); }
-    70%  { box-shadow: 0 0 0 8px rgba(47, 217, 196, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(47, 217, 196, 0); }
-}
-
-/* --- Lista de enlaces (con scroll propio) --- */
-.menu-scroll {
-    flex: 1 1 auto;
-    overflow-y: auto;
-    padding: 10px 0;
-}
-.menu-scroll::-webkit-scrollbar {
-    width: 6px;
-}
-.menu-scroll::-webkit-scrollbar-thumb {
-    background: rgba(47, 217, 196, 0.25);
-    border-radius: 6px;
-}
-
-.sidebar-menu .menu-section-label {
-    padding: 16px 20px 6px 20px !important;
-    font-size: 0.7em;
+.admin-brand-text {
+    display: flex;
+    flex-direction: column;
+    color: var(--color-white);
     font-weight: 700;
-    letter-spacing: 0.1em;
+    font-size: 1.05em;
+    line-height: 1.25;
+}
+.admin-brand-text small {
+    color: var(--admin-nav-text-dim);
+    font-weight: 400;
+    font-size: 0.62em;
     text-transform: uppercase;
-    color: var(--menu-text-dim) !important;
-    cursor: default;
+    letter-spacing: 0.06em;
+}
+
+/* --- Botón hamburguesa (móvil) --- */
+.admin-nav-toggle {
+    display: none;
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: var(--color-white);
+    font-size: 1.3em;
+    cursor: pointer;
+    padding: 10px;
+}
+
+/* --- Enlaces y grupos desplegables --- */
+.admin-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex: 1;
+}
+.admin-nav-spacer {
+    flex: 1;
+}
+.admin-nav-item {
     display: flex;
     align-items: center;
     gap: 8px;
-}
-.sidebar-menu .menu-section-label::after {
-    content: "";
-    flex: 1;
-    height: 1px;
-    background: rgba(255, 255, 255, 0.08);
-}
-
-.sidebar-menu.ui.menu .item {
-    color: var(--menu-text) !important;
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 2px 10px;
-    border-radius: 10px;
-    border-left: none !important;
-    transition: background-color 0.25s ease, color 0.2s ease, transform 0.2s ease;
-    animation: menuItemIn 0.4s ease backwards;
-}
-.sidebar-menu.ui.menu .item:nth-of-type(1)  { animation-delay: 0.02s; }
-.sidebar-menu.ui.menu .item:nth-of-type(2)  { animation-delay: 0.05s; }
-.sidebar-menu.ui.menu .item:nth-of-type(3)  { animation-delay: 0.08s; }
-.sidebar-menu.ui.menu .item:nth-of-type(4)  { animation-delay: 0.11s; }
-.sidebar-menu.ui.menu .item:nth-of-type(5)  { animation-delay: 0.14s; }
-.sidebar-menu.ui.menu .item:nth-of-type(6)  { animation-delay: 0.17s; }
-.sidebar-menu.ui.menu .item:nth-of-type(7)  { animation-delay: 0.20s; }
-.sidebar-menu.ui.menu .item:nth-of-type(8)  { animation-delay: 0.23s; }
-@keyframes menuItemIn {
-    from { opacity: 0; transform: translateX(-10px); }
-    to   { opacity: 1; transform: translateX(0); }
-}
-
-.menu-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    flex-shrink: 0;
+    color: var(--admin-nav-text) !important;
+    text-decoration: none !important;
+    font-weight: 600;
+    font-size: 0.92em;
+    padding: 10px 14px;
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.05);
-    transition: background-color 0.25s ease, transform 0.25s ease;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    white-space: nowrap;
 }
-.sidebar-menu.ui.menu .item .menu-icon i.icon {
+.admin-nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: var(--color-white) !important;
+}
+.admin-nav-item.active {
+    background-color: var(--color-blue);
+    color: var(--color-white) !important;
+}
+.admin-nav-item .icon {
     margin: 0 !important;
-    color: inherit;
-    transition: transform 0.25s ease, color 0.25s ease;
+}
+.admin-nav-account {
+    margin-left: 4px;
 }
 
-.sidebar-menu.ui.menu .item:hover {
-    background-color: rgba(47, 217, 196, 0.08) !important;
-    color: var(--color-white) !important;
-    transform: translateX(3px);
+/* Submenús desplegables (Semantic UI dropdown) */
+.admin-nav-item.ui.dropdown .menu {
+    border-radius: 10px !important;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18) !important;
+    border: 1px solid var(--color-beige-dark) !important;
+    margin-top: 8px !important;
 }
-.sidebar-menu.ui.menu .item:hover .menu-icon {
-    background: rgba(47, 217, 196, 0.18);
-    transform: scale(1.08);
-}
-.sidebar-menu.ui.menu .item:active {
-    transform: translateX(3px) scale(0.97);
-}
-
-.sidebar-menu.ui.menu .item.active-link {
-    background: linear-gradient(90deg, rgba(47, 217, 196, 0.18), rgba(47, 217, 196, 0.03)) !important;
-    color: var(--color-white) !important;
-    font-weight: 700;
-}
-.sidebar-menu.ui.menu .item.active-link::before {
-    content: "";
-    position: absolute;
-    left: -10px;
-    top: 8px;
-    bottom: 8px;
-    width: 4px;
-    border-radius: 4px;
-    background: var(--menu-accent);
-    box-shadow: 0 0 10px 1px rgba(47, 217, 196, 0.7);
-}
-.sidebar-menu.ui.menu .item.active-link .menu-icon {
-    background: var(--menu-accent);
-    box-shadow: 0 0 12px rgba(47, 217, 196, 0.5);
-}
-.sidebar-menu.ui.menu .item.active-link .menu-icon i.icon {
-    color: var(--menu-bg-top) !important;
-}
-
-/* --- Pie: perfil y salir --- */
-.menu-bottom {
-    flex-shrink: 0;
-    padding: 10px 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
-}
-.sidebar-menu .item.logout-item {
-    margin: 2px 10px;
-    padding: 0 !important;
-}
-.sidebar-menu .logout-link-button {
-    display: flex;
+.admin-nav-item.ui.dropdown .menu > .item {
+    display: flex !important;
     align-items: center;
-    gap: 12px;
-    border-radius: 10px;
+    gap: 10px;
+    color: var(--color-text) !important;
+    font-weight: 500 !important;
+    padding: 10px 16px !important;
 }
-.sidebar-menu .logout-link-button:hover {
-    background-color: rgba(219, 40, 40, 0.12);
-    color: #FF8A8A;
-}
-.sidebar-menu .logout-link-button:hover .menu-icon {
-    background: rgba(219, 40, 40, 0.25);
+.admin-nav-item.ui.dropdown .menu > .item:hover {
+    background-color: var(--color-beige) !important;
+    color: var(--color-blue) !important;
 }
 
-/* Botón "Salir" disfrazado de enlace de menú (el logout real es un POST). */
+/* Botón "Salir" disfrazado de enlace de menú (el logout real es un POST).
+   Se reutiliza tanto en el navbar de administración como en el de la tienda. */
 .logout-link-button {
     background: none;
     border: none;
     color: inherit;
     font: inherit;
     width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
     text-align: left;
     cursor: pointer;
-    padding: 0.92857143em 1.14285714em;
+    padding: 10px 16px;
 }
 .logout-link-form {
     padding: 0 !important;
 }
-.logout-link-form .logout-link-button {
-    color: inherit;
+.logout-link-form .logout-link-button:hover {
+    background-color: #FEF2F2;
+    color: #DC2626;
 }
 
-/* Contenido principal */
-.content {
-    flex: 1;
+/* Contenido principal (debajo del navbar superior) */
+.admin-content {
     padding: 40px;
     background-color: var(--color-cream);
+    min-height: calc(100vh - 60px);
 }
 
 /* --- 3. CONTENEDOR CENTRAL (Caja blanca) --- */
@@ -612,11 +536,112 @@ body {
     margin: 0 auto;
     padding: 30px;
 }
+/* --- Pie de página de la tienda (estilo grandes e-commerce) --- */
 .tienda-footer {
-    text-align: center;
-    color: var(--color-text-muted);
-    font-size: 13px;
-    padding: 20px;
+    background: var(--color-navy-dark);
+    color: #94A3B8;
+    margin-top: 40px;
+}
+.tienda-footer-main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 48px 30px 32px 30px;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 1.2fr;
+    gap: 32px;
+}
+.tienda-footer-col h4 {
+    color: var(--color-white);
+    font-size: 0.9em;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0 0 16px 0;
+}
+.tienda-footer-col ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.tienda-footer-col ul li {
+    font-size: 0.92em;
+}
+.tienda-footer-col a {
+    color: #94A3B8;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+.tienda-footer-col a:hover {
+    color: var(--color-white);
+}
+.tienda-footer-brand-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-white) !important;
+    font-size: 1.25em;
+    font-weight: 700;
+    text-decoration: none;
+    margin-bottom: 12px;
+}
+.tienda-footer-brand p {
+    font-size: 0.9em;
+    line-height: 1.6;
+    margin: 0 0 18px 0;
+}
+.tienda-footer-pagos {
+    display: flex;
+    gap: 12px;
+    font-size: 1.5em;
+    color: #64748B;
+}
+.tienda-footer-contacto {
+    margin-bottom: 18px;
+}
+.tienda-footer-contacto li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    color: #94A3B8;
+}
+.tienda-footer-contacto .icon {
+    color: var(--color-blue-light);
+    margin-top: 2px;
+}
+.tienda-footer-social {
+    display: flex;
+    gap: 10px;
+}
+.tienda-social-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--color-white);
+    cursor: default;
+    transition: background-color 0.2s ease;
+}
+.tienda-social-icon:hover {
+    background: var(--color-blue);
+}
+.tienda-social-icon .icon {
+    margin: 0 !important;
+}
+.tienda-footer-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 18px 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 0.82em;
 }
 .tienda-hero {
     background: linear-gradient(135deg, var(--color-navy), var(--color-blue));
@@ -699,7 +724,7 @@ body {
     margin: 4px 0;
 }
 .tienda-card-precio {
-    color: #21ba45;
+    color: var(--color-success);
     font-weight: 700;
     font-size: 1.1em;
 }
@@ -760,7 +785,7 @@ body {
     border-top: 1px solid var(--color-beige-dark);
     font-size: 0.9em;
 }
-.finanzas-utilidad.positiva { color: #21ba45; }
+.finanzas-utilidad.positiva { color: var(--color-success); }
 .finanzas-utilidad.negativa { color: #db2828; }
 
 /* --- Comprobante (boleta / factura) --- */
@@ -836,25 +861,6 @@ body {
 
 /* --- 6. RESPONSIVIDAD (móvil + escritorio) --- */
 
-/* Barra con botón "Menú" del panel admin: solo se ve en móvil */
-.mobile-topbar {
-    display: none;
-}
-.mobile-menu-toggle {
-    width: 100%;
-    background: linear-gradient(195deg, var(--menu-bg-top), var(--menu-bg-bottom));
-    color: var(--color-white);
-    border: none;
-    border-bottom: 1px solid rgba(47, 217, 196, 0.25);
-    padding: 14px;
-    font-size: 1em;
-    text-align: left;
-    transition: background-color 0.2s ease;
-}
-.mobile-menu-toggle .icon {
-    color: var(--menu-accent);
-}
-
 /* Formularios: los campos en fila pasan a columna en pantallas angostas
    (arregla de una sola vez todos los formularios existentes). */
 @media (max-width: 768px) {
@@ -877,22 +883,40 @@ body {
 }
 
 @media (max-width: 768px) {
-    /* Panel admin: la sidebar se convierte en menú desplegable con botón hamburguesa */
-    .mobile-topbar {
+    /* Panel admin: el navbar superior colapsa a menú desplegable con botón hamburguesa */
+    .admin-navbar-bar {
+        flex-wrap: wrap;
+        padding: 0 16px;
+    }
+    .admin-nav-toggle {
         display: block;
     }
-    .wrapper {
-        flex-direction: column;
-    }
-    .sidebar-menu.ui.vertical.menu {
-        width: 100% !important;
-        flex: none;
+    .admin-nav-links {
         display: none;
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        gap: 4px;
+        padding: 10px 0 16px 0;
     }
-    .sidebar-menu.ui.vertical.menu.open {
+    .admin-nav-links.open {
         display: flex;
     }
-    .content {
+    .admin-nav-spacer {
+        display: none;
+    }
+    .admin-nav-item.ui.dropdown .menu {
+        position: static !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: rgba(255, 255, 255, 0.04) !important;
+        margin: 4px 0 4px 12px !important;
+        width: auto !important;
+    }
+    .admin-nav-item.ui.dropdown .menu > .item {
+        color: var(--admin-nav-text) !important;
+    }
+    .admin-content {
         padding: 20px;
     }
     .container {
@@ -924,6 +948,15 @@ body {
     }
     .tienda-content {
         padding: 16px;
+    }
+    .tienda-footer-main {
+        grid-template-columns: 1fr;
+        gap: 28px;
+        padding: 36px 20px 24px 20px;
+    }
+    .tienda-footer-bottom {
+        flex-direction: column;
+        padding: 16px 20px;
     }
     .tienda-hero {
         padding: 24px 18px;
