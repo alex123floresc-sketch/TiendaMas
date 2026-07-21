@@ -25,7 +25,17 @@
         </div>
     </div>
 
-    <table class="ui celled striped table" th:unless="${gastos.isEmpty()}">
+    <div class="ui icon input list-search" th:unless="${gastos.isEmpty()}">
+        <i class="search icon"></i>
+        <input type="text" placeholder="Buscar por concepto, categoría o fecha..." aria-label="Buscar gastos"
+               oninput="filtrarTabla(this, 'tablaGastos')">
+    </div>
+    <div id="tablaGastosSinResultados" class="ui icon info message" style="display:none;">
+        <i class="search icon"></i>
+        <div class="content">No se encontraron gastos con ese criterio de búsqueda.</div>
+    </div>
+
+    <table id="tablaGastos" class="ui celled striped table" th:unless="${gastos.isEmpty()}">
         <thead>
         <tr>
             <th>Concepto</th>

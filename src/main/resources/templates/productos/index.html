@@ -30,7 +30,17 @@
         </div>
     </div>
 
-    <table class="ui celled striped table" th:unless="${productos.isEmpty()}">
+    <div class="ui icon input list-search" th:unless="${productos.isEmpty()}">
+        <i class="search icon"></i>
+        <input type="text" placeholder="Buscar por nombre, marca, código o categoría..." aria-label="Buscar productos"
+               oninput="filtrarTabla(this, 'tablaProductos')">
+    </div>
+    <div id="tablaProductosSinResultados" class="ui icon info message" style="display:none;">
+        <i class="search icon"></i>
+        <div class="content">No se encontraron productos con ese criterio de búsqueda.</div>
+    </div>
+
+    <table id="tablaProductos" class="ui celled striped table" th:unless="${productos.isEmpty()}">
         <thead>
         <tr>
             <th class="one wide">ID</th>

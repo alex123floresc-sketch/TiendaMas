@@ -30,7 +30,17 @@
         </div>
     </div>
 
-    <table class="ui celled striped table" th:if="${personas != null and not #lists.isEmpty(personas)}">
+    <div class="ui icon input list-search" th:if="${personas != null and not #lists.isEmpty(personas)}">
+        <i class="search icon"></i>
+        <input type="text" placeholder="Buscar por nombre, email o teléfono..." aria-label="Buscar clientes"
+               oninput="filtrarTabla(this, 'tablaPersonas')">
+    </div>
+    <div id="tablaPersonasSinResultados" class="ui icon info message" style="display:none;">
+        <i class="search icon"></i>
+        <div class="content">No se encontraron clientes con ese criterio de búsqueda.</div>
+    </div>
+
+    <table id="tablaPersonas" class="ui celled striped table" th:if="${personas != null and not #lists.isEmpty(personas)}">
         <thead>
         <tr>
             <th class="one wide">ID</th>

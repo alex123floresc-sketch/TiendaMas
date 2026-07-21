@@ -6,7 +6,7 @@
 
   <a href="/" class="item brand-item">
     <h2 class="ui inverted header brand-header">
-      <i class="shop icon"></i>
+      <span class="brand-icon-badge"><i class="shop icon"></i></span>
       <div class="content">
         TiendaMas
         <div class="sub header">Panel Administrador</div>
@@ -14,30 +14,41 @@
     </h2>
   </a>
 
-  <div class="ui inverted divider"></div>
+  <div class="menu-scroll">
 
-  <div class="item menu-section-label">Catálogo</div>
-  <a href="/productos" class="item" th:classappend="${uri != null and uri.startsWith('/productos')} ? 'active-link'"><i class="cube icon"></i> Productos</a>
-  <a href="/categorias" class="item" th:classappend="${uri != null and uri.startsWith('/categorias')} ? 'active-link'"><i class="tags icon"></i> Categorías</a>
+    <div class="item menu-section-label">Catálogo</div>
+    <a href="/productos" class="item" th:classappend="${uri != null and uri.startsWith('/productos')} ? 'active-link'">
+      <span class="menu-icon"><i class="cube icon"></i></span> Productos</a>
+    <a href="/categorias" class="item" th:classappend="${uri != null and uri.startsWith('/categorias')} ? 'active-link'">
+      <span class="menu-icon"><i class="tags icon"></i></span> Categorías</a>
 
-  <div class="item menu-section-label">Ventas</div>
-  <a href="/pedidos" class="item" th:classappend="${uri != null and uri.startsWith('/pedidos')} ? 'active-link'"><i class="shopping cart icon"></i> Ventas</a>
-  <a href="/reportes" class="item" th:classappend="${uri != null and uri.startsWith('/reportes')} ? 'active-link'"><i class="chart bar icon"></i> Reportes</a>
+    <div class="item menu-section-label">Ventas</div>
+    <a href="/pedidos" class="item" th:classappend="${uri != null and uri.startsWith('/pedidos')} ? 'active-link'">
+      <span class="menu-icon"><i class="shopping cart icon"></i></span> Ventas</a>
+    <a href="/reportes" class="item" th:classappend="${uri != null and uri.startsWith('/reportes')} ? 'active-link'">
+      <span class="menu-icon"><i class="chart bar icon"></i></span> Reportes</a>
 
-  <div class="item menu-section-label">Finanzas</div>
-  <a href="/gastos" class="item" th:classappend="${uri != null and uri.startsWith('/gastos')} ? 'active-link'"><i class="money bill wave icon"></i> Gastos</a>
-  <a href="/sueldos" class="item" th:classappend="${uri != null and uri.startsWith('/sueldos')} ? 'active-link'"><i class="id badge icon"></i> Sueldos</a>
+    <div class="item menu-section-label">Finanzas</div>
+    <a href="/gastos" class="item" th:classappend="${uri != null and uri.startsWith('/gastos')} ? 'active-link'">
+      <span class="menu-icon"><i class="money bill wave icon"></i></span> Gastos</a>
+    <a href="/sueldos" class="item" th:classappend="${uri != null and uri.startsWith('/sueldos')} ? 'active-link'">
+      <span class="menu-icon"><i class="id badge icon"></i></span> Sueldos</a>
 
-  <div class="item menu-section-label">Clientes</div>
-  <a href="/personas" class="item" th:classappend="${uri != null and uri.startsWith('/personas')} ? 'active-link'"><i class="users icon"></i> Clientes</a>
+    <div class="item menu-section-label">Clientes</div>
+    <a href="/personas" class="item" th:classappend="${uri != null and uri.startsWith('/personas')} ? 'active-link'">
+      <span class="menu-icon"><i class="users icon"></i></span> Clientes</a>
 
-  <div class="ui inverted divider"></div>
+  </div>
 
-  <a href="/perfil" class="item" th:classappend="${uri != null and uri.startsWith('/perfil')} ? 'active-link'"><i class="user icon"></i> Mi perfil</a>
+  <div class="menu-bottom">
+    <a href="/perfil" class="item" th:classappend="${uri != null and uri.startsWith('/perfil')} ? 'active-link'">
+      <span class="menu-icon"><i class="user icon"></i></span> Mi perfil</a>
 
-  <form th:action="@{/logout}" method="post" class="item logout-item">
-    <button type="submit" class="logout-link-button"><i class="sign out alternate icon"></i> Salir</button>
-  </form>
+    <form th:action="@{/logout}" method="post" class="item logout-item">
+      <button type="submit" class="logout-link-button">
+        <span class="menu-icon"><i class="sign out alternate icon"></i></span> Salir</button>
+    </form>
+  </div>
 </nav>
 </body>
 </html>

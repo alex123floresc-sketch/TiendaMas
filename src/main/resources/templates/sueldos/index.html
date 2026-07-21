@@ -29,7 +29,17 @@
         </div>
     </div>
 
-    <table class="ui celled striped table" th:unless="${sueldos.isEmpty()}">
+    <div class="ui icon input list-search" th:unless="${sueldos.isEmpty()}">
+        <i class="search icon"></i>
+        <input type="text" placeholder="Buscar por empleado, periodo o estado..." aria-label="Buscar sueldos"
+               oninput="filtrarTabla(this, 'tablaSueldos')">
+    </div>
+    <div id="tablaSueldosSinResultados" class="ui icon info message" style="display:none;">
+        <i class="search icon"></i>
+        <div class="content">No se encontraron sueldos con ese criterio de búsqueda.</div>
+    </div>
+
+    <table id="tablaSueldos" class="ui celled striped table" th:unless="${sueldos.isEmpty()}">
         <thead>
         <tr>
             <th>Empleado</th>

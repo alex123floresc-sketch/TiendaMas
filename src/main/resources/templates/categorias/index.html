@@ -30,7 +30,17 @@
         </div>
     </div>
 
-    <table class="ui celled striped table" th:unless="${categorias.isEmpty()}">
+    <div class="ui icon input list-search" th:unless="${categorias.isEmpty()}">
+        <i class="search icon"></i>
+        <input type="text" placeholder="Buscar por nombre o descripción..." aria-label="Buscar categorías"
+               oninput="filtrarTabla(this, 'tablaCategorias')">
+    </div>
+    <div id="tablaCategoriasSinResultados" class="ui icon info message" style="display:none;">
+        <i class="search icon"></i>
+        <div class="content">No se encontraron categorías con ese criterio de búsqueda.</div>
+    </div>
+
+    <table id="tablaCategorias" class="ui celled striped table" th:unless="${categorias.isEmpty()}">
         <thead>
         <tr>
             <th class="one wide">ID</th>

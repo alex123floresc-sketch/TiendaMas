@@ -16,7 +16,7 @@
 
             <div class="field required">
                 <label>Empleado</label>
-                <select name="usuarioId" class="ui fluid dropdown" required>
+                <select name="usuarioId" class="ui search fluid dropdown" required>
                     <option value="">-- Selecciona un empleado --</option>
                     <option th:each="u : ${empleados}" th:value="${u.id}"
                             th:text="${u.nombre + ' ' + u.apellido + ' (' + u.rol + ')'}"></option>
@@ -55,5 +55,11 @@
         </form>
     </div>
 </div>
+
+<script>
+    $(document).ready(function () {
+        $('.ui.dropdown').dropdown();
+    });
+</script>
 </body>
 </html>

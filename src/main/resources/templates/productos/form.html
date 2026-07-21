@@ -65,7 +65,7 @@
 
             <div class="field required">
                 <label for="categoriaId">Categoría</label>
-                <select id="categoriaId" name="categoriaId" class="ui fluid dropdown" required>
+                <select id="categoriaId" name="categoriaId" class="ui search fluid dropdown" required>
                     <option value="">-- Seleccione una Categoría --</option>
                     <option th:each="cat : ${categorias}"
                             th:value="${cat.id}"
