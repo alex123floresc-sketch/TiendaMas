@@ -86,4 +86,40 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuarioRepository.save(usuario);
         return true;
     }
+
+    @Override
+    public List<Usuario> obtenerTodos() {
+        return usuarioRepository.findAll();
+    }
+
+    @Override
+    public Usuario obtenerPorId(Long id) {
+        return usuarioRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    @Transactional
+    public Usuario actualizarUsuario(Long id, String nombre, String apellido, RolUsuario rol, boolean activo, String nuevaPassword) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado: " + id));
+        usuario.setNombre(nombre);
+        usuario.setApellido(apellido);
+        usuario.setRol(rol);
+        usuario.setActivo(activo);
+        if (nuevaPassword != null && !nuevaPassword.isBlank()) {
+            usuario.setPassword(passwordEncoder.encode(nuevaPassword));
+        }
+        return usuarioRepository.save(usuario);
+    }
+
+    @Override
+    public long contarPorRol(RolUsuario rol) {
+        return usuarioRepository.findByRolIn(List.of(rol)).size();
+    }
+
+    @Override
+    @Transactional
+    public void eliminar(Long id) {
+        usuarioRepository.deleteById(id);
+    }
 }

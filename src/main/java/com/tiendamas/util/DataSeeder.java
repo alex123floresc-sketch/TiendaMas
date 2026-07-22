@@ -8,20 +8,19 @@ import com.tiendamas.entity.Gasto;
 import com.tiendamas.entity.Persona;
 import com.tiendamas.entity.Producto;
 import com.tiendamas.entity.RolUsuario;
-import com.tiendamas.entity.SerieCorrelativo;
 import com.tiendamas.entity.Sueldo;
-import com.tiendamas.entity.TipoComprobante;
 import com.tiendamas.entity.TipoDocumento;
 import com.tiendamas.repository.CategoriaRepository;
 import com.tiendamas.repository.GastoRepository;
 import com.tiendamas.repository.PersonaRepository;
 import com.tiendamas.repository.ProductoRepository;
-import com.tiendamas.repository.SerieCorrelativoRepository;
 import com.tiendamas.repository.SueldoRepository;
 import com.tiendamas.repository.UsuarioRepository;
 import com.tiendamas.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -30,6 +29,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
+@Profile("!prod")
+@ConditionalOnProperty(name = "app.seed.demo", havingValue = "true")
 public class DataSeeder implements CommandLineRunner {
 
     @Autowired
@@ -38,8 +39,6 @@ public class DataSeeder implements CommandLineRunner {
     private CategoriaRepository categoriaRepository;
     @Autowired
     private ProductoRepository productoRepository;
-    @Autowired
-    private SerieCorrelativoRepository serieCorrelativoRepository;
     @Autowired
     private UsuarioRepository usuarioRepository;
     @Autowired
@@ -51,8 +50,6 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        sembrarSeriesCorrelativas();
-
         if (personaRepository.count() <= 0) {
             sembrarCatalogoYClientesDemo();
         }
@@ -67,14 +64,6 @@ public class DataSeeder implements CommandLineRunner {
 
         if (sueldoRepository.count() <= 0) {
             sembrarSueldosDemo();
-        }
-    }
-
-    private void sembrarSeriesCorrelativas() {
-        for (TipoComprobante tipo : TipoComprobante.values()) {
-            if (!serieCorrelativoRepository.existsById(tipo)) {
-                serieCorrelativoRepository.save(new SerieCorrelativo(tipo));
-            }
         }
     }
 

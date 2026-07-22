@@ -24,10 +24,13 @@ services:
       mysql:
         condition: service_healthy
     environment:
+      SPRING_PROFILES_ACTIVE: prod
       PORT: 9097
       DB_URL: jdbc:mysql://mysql:3306/TiendaMas?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       DB_USERNAME: root
       DB_PASSWORD: ${DB_PASSWORD:-mysql123@}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:?Define ADMIN_USERNAME en tu archivo .env}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Define ADMIN_PASSWORD en tu archivo .env}
     ports:
       - "9097:9097"
     volumes:

@@ -19,4 +19,10 @@ public interface UsuarioService {
     Usuario actualizarPerfil(String username, String nombre, String apellido);
 
     boolean cambiarPassword(String username, String passwordActual, String passwordNueva);
+
+    List<Usuario> obtenerTodos();
+    Usuario obtenerPorId(Long id);
+    Usuario actualizarUsuario(Long id, String nombre, String apellido, RolUsuario rol, boolean activo, String nuevaPassword);
+    long contarPorRol(RolUsuario rol);
+    void eliminar(Long id);
 }

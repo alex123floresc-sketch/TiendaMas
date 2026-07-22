@@ -43,6 +43,10 @@
         <i class="users icon"></i> Clientes
       </a>
 
+      <a href="/usuarios" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/usuarios')} ? 'active'">
+        <i class="user shield icon"></i> Usuarios
+      </a>
+
       <div class="admin-nav-spacer"></div>
 
       <div class="ui dropdown admin-nav-item admin-nav-account" th:classappend="${uri != null and uri.startsWith('/perfil')} ? 'active'">

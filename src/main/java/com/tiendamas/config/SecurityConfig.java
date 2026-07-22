@@ -25,7 +25,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**", "/js/**", "/login", "/registro").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/uploads/**", "/login", "/registro").permitAll()
 
                         .requestMatchers("/tienda/checkout/**", "/tienda/pedidos/**", "/tienda/perfil/**").hasRole("CLIENTE")
                         .requestMatchers("/tienda/**").permitAll()
@@ -33,7 +33,7 @@ public class SecurityConfig {
                         .requestMatchers("/pos/**").hasAnyRole("VENDEDOR", "ADMIN")
 
                         .requestMatchers("/personas/**", "/categorias/**", "/productos/**", "/reportes/**",
-                                "/gastos/**", "/sueldos/**").hasRole("ADMIN")
+                                "/gastos/**", "/sueldos/**", "/usuarios/**").hasRole("ADMIN")
                         .requestMatchers("/pedidos", "/pedidos/nuevo", "/pedidos/*/eliminar").hasRole("ADMIN")
 
                         .requestMatchers("/pedidos/**").authenticated()

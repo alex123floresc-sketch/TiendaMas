@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base}">
+<body>
+<div th:fragment="content">
+
+    <h1 class="ui dividing header">
+        <i class="user shield icon"></i>
+        <div class="content">
+            Usuarios
+            <div class="sub header">Administra las cuentas de acceso al sistema.</div>
+        </div>
+    </h1>
+
+    <div style="margin-bottom: 25px;">
+        <a href="/usuarios/nuevo" class="ui primary button">
+            <i class="plus icon"></i> Agregar Nuevo Usuario
+        </a>
+    </div>
+
+    <div class="ui negative message" th:if="${param.error != null and param.error[0] == 'conRelaciones'}">
+        <div class="header">No se puede eliminar</div>
+        <p>Este usuario tiene registros asociados (por ejemplo sueldos) y no puede eliminarse.</p>
+    </div>
+    <div class="ui negative message" th:if="${param.error != null and param.error[0] == 'ultimoAdmin'}">
+        <div class="header">No se puede completar la acción</div>
+        <p>Debe existir al menos un usuario ADMIN activo en el sistema.</p>
+    </div>
+    <div class="ui negative message" th:if="${param.error != null and param.error[0] == 'noPropio'}">
+        <div class="header">No se puede eliminar</div>
+        <p>No puedes eliminar tu propia cuenta mientras tienes la sesión iniciada.</p>
+    </div>
+
+    <div th:if="${usuarios == null or #lists.isEmpty(usuarios)}" class="ui icon warning message">
+        <i class="info circle icon"></i>
+        <div class="content">
+            <div class="header">Sin usuarios</div>
+            <p>No hay usuarios registrados en el sistema actualmente.</p>
+        </div>
+    </div>
+
+    <table class="ui celled striped table" th:if="${usuarios != null and not #lists.isEmpty(usuarios)}">
+        <thead>
+        <tr>
+            <th class="one wide">ID</th>
+            <th class="three wide">Usuario</th>
+            <th class="three wide">Nombre</th>
+            <th class="two wide">Rol</th>
+            <th class="two wide center aligned">Estado</th>
+            <th class="three wide center aligned">Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="usuario : ${usuarios}">
+            <td th:text="${usuario.id}"></td>
+            <td th:text="${usuario.username}" style="font-weight: bold;"></td>
+            <td th:text="${usuario.nombre + ' ' + usuario.apellido}"></td>
+            <td th:text="${usuario.rol}"></td>
+            <td class="center aligned">
+                <span th:if="${usuario.activo}" class="ui small green label">Activo</span>
+                <span th:unless="${usuario.activo}" class="ui small grey label">Inactivo</span>
+            </td>
+            <td class="center aligned">
+                <div class="ui small buttons">
+                    <a th:href="@{/usuarios/{id}/editar(id=${usuario.id})}" class="ui yellow button" title="Editar">
+                        <i class="edit icon"></i>
+                    </a>
+                    <form th:action="@{/usuarios/{id}/eliminar(id=${usuario.id})}" method="post"
+                          style="display:contents" th:onsubmit="return confirm('¿Está seguro de eliminar este usuario?')">
+                        <button type="submit" class="ui red button" title="Eliminar">
+                            <i class="trash icon"></i>
+                        </button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

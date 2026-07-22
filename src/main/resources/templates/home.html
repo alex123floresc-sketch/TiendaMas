@@ -3,19 +3,80 @@
 <body>
 <div th:fragment="content">
     <h1 class="ui header">
-        <i class="home icon"></i>
-        <div class="content">Bienvenido al Sistema de Ventas</div>
+        <i class="shop icon"></i>
+        <div class="content">Panel de TiendaMas</div>
     </h1>
 
+    <div class="ui four statistics">
+        <div class="statistic">
+            <div class="value" th:text="${totalProductos}">0</div>
+            <div class="label">Productos</div>
+        </div>
+        <div class="statistic">
+            <div class="value" th:text="${totalCategorias}">0</div>
+            <div class="label">Categorías</div>
+        </div>
+        <div class="statistic">
+            <div class="value" th:text="${totalPedidos}">0</div>
+            <div class="label">Pedidos</div>
+        </div>
+        <div class="statistic">
+            <div class="value" th:text="${totalPersonas}">0</div>
+            <div class="label">Clientes</div>
+        </div>
+    </div>
+
     <div class="ui segment">
-        <h2>¿Por dónde empezamos?</h2>
-        <p>Selecciona una opción del menú lateral para gestionar:</p>
-        <div class="ui bulleted list">
-            <div class="item"><strong>Personas:</strong> Gestiona la información de clientes.</div>
-            <div class="item"><strong>Categorías:</strong> Organiza tu catálogo por familias de productos.</div>
-            <div class="item"><strong>Productos:</strong> Administra tu catálogo, precios y existencias.</div>
-            <div class="item"><strong>Pedidos:</strong> Registra las ventas realizadas a tus clientes.</div>
-            <div class="item"><strong>Reportes:</strong> Visualiza tus estadísticas de ventas.</div>
+        <h3 class="ui header">Ingresos totales</h3>
+        <p class="ui big label">S/ <span th:text="${#numbers.formatDecimal(ingresosTotales, 1, 2)}">0.00</span></p>
+    </div>
+
+    <div class="ui segment" th:if="${not #lists.isEmpty(stockBajo)}">
+        <h3 class="ui header"><i class="exclamation triangle icon"></i> Productos con stock bajo</h3>
+        <table class="ui celled table">
+            <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Stock</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="p : ${stockBajo}">
+                <td th:text="${p.nombre}">Producto</td>
+                <td th:text="${p.stock}">0</td>
+            </tr>
+            </tbody>
+        </table>
+        <a href="/productos" class="ui orange button">Ir a Productos</a>
+    </div>
+
+    <div class="ui segment">
+        <h3 class="ui header">Accesos rápidos</h3>
+        <div class="ui four stackable cards">
+            <a href="/productos" class="ui card">
+                <div class="content">
+                    <i class="cube icon"></i> <span class="header">Productos</span>
+                    <div class="description">Catálogo, precios y existencias.</div>
+                </div>
+            </a>
+            <a href="/pedidos" class="ui card">
+                <div class="content">
+                    <i class="list icon"></i> <span class="header">Pedidos</span>
+                    <div class="description">Ventas registradas a tus clientes.</div>
+                </div>
+            </a>
+            <a href="/reportes" class="ui card">
+                <div class="content">
+                    <i class="chart bar icon"></i> <span class="header">Reportes</span>
+                    <div class="description">Estadísticas de ventas del negocio.</div>
+                </div>
+            </a>
+            <a href="/pos" class="ui card">
+                <div class="content">
+                    <i class="cash register icon"></i> <span class="header">Punto de venta</span>
+                    <div class="description">Registra una venta al instante.</div>
+                </div>
+            </a>
         </div>
     </div>
 </div>

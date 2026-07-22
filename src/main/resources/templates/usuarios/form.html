@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base}">
+<body>
+<div th:fragment="content" style="max-width: 700px; margin: 0 auto;">
+
+    <h1 class="ui dividing header">
+        <i class="user shield icon"></i>
+        <div class="content">
+            <span th:text="${usuario.id != null} ? 'Editar Usuario' : 'Nuevo Usuario'"></span>
+            <div class="sub header">Cuentas con acceso al panel administrativo o de ventas.</div>
+        </div>
+    </h1>
+
+    <div class="ui segment">
+
+        <div class="ui negative message" th:if="${error == 'usernameDuplicado'}">
+            <div class="header">No se pudo crear el usuario</div>
+            <p>Ya existe un usuario con ese nombre de acceso.</p>
+        </div>
+
+        <form th:action="${usuario.id != null} ? @{/usuarios/{id}(id=${usuario.id})} : @{/usuarios}"
+              method="POST" class="ui form">
+
+            <div class="field required" th:if="${usuario.id == null}">
+                <label for="username">Usuario (para iniciar sesión)</label>
+                <div class="ui left icon input">
+                    <i class="at icon"></i>
+                    <input type="text" id="username" name="username" th:value="${usuario.username}" required placeholder="Ej. vendedor3">
+                </div>
+            </div>
+            <div class="field" th:if="${usuario.id != null}">
+                <label>Usuario</label>
+                <input type="text" th:value="${usuario.username}" disabled>
+            </div>
+
+            <div class="two fields">
+                <div class="field required">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" id="nombre" name="nombre" th:value="${usuario.nombre}" required placeholder="Ej. Carlos">
+                </div>
+                <div class="field required">
+                    <label for="apellido">Apellido</label>
+                    <input type="text" id="apellido" name="apellido" th:value="${usuario.apellido}" required placeholder="Ej. Mendoza">
+                </div>
+            </div>
+
+            <div class="field required">
+                <label for="rol">Rol</label>
+                <select id="rol" name="rol" class="ui fluid dropdown" required>
+                    <option th:each="r : ${roles}" th:value="${r}" th:text="${r}" th:selected="${r == usuario.rol}"></option>
+                </select>
+            </div>
+
+            <div class="field required" th:if="${usuario.id == null}">
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" name="password" required placeholder="Mínimo 6 caracteres">
+            </div>
+            <div class="field" th:if="${usuario.id != null}">
+                <label for="nuevaPassword">Nueva contraseña</label>
+                <input type="password" id="nuevaPassword" name="nuevaPassword" placeholder="Dejar en blanco para no cambiarla">
+            </div>
+
+            <div class="field" th:if="${usuario.id != null}">
+                <div class="ui checkbox">
+                    <input type="checkbox" name="activo" value="true" th:checked="${usuario.activo}">
+                    <label for="activo">Cuenta activa (permite iniciar sesión)</label>
+                </div>
+            </div>
+
+            <div class="ui divider"></div>
+
+            <div class="form-actions">
+                <button type="submit" class="ui positive button">
+                    <i class="save icon"></i> Guardar
+                </button>
+                <a href="/usuarios" class="ui button">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>
