@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base}">
 <body>
 <div th:fragment="content">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 
     <h1 class="ui dividing header">
         <i class="chart bar icon"></i>
@@ -63,6 +64,26 @@
         </div>
     </div>
 
+    <h3 class="ui header" style="margin-top: 30px;"><i class="chart bar icon"></i>Ventas por semana y por mes (por canal)</h3>
+    <div class="ui two column stackable grid">
+        <div class="column">
+            <div class="reporte-chart-card">
+                <div class="hint" style="margin-bottom:8px;">Últimas 8 semanas</div>
+                <div class="reporte-chart-wrap">
+                    <canvas id="chartVentasSemanal"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="column">
+            <div class="reporte-chart-card">
+                <div class="hint" style="margin-bottom:8px;">Últimos 6 meses</div>
+                <div class="reporte-chart-wrap">
+                    <canvas id="chartVentasMensual"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="ui two column stackable grid" style="margin-top: 10px;">
 
         <div class="column">
@@ -116,20 +137,27 @@
             <div th:if="${#maps.isEmpty(ventasPorCanal)}" class="ui info message">
                 <p>Aún no hay ventas registradas.</p>
             </div>
-            <table class="ui celled striped table" th:unless="${#maps.isEmpty(ventasPorCanal)}">
-                <thead>
-                <tr>
-                    <th>Canal</th>
-                    <th class="right aligned">Total vendido</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="entry : ${ventasPorCanal}">
-                    <td th:text="${entry.key}" style="font-weight: bold;"></td>
-                    <td th:text="'S/ ' + ${#numbers.formatDecimal(entry.value, 1, 2)}" class="right aligned"></td>
-                </tr>
-                </tbody>
-            </table>
+            <div th:unless="${#maps.isEmpty(ventasPorCanal)}">
+                <div class="reporte-chart-card" style="margin-bottom:15px;">
+                    <div class="reporte-chart-wrap pequeno">
+                        <canvas id="chartVentasPorCanal"></canvas>
+                    </div>
+                </div>
+                <table class="ui celled striped table">
+                    <thead>
+                    <tr>
+                        <th>Canal</th>
+                        <th class="right aligned">Total vendido</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="entry : ${ventasPorCanal}">
+                        <td th:text="${entry.key}" style="font-weight: bold;"></td>
+                        <td th:text="'S/ ' + ${#numbers.formatDecimal(entry.value, 1, 2)}" class="right aligned"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div class="column">
@@ -137,22 +165,60 @@
             <div th:if="${#maps.isEmpty(ventasPorMetodoPago)}" class="ui info message">
                 <p>Aún no hay ventas registradas.</p>
             </div>
-            <table class="ui celled striped table" th:unless="${#maps.isEmpty(ventasPorMetodoPago)}">
+            <div th:unless="${#maps.isEmpty(ventasPorMetodoPago)}">
+                <div class="reporte-chart-card" style="margin-bottom:15px;">
+                    <div class="reporte-chart-wrap pequeno">
+                        <canvas id="chartVentasPorMetodoPago"></canvas>
+                    </div>
+                </div>
+                <table class="ui celled striped table">
+                    <thead>
+                    <tr>
+                        <th>Método de pago</th>
+                        <th class="right aligned">Total vendido</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="entry : ${ventasPorMetodoPago}">
+                        <td th:text="${entry.key}" style="font-weight: bold;"></td>
+                        <td th:text="'S/ ' + ${#numbers.formatDecimal(entry.value, 1, 2)}" class="right aligned"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <h3 class="ui header" style="margin-top: 10px;"><i class="id badge icon"></i>Ventas por vendedor</h3>
+    <p class="hint" style="margin-bottom: 10px;">Incluye tanto las ventas atendidas en tienda física como las realizadas por el cliente en la tienda en línea.</p>
+    <div th:if="${#maps.isEmpty(ventasPorVendedor)}" class="ui info message">
+        <p>Aún no hay ventas registradas.</p>
+    </div>
+    <div class="ui two column stackable grid" th:unless="${#maps.isEmpty(ventasPorVendedor)}">
+        <div class="column">
+            <div class="reporte-chart-card">
+                <div class="reporte-chart-wrap">
+                    <canvas id="chartVentasPorVendedor"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="column">
+            <table class="ui celled striped table">
                 <thead>
                 <tr>
-                    <th>Método de pago</th>
+                    <th>Vendedor</th>
                     <th class="right aligned">Total vendido</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="entry : ${ventasPorMetodoPago}">
+                <tr th:each="entry : ${ventasPorVendedor}">
                     <td th:text="${entry.key}" style="font-weight: bold;"></td>
                     <td th:text="'S/ ' + ${#numbers.formatDecimal(entry.value, 1, 2)}" class="right aligned"></td>
                 </tr>
                 </tbody>
             </table>
         </div>
-
     </div>
 
     <h3 class="ui header" style="margin-top: 30px;"><i class="warning sign icon"></i>Recomendaciones de reabastecimiento</h3>
@@ -186,6 +252,59 @@
         </tr>
         </tbody>
     </table>
+
+    <script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        const paleta = ['#4F46E5', '#818CF8', '#059669', '#F59E0B', '#EF4444', '#0EA5E9', '#8B5CF6', '#64748B'];
+
+        function graficoPie(idCanvas, datosMapa) {
+            const el = document.getElementById(idCanvas);
+            if (!el) return;
+            new Chart(el, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(datosMapa),
+                    datasets: [{ data: Object.values(datosMapa), backgroundColor: paleta }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function graficoBarrasApiladas(idCanvas, labels, datosFisica, datosOnline) {
+            const el = document.getElementById(idCanvas);
+            if (!el) return;
+            new Chart(el, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Tienda física', data: datosFisica, backgroundColor: paleta[0] },
+                        { label: 'Online', data: datosOnline, backgroundColor: paleta[1] }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }
+                }
+            });
+        }
+
+        const semanaLabels = /*[[${resumenSemanal.![etiqueta]}]]*/ [];
+        const semanaFisica = /*[[${resumenSemanal.![ventasTiendaFisica]}]]*/ [];
+        const semanaOnline = /*[[${resumenSemanal.![ventasOnline]}]]*/ [];
+        graficoBarrasApiladas('chartVentasSemanal', semanaLabels, semanaFisica, semanaOnline);
+
+        const mesLabels = /*[[${resumenMensualVentas.![etiqueta]}]]*/ [];
+        const mesFisica = /*[[${resumenMensualVentas.![ventasTiendaFisica]}]]*/ [];
+        const mesOnline = /*[[${resumenMensualVentas.![ventasOnline]}]]*/ [];
+        graficoBarrasApiladas('chartVentasMensual', mesLabels, mesFisica, mesOnline);
+
+        graficoPie('chartVentasPorCanal', /*[[${ventasPorCanal}]]*/ {});
+        graficoPie('chartVentasPorMetodoPago', /*[[${ventasPorMetodoPago}]]*/ {});
+        graficoPie('chartVentasPorVendedor', /*[[${ventasPorVendedor}]]*/ {});
+    });
+    </script>
 </div>
 </body>
 </html>

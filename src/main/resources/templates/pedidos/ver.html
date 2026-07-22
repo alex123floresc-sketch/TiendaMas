@@ -13,6 +13,13 @@
             <div><strong>Canal:</strong> <span th:text="${pedido.canal}"></span></div>
             <div><strong>Método de pago:</strong> <span th:text="${pedido.metodoPago}"></span></div>
             <div th:if="${pedido.vendedorUsername != null}"><strong>Atendido por:</strong> <span th:text="${pedido.vendedorUsername}"></span></div>
+            <div th:if="${pedido.tipoEntrega != null}"><strong>Entrega:</strong> <span th:text="${pedido.tipoEntrega.etiqueta}"></span></div>
+            <div th:if="${pedido.direccionEntrega != null and !pedido.direccionEntrega.isEmpty()}"><strong>Dirección de entrega:</strong> <span th:text="${pedido.direccionEntrega}"></span></div>
+            <div th:if="${pedido.estado != null}"><strong>Estado:</strong>
+                <span class="ui label"
+                      th:classappend="${pedido.estado.name() == 'PENDIENTE'} ? 'yellow' : (${pedido.estado.name() == 'EN_CAMINO'} ? 'blue' : (${pedido.estado.name() == 'ENTREGADO'} ? 'green' : 'red'))"
+                      th:text="${pedido.estado.etiqueta}"></span>
+            </div>
         </div>
     </div>
 

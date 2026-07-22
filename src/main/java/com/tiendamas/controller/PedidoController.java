@@ -1,6 +1,7 @@
 package com.tiendamas.controller;
 
 import com.tiendamas.dto.PedidoForm;
+import com.tiendamas.entity.EstadoPedido;
 import com.tiendamas.entity.Pedido;
 import com.tiendamas.entity.RolUsuario;
 import com.tiendamas.entity.Usuario;
@@ -86,6 +87,12 @@ public class PedidoController {
         model.addAttribute("titulo", "Detalle de Pedido");
         model.addAttribute("volverUrl", volverUrl);
         return "pedidos/ver";
+    }
+
+    @PostMapping("/{id}/estado")
+    public String actualizarEstado(@PathVariable Long id, @RequestParam EstadoPedido estado) {
+        pedidoService.actualizarEstado(id, estado);
+        return "redirect:/pedidos";
     }
 
     @PostMapping("/{id}/eliminar")

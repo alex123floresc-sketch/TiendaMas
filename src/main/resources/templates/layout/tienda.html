@@ -19,7 +19,20 @@
   </button>
 
   <div class="tienda-nav-links">
-    <a th:href="@{/tienda}" class="item" th:classappend="${currentUri == '/tienda'} ? 'active'">Catálogo</a>
+    <div class="ui dropdown item tienda-catalogo-dropdown" th:classappend="${currentUri == '/tienda'} ? 'seccion-actual'">
+      <a th:href="@{/tienda}" style="color:inherit; text-decoration:none;">Catálogo</a> <i class="dropdown icon"></i>
+      <div class="menu">
+        <a th:href="@{/tienda}" class="item"><i class="th icon"></i> Todas las categorías</a>
+        <div class="divider" th:if="${categoriasMenu != null and !categoriasMenu.isEmpty()}"></div>
+        <a th:each="cat : ${categoriasMenu}" th:href="@{/tienda(categoriaId=${cat.id})}" class="item" th:text="${cat.nombre}"></a>
+      </div>
+    </div>
+
+    <form th:action="@{/tienda}" method="get" class="tienda-search">
+      <input type="text" name="q" placeholder="Buscar productos..." th:value="${q}" aria-label="Buscar productos">
+      <button type="submit" aria-label="Buscar"><i class="search icon"></i></button>
+    </form>
+
     <a th:href="@{/tienda/carrito}" class="item tienda-cart-link">
       <i class="shopping cart icon"></i> Carrito
       <span class="tienda-cart-badge" th:if="${carritoCount != null and carritoCount > 0}" th:text="${carritoCount}"></span>
@@ -83,8 +96,8 @@
     <div class="tienda-footer-col">
       <h4>Contacto</h4>
       <ul class="tienda-footer-contacto">
-        <li><i class="map marker alternate icon"></i> Av. Principal 1234, Buenos Aires</li>
-        <li><i class="phone icon"></i> <a href="tel:+541100000000">+54 11 0000-0000</a></li>
+        <li><i class="map marker alternate icon"></i> <a href="https://www.google.com/maps?q=-15.492302105189488,-70.13447502049469" target="_blank" rel="noopener">Ver ubicación en el mapa</a></li>
+        <li><i class="phone icon"></i> <a href="tel:+51900948480">+51 900 948 480</a></li>
         <li><i class="envelope icon"></i> <a href="mailto:contacto@tiendamas.com">contacto@tiendamas.com</a></li>
         <li><i class="clock outline icon"></i> Lun. a Vie. 9:00–19:00 hs.</li>
       </ul>

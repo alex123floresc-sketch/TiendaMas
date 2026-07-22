@@ -38,6 +38,14 @@ public class Pedido {
 
     private String vendedorUsername;
 
+    @Enumerated(EnumType.STRING)
+    private TipoEntrega tipoEntrega = TipoEntrega.RETIRO_TIENDA;
+
+    private String direccionEntrega;
+
+    @Enumerated(EnumType.STRING)
+    private EstadoPedido estado = EstadoPedido.PENDIENTE;
+
     public Pedido() {
         this.fecha = LocalDateTime.now();
     }
@@ -85,6 +93,15 @@ public class Pedido {
 
     public String getVendedorUsername() { return vendedorUsername; }
     public void setVendedorUsername(String vendedorUsername) { this.vendedorUsername = vendedorUsername; }
+
+    public TipoEntrega getTipoEntrega() { return tipoEntrega; }
+    public void setTipoEntrega(TipoEntrega tipoEntrega) { this.tipoEntrega = tipoEntrega; }
+
+    public String getDireccionEntrega() { return direccionEntrega; }
+    public void setDireccionEntrega(String direccionEntrega) { this.direccionEntrega = direccionEntrega; }
+
+    public EstadoPedido getEstado() { return estado; }
+    public void setEstado(EstadoPedido estado) { this.estado = estado; }
 
     @Transient
     public String getNumeroCompleto() {

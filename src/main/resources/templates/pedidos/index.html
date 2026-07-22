@@ -46,8 +46,10 @@
             <th>ID</th>
             <th>Cliente</th>
             <th>Fecha</th>
+            <th>Canal</th>
             <th>Items</th>
             <th>Total</th>
+            <th>Estado</th>
             <th class="center aligned">Acciones</th>
         </tr>
         </thead>
@@ -56,10 +58,24 @@
             <td th:text="${pedido.id}"></td>
             <td th:text="${pedido.persona.nombre + ' ' + pedido.persona.apellido}" style="font-weight: bold;"></td>
             <td th:text="${pedido.fechaTexto}"></td>
+            <td th:text="${pedido.canal != null ? pedido.canal.etiqueta : '—'}"></td>
             <td>
                 <div class="ui label" th:text="${pedido.detalles.size()}"></div>
             </td>
             <td th:text="'$' + ${pedido.total}" style="color: #21ba45; font-weight: bold;"></td>
+            <td>
+                <form th:if="${pedido.canal != null and pedido.canal.name() == 'ONLINE'}"
+                      th:action="@{/pedidos/{id}/estado(id=${pedido.id})}" method="post" style="display:contents">
+                    <select name="estado" class="ui small dropdown" onchange="this.form.submit()">
+                        <option value="PENDIENTE" th:selected="${pedido.estado != null and pedido.estado.name() == 'PENDIENTE'}">Pendiente</option>
+                        <option value="EN_CAMINO" th:selected="${pedido.estado != null and pedido.estado.name() == 'EN_CAMINO'}">En camino</option>
+                        <option value="ENTREGADO" th:selected="${pedido.estado != null and pedido.estado.name() == 'ENTREGADO'}">Entregado</option>
+                        <option value="CANCELADO" th:selected="${pedido.estado != null and pedido.estado.name() == 'CANCELADO'}">Cancelado</option>
+                    </select>
+                </form>
+                <span class="ui label green" th:unless="${pedido.canal != null and pedido.canal.name() == 'ONLINE'}"
+                      th:text="${pedido.estado != null ? pedido.estado.etiqueta : 'Entregado'}"></span>
+            </td>
             <td class="center aligned">
                 <div class="ui small buttons">
                     <a th:href="@{/pedidos/{id}(id=${pedido.id})}" class="ui info button" title="Ver">

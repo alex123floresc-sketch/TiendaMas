@@ -7,6 +7,7 @@ import com.tiendamas.entity.CanalVenta;
 import com.tiendamas.entity.MetodoPago;
 import com.tiendamas.entity.Pedido;
 import com.tiendamas.entity.Producto;
+import com.tiendamas.entity.TipoEntrega;
 import com.tiendamas.service.CategoriaService;
 import com.tiendamas.service.PedidoService;
 import com.tiendamas.service.PersonaService;
@@ -173,7 +174,8 @@ public class PosController {
 
         Pedido pedido;
         try {
-            pedido = pedidoService.crearVenta(personaId, items, CanalVenta.TIENDA_FISICA, metodoPago, principal.getName());
+            pedido = pedidoService.crearVenta(personaId, items, CanalVenta.TIENDA_FISICA, metodoPago, principal.getName(),
+                    TipoEntrega.RETIRO_TIENDA, null);
         } catch (IllegalArgumentException e) {
             return "redirect:/pos?error=clienteInvalido";
         }

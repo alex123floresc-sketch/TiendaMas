@@ -16,9 +16,15 @@
            th:text="${cat.nombre}"></a>
     </div>
 
+    <div class="ui message" th:if="${q != null and !q.isBlank()}">
+        Resultados de búsqueda para "<strong th:text="${q}"></strong>" (<span th:text="${productos.size()}"></span>)
+        — <a th:href="@{/tienda}">quitar filtro</a>
+    </div>
+
     <div class="ui icon warning message" th:if="${productos.isEmpty()}">
         <i class="info circle icon"></i>
-        <div class="content">No hay productos disponibles en esta categoría por ahora.</div>
+        <div class="content" th:if="${q != null and !q.isBlank()}">No encontramos productos que coincidan con tu búsqueda.</div>
+        <div class="content" th:unless="${q != null and !q.isBlank()}">No hay productos disponibles en esta categoría por ahora.</div>
     </div>
 
     <div class="tienda-grid">
@@ -47,6 +53,33 @@
                     <span th:text="${p.stock != null and p.stock > 0} ? 'Agregar al carrito' : 'Sin stock'"></span>
                 </button>
             </form>
+        </div>
+    </div>
+
+    <div th:if="${masVendidos != null and !masVendidos.isEmpty()}" style="margin-top: 40px;">
+        <h3 class="ui header"><i class="star icon"></i>Los más vendidos</h3>
+        <div class="tienda-grid">
+            <div class="tienda-card" th:each="p : ${masVendidos}">
+                <a th:href="@{/tienda/productos/{id}(id=${p.id})}" class="tienda-card-link">
+                    <div class="tienda-card-img">
+                        <img th:if="${p.imagenUrl != null}" th:src="@{${p.imagenUrl}}" alt="Imagen del producto">
+                        <i th:unless="${p.imagenUrl != null}" class="box icon huge"></i>
+                    </div>
+                    <div class="tienda-card-body">
+                        <div class="tienda-card-cat" th:text="${p.categoria != null ? p.categoria.nombre : ''}"></div>
+                        <div class="tienda-card-nombre" th:text="${p.nombre}"></div>
+                        <div class="tienda-card-precio">S/ <span th:text="${p.precio}"></span></div>
+                    </div>
+                </a>
+                <form th:action="@{/tienda/carrito/agregar}" method="post">
+                    <input type="hidden" name="productoId" th:value="${p.id}">
+                    <input type="hidden" name="cantidad" value="1">
+                    <button type="submit" class="ui fluid primary button" th:disabled="${p.stock == null or p.stock <= 0}">
+                        <i class="cart plus icon"></i>
+                        <span th:text="${p.stock != null and p.stock > 0} ? 'Agregar al carrito' : 'Sin stock'"></span>
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </div>

@@ -7,6 +7,7 @@ import com.tiendamas.entity.MetodoPago;
 import com.tiendamas.entity.Pedido;
 import com.tiendamas.entity.Persona;
 import com.tiendamas.entity.Producto;
+import com.tiendamas.entity.TipoEntrega;
 import com.tiendamas.entity.Usuario;
 import com.tiendamas.service.CategoriaService;
 import com.tiendamas.service.PedidoService;
@@ -46,16 +47,17 @@ public class TiendaController {
     private UsuarioService usuarioService;
 
     @GetMapping
-    public String index(@RequestParam(required = false) Long categoriaId, Model model) {
-        List<Producto> productos = productoService.obtenerTodos();
-        if (categoriaId != null) {
-            productos = productos.stream()
-                    .filter(p -> p.getCategoria() != null && categoriaId.equals(p.getCategoria().getId()))
-                    .collect(Collectors.toList());
-        }
+    public String index(@RequestParam(required = false) String q,
+                         @RequestParam(required = false) Long categoriaId, Model model) {
+        List<Producto> productos = productoService.buscar(q, categoriaId);
+
         model.addAttribute("productos", productos);
         model.addAttribute("categorias", categoriaService.obtenerTodas());
         model.addAttribute("categoriaSeleccionada", categoriaId);
+        model.addAttribute("q", q);
+        if ((q == null || q.isBlank()) && categoriaId == null) {
+            model.addAttribute("masVendidos", pedidoService.obtenerMasVendidos(4));
+        }
         model.addAttribute("titulo", "Tienda");
         return "tienda/index";
     }
@@ -132,7 +134,10 @@ public class TiendaController {
     }
 
     @PostMapping("/checkout")
-    public String checkout(@RequestParam MetodoPago metodoPago, Principal principal, Model model) {
+    public String checkout(@RequestParam MetodoPago metodoPago,
+                            @RequestParam TipoEntrega tipoEntrega,
+                            @RequestParam(required = false) String direccionEntrega,
+                            Principal principal, Model model) {
         if (carrito.isEmpty()) {
             return "redirect:/tienda/carrito";
         }
@@ -141,11 +146,16 @@ public class TiendaController {
             return "redirect:/tienda/perfil?volver=checkout";
         }
 
+        String direccion = tipoEntrega == TipoEntrega.DOMICILIO
+                ? (direccionEntrega != null && !direccionEntrega.isBlank() ? direccionEntrega : persona.getDireccion())
+                : null;
+
         List<ItemVenta> items = carrito.getItems().stream()
                 .map(i -> new ItemVenta(i.getProductoId(), i.getCantidad()))
                 .collect(Collectors.toList());
 
-        Pedido pedido = pedidoService.crearVenta(persona.getId(), items, CanalVenta.ONLINE, metodoPago, null);
+        Pedido pedido = pedidoService.crearVenta(persona.getId(), items, CanalVenta.ONLINE, metodoPago, null,
+                tipoEntrega, direccion);
         carrito.vaciar();
         return "redirect:/pedidos/" + pedido.getId();
     }

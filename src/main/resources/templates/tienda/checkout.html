@@ -34,7 +34,29 @@
 
         <div class="ui divider"></div>
 
-        <form th:action="@{/tienda/checkout}" method="post" class="ui form">
+        <form th:action="@{/tienda/checkout}" method="post" class="ui form" id="formCheckout">
+            <div class="field required">
+                <label>Tipo de entrega</label>
+                <div class="tienda-entrega-opciones">
+                    <label class="tienda-entrega-opcion">
+                        <input type="radio" name="tipoEntrega" value="RETIRO_TIENDA" checked
+                               onchange="document.getElementById('bloqueDireccionEntrega').style.display='none'; document.getElementById('direccionEntrega').required=false;">
+                        <i class="store icon"></i> Retiro en tienda
+                    </label>
+                    <label class="tienda-entrega-opcion">
+                        <input type="radio" name="tipoEntrega" value="DOMICILIO"
+                               onchange="document.getElementById('bloqueDireccionEntrega').style.display='block'; document.getElementById('direccionEntrega').required=true;">
+                        <i class="truck icon"></i> Envío a domicilio
+                    </label>
+                </div>
+            </div>
+
+            <div class="field" id="bloqueDireccionEntrega" style="display:none;">
+                <label>Dirección de entrega</label>
+                <textarea name="direccionEntrega" id="direccionEntrega" rows="2"
+                          placeholder="Calle, número, referencia..." th:text="${persona.direccion}"></textarea>
+            </div>
+
             <div class="field required">
                 <label>Método de pago</label>
                 <select name="metodoPago" class="ui fluid dropdown" required>

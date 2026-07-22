@@ -5,11 +5,13 @@ import com.tiendamas.dto.ItemVenta;
 import com.tiendamas.dto.PedidoForm;
 import com.tiendamas.entity.CanalVenta;
 import com.tiendamas.entity.DetallePedido;
+import com.tiendamas.entity.EstadoPedido;
 import com.tiendamas.entity.MetodoPago;
 import com.tiendamas.entity.Pedido;
 import com.tiendamas.entity.Persona;
 import com.tiendamas.entity.Producto;
 import com.tiendamas.entity.TipoComprobante;
+import com.tiendamas.entity.TipoEntrega;
 import com.tiendamas.repository.PedidoRepository;
 import com.tiendamas.service.PedidoService;
 import com.tiendamas.service.PersonaService;
@@ -69,13 +71,15 @@ public class PedidoServiceImpl implements PedidoService {
             if (df == null) continue;
             items.add(new ItemVenta(df.getProductoId(), df.getCantidad()));
         }
-        return crearVenta(form.getPersonaId(), items, CanalVenta.TIENDA_FISICA, form.getMetodoPago(), creadoPor);
+        return crearVenta(form.getPersonaId(), items, CanalVenta.TIENDA_FISICA, form.getMetodoPago(), creadoPor,
+                TipoEntrega.RETIRO_TIENDA, null);
     }
 
     @Override
     @Transactional
     public Pedido crearVenta(Long personaId, List<ItemVenta> items, CanalVenta canal,
-                              MetodoPago metodoPago, String vendedorUsername) {
+                              MetodoPago metodoPago, String vendedorUsername,
+                              TipoEntrega tipoEntrega, String direccionEntrega) {
         Persona persona = personaService.obtenerPorId(personaId);
         if (persona == null) {
             throw new IllegalArgumentException("Cliente no encontrado");
@@ -86,6 +90,10 @@ public class PedidoServiceImpl implements PedidoService {
         pedido.setCanal(canal);
         pedido.setMetodoPago(metodoPago);
         pedido.setVendedorUsername(vendedorUsername);
+        pedido.setTipoEntrega(tipoEntrega != null ? tipoEntrega : TipoEntrega.RETIRO_TIENDA);
+        pedido.setDireccionEntrega(pedido.getTipoEntrega() == TipoEntrega.DOMICILIO ? direccionEntrega : null);
+        // Una venta en tienda física se entrega en el acto; una venta online queda pendiente hasta su despacho/retiro.
+        pedido.setEstado(canal == CanalVenta.TIENDA_FISICA ? EstadoPedido.ENTREGADO : EstadoPedido.PENDIENTE);
 
         TipoComprobante tipoComprobante = persona.getTipoComprobanteSugerido();
         pedido.setTipoComprobante(tipoComprobante);
@@ -156,6 +164,17 @@ public class PedidoServiceImpl implements PedidoService {
             }
         }
         return unidadesPorProductoId;
+    }
+
+    @Override
+    @Transactional
+    public void actualizarEstado(Long pedidoId, EstadoPedido nuevoEstado) {
+        Pedido pedido = pedidoRepository.findById(pedidoId).orElse(null);
+        if (pedido == null) {
+            throw new IllegalArgumentException("Pedido no encontrado");
+        }
+        pedido.setEstado(nuevoEstado);
+        pedidoRepository.save(pedido);
     }
 
     @Override
