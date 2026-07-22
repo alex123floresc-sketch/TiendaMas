@@ -1,5 +1,5 @@
 server:
-  port: ${PORT:9097}
+  port: ${PORT:9095}
 
 spring:
   servlet:

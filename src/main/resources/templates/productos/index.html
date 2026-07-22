@@ -30,14 +30,30 @@
         </div>
     </div>
 
-    <div class="ui icon input list-search" th:unless="${productos.isEmpty()}">
-        <i class="search icon"></i>
-        <input type="text" placeholder="Buscar por nombre, marca, código o categoría..." aria-label="Buscar productos"
-               oninput="filtrarTabla(this, 'tablaProductos')">
+    <div class="list-search-row" th:unless="${productos.isEmpty()}">
+        <div class="ui icon input list-search">
+            <i class="search icon"></i>
+            <input type="text" id="buscarProductosInput" placeholder="Buscar por nombre, marca, código o categoría..." aria-label="Buscar productos"
+                   autocomplete="off" oninput="filtrarTabla(this, 'tablaProductos')">
+        </div>
+        <button type="button" class="ui icon button list-search-scan-btn" title="Escanear código de barras con la cámara" onclick="abrirEscanerBusqueda()">
+            <i class="camera icon"></i>
+        </button>
     </div>
+    <div id="scanFlashBusqueda" class="pos-scan-flash"></div>
     <div id="tablaProductosSinResultados" class="ui icon info message" style="display:none;">
         <i class="search icon"></i>
         <div class="content">No se encontraron productos con ese criterio de búsqueda.</div>
+    </div>
+
+    <div id="modalCamaraBusqueda" class="ui modal">
+        <div class="header">Escanear código de barras</div>
+        <div class="content">
+            <div id="readerBusqueda" style="width:100%"></div>
+        </div>
+        <div class="actions">
+            <button type="button" class="ui button" onclick="cerrarEscanerBusqueda()">Cerrar</button>
+        </div>
     </div>
 
     <table id="tablaProductos" class="ui celled striped table" th:unless="${productos.isEmpty()}">
@@ -91,6 +107,54 @@
         </tr>
         </tbody>
     </table>
+
+<script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+<script>
+    let html5QrCodeBusqueda = null;
+
+    function abrirEscanerBusqueda() {
+        $('#modalCamaraBusqueda').modal({ closable: false, onHide: pararCamaraBusqueda }).modal('show');
+        html5QrCodeBusqueda = new Html5Qrcode("readerBusqueda");
+        html5QrCodeBusqueda.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: 250 },
+            function (decodedText) {
+                const input = document.getElementById('buscarProductosInput');
+                input.value = decodedText;
+                filtrarTabla(input, 'tablaProductos');
+                mostrarFlashBusqueda('exito', '✓ Código escaneado: ' + decodedText);
+                cerrarEscanerBusqueda();
+            },
+            function () { /* frame sin código detectado, se ignora */ }
+        ).catch(function (err) {
+            console.error('No se pudo iniciar la cámara:', err);
+            alert('No se pudo acceder a la cámara. Escribe el código manualmente en el buscador.');
+            $('#modalCamaraBusqueda').modal('hide');
+        });
+    }
+
+    function pararCamaraBusqueda() {
+        if (html5QrCodeBusqueda) {
+            html5QrCodeBusqueda.stop().catch(function () {});
+        }
+    }
+
+    function cerrarEscanerBusqueda() {
+        $('#modalCamaraBusqueda').modal('hide');
+    }
+
+    function mostrarFlashBusqueda(tipo, mensaje) {
+        const el = document.getElementById('scanFlashBusqueda');
+        if (!el) return;
+        el.className = 'pos-scan-flash ' + tipo;
+        el.textContent = mensaje;
+        clearTimeout(el._timeout);
+        el._timeout = setTimeout(function () {
+            el.className = 'pos-scan-flash';
+            el.textContent = '';
+        }, 2500);
+    }
+</script>
 </div>
 </body>
 </html>

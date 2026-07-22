@@ -15,6 +15,9 @@
 
 <div class="pos-topbar">
   <a th:href="@{/pos}" class="pos-brand"><i class="cash register icon"></i> TiendaMas <span>POS</span></a>
+  <button type="button" class="pos-nav-toggle" onclick="document.querySelector('.pos-topbar-actions').classList.toggle('open')">
+    <i class="bars icon"></i>
+  </button>
   <div class="pos-topbar-actions">
     <span class="pos-user" th:if="${usuarioAutenticado}">
       <i class="user icon"></i> <span th:text="${usuarioAutenticado}"></span>

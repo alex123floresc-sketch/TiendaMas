@@ -386,10 +386,16 @@ body {
 }
 
 /* Buscador de listados admin */
+.list-search-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+}
 .list-search {
     width: 100%;
     max-width: 340px;
-    margin-bottom: 18px;
+    margin-bottom: 0;
 }
 .list-search input {
     border-radius: 8px !important;
@@ -401,6 +407,9 @@ body {
 }
 .list-search .icon {
     color: var(--color-blue-light);
+}
+.list-search-scan-btn {
+    flex-shrink: 0;
 }
 
 /* --- 5. COMPONENTES ADICIONALES --- */
@@ -442,6 +451,7 @@ body {
     background-color: var(--color-navy);
     color: var(--color-white);
     padding: 14px 24px;
+    position: relative;
 }
 .pos-brand {
     font-size: 1.2em;
@@ -451,6 +461,16 @@ body {
 }
 .pos-brand span {
     color: var(--color-blue-light);
+}
+.pos-nav-toggle {
+    display: none;
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: var(--color-white);
+    font-size: 1.3em;
+    cursor: pointer;
+    padding: 10px;
 }
 .pos-topbar-actions {
     display: flex;
@@ -1146,6 +1166,11 @@ body {
     .admin-nav-item.ui.dropdown .menu > .item {
         color: var(--admin-nav-text) !important;
     }
+    .admin-nav-account {
+        margin: 6px 0 0 0;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
     .admin-content {
         padding: 20px;
     }
@@ -1176,6 +1201,19 @@ body {
     .tienda-nav-links.open {
         display: flex;
     }
+    .tienda-search {
+        width: 100%;
+        margin: 4px 0;
+    }
+    .tienda-search input {
+        width: 100%;
+        flex: 1;
+    }
+    .tienda-cart-link {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 10px;
+        margin-top: 4px;
+    }
     .tienda-content {
         padding: 16px;
     }
@@ -1202,9 +1240,41 @@ body {
     .pos-content {
         padding: 16px;
     }
-    .pos-topbar {
-        flex-wrap: wrap;
-        gap: 10px;
+
+    /* POS: la barra superior colapsa a menú desplegable con botón hamburguesa */
+    .pos-nav-toggle {
+        display: block;
+    }
+    .pos-topbar-actions {
+        display: none;
+        flex-direction: column;
+        align-items: stretch;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--color-navy);
+        padding: 10px;
+        gap: 6px;
+        z-index: 99;
+        box-shadow: 0 12px 20px rgba(15, 23, 42, 0.25);
+    }
+    .pos-topbar-actions.open {
+        display: flex;
+    }
+    .pos-topbar-actions .ui.button {
+        width: 100%;
+        margin: 0;
+    }
+    .pos-topbar-actions .pos-user {
+        padding: 8px 6px;
+    }
+
+    /* Objetivos táctiles consistentes en los tres menús al estar en modo celular */
+    .admin-nav-links.open .admin-nav-item,
+    .tienda-nav-links.open .item,
+    .pos-topbar-actions.open .ui.button {
+        min-height: 44px;
     }
 
     /* Comprobante */
@@ -1213,5 +1283,39 @@ body {
     }
     .comprobante-meta {
         text-align: left;
+    }
+
+    /* Buscador con botón de cámara: no se achica en celulares */
+    .list-search-row {
+        flex-wrap: nowrap;
+    }
+    .list-search {
+        max-width: none;
+    }
+}
+
+/* Celulares: objetivos táctiles más grandes y catálogo en una sola columna */
+@media (max-width: 480px) {
+    .ui.button,
+    .list-search-scan-btn,
+    #formCodigo button,
+    .pos-chip {
+        min-height: 44px;
+    }
+    .pos-product-grid {
+        grid-template-columns: repeat(2, 1fr);
+        max-height: 340px;
+    }
+    .tienda-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    #formCodigo .fields {
+        gap: 8px;
+    }
+    #modalCamara,
+    #modalCamaraBusqueda {
+        width: 94% !important;
+        margin: 0 3% !important;
     }
 }
