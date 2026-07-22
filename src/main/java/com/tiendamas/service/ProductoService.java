@@ -29,6 +29,11 @@ public class ProductoService {
         return productoRepository.findByCodigoBarras(codigoBarras.trim()).orElse(null);
     }
 
+    public List<Producto> buscar(String query, Long categoriaId) {
+        String q = (query == null || query.isBlank()) ? null : query.trim().toLowerCase();
+        return productoRepository.buscar(q, categoriaId);
+    }
+
     public Producto guardar(Producto producto) {
         return productoRepository.save(producto);
     }
