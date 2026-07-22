@@ -25,23 +25,17 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        // Recursos públicos y páginas de acceso
                         .requestMatchers("/css/**", "/js/**", "/login", "/registro").permitAll()
 
-                        // Tienda en línea: checkout, perfil y "mis pedidos" son solo del cliente autenticado;
-                        // el resto (catálogo y carrito) es público, como en cualquier tienda grande.
                         .requestMatchers("/tienda/checkout/**", "/tienda/pedidos/**", "/tienda/perfil/**").hasRole("CLIENTE")
                         .requestMatchers("/tienda/**").permitAll()
 
-                        // Punto de venta: solo vendedores (y administradores, para soporte).
                         .requestMatchers("/pos/**").hasAnyRole("VENDEDOR", "ADMIN")
 
-                        // Panel administrativo.
                         .requestMatchers("/personas/**", "/categorias/**", "/productos/**", "/reportes/**",
                                 "/gastos/**", "/sueldos/**").hasRole("ADMIN")
                         .requestMatchers("/pedidos", "/pedidos/nuevo", "/pedidos/*/eliminar").hasRole("ADMIN")
 
-                        // Ver un comprobante puntual: cualquier autenticado; el controlador valida propiedad.
                         .requestMatchers("/pedidos/**").authenticated()
 
                         .anyRequest().authenticated()

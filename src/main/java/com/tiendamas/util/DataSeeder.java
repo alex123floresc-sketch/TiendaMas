@@ -29,12 +29,6 @@ import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Siembra datos de demostración. Se ejecuta en cada arranque, pero cada bloque
- * es idempotente por separado: no vuelve a crear catálogo si ya hay personas,
- * y no vuelve a crear usuarios si ya existe alguno (para no romper una base
- * de datos real ya en uso, p. ej. la de MySQL configurada en application.yml).
- */
 @Component
 public class DataSeeder implements CommandLineRunner {
 
@@ -85,7 +79,6 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void sembrarCatalogoYClientesDemo() {
-        // Clientes con DNI (compran con boleta)
         personaRepository.save(new Persona("Ana", "Gómez", "ana.gomez@example.com",
                 "987654321", "Av. Los Álamos 123", TipoDocumento.DNI, "45678912"));
         personaRepository.save(new Persona("Luis", "Ramírez", "luis.ramirez@example.com",
@@ -95,7 +88,6 @@ public class DataSeeder implements CommandLineRunner {
         personaRepository.save(new Persona("Jorge", "Salazar", "jorge.salazar@example.com",
                 "987654324", "Av. Industrial 321", TipoDocumento.DNI, "42345678"));
 
-        // Clientes con RUC (compran con factura)
         Persona comercialLosAndes = new Persona("Comercial", "Los Andes S.A.C.", "ventas@losandes.com",
                 "014567890", "Av. Comercio 1000", TipoDocumento.RUC, "20481234567");
         comercialLosAndes.setRazonSocial("Comercial Los Andes S.A.C.");
@@ -106,14 +98,12 @@ public class DataSeeder implements CommandLineRunner {
         distribuidoraElSol.setRazonSocial("Distribuidora El Sol E.I.R.L.");
         personaRepository.save(distribuidoraElSol);
 
-        // Categorías
         Categoria abarrotes = categoriaRepository.save(new Categoria("Abarrotes", "Alimentos y productos de despensa"));
         Categoria bebidas = categoriaRepository.save(new Categoria("Bebidas", "Bebidas frías y calientes"));
         Categoria limpieza = categoriaRepository.save(new Categoria("Limpieza", "Productos de limpieza para el hogar"));
         Categoria electronica = categoriaRepository.save(new Categoria("Electrónica", "Accesorios y artículos electrónicos"));
         Categoria ropa = categoriaRepository.save(new Categoria("Ropa", "Prendas de vestir"));
 
-        // Productos con código de barras (para el escaneo en el punto de venta)
         List<Producto> productos = List.of(
                 conCodigo(new Producto("Arroz Extra 1kg", "Arroz blanco extra", 4.50, 80, abarrotes), "7750001000011"),
                 conCodigo(new Producto("Azúcar Rubia 1kg", "Azúcar rubia doméstica", 4.20, 60, abarrotes), "7750001000028"),

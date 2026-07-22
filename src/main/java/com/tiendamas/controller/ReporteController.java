@@ -89,7 +89,6 @@ public class ReporteController {
             }
         }
 
-        // Misma fuente de datos que usa la tienda en línea para sus recomendaciones.
         List<Producto> masVendidos = pedidoService.obtenerMasVendidos(TOP_PRODUCTOS_LIMITE);
 
         Map<Long, Integer> unidadesUltimos30Dias = pedidoService.obtenerUnidadesVendidasDesde(

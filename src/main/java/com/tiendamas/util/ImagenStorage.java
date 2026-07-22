@@ -9,7 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 
-/** Guarda y elimina las imágenes de producto subidas por el usuario en la carpeta externa "uploads/productos". */
 @Component
 public class ImagenStorage {
 
@@ -38,7 +37,6 @@ public class ImagenStorage {
         try {
             Files.deleteIfExists(CARPETA.resolve(imagenUrl.substring(RUTA_PUBLICA.length())));
         } catch (IOException ignored) {
-            // Si no se puede borrar el archivo viejo, no es motivo para fallar la operación.
         }
     }
 

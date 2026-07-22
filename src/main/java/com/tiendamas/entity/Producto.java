@@ -20,10 +20,8 @@ public class Producto {
 
     private String marca;
 
-    /** Ej. "kg", "unidad", "paquete", "litro". */
     private String unidadMedida;
 
-    /** Ruta pública de la imagen (ej. "/uploads/productos/archivo.jpg"). */
     private String imagenUrl;
 
     @ManyToOne

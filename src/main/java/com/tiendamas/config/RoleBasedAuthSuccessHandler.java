@@ -22,8 +22,6 @@ public class RoleBasedAuthSuccessHandler implements AuthenticationSuccessHandler
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                          Authentication authentication) throws IOException, ServletException {
-        // Si el usuario fue redirigido al login desde una página protegida
-        // (p. ej. /tienda/checkout o /pos), lo devolvemos ahí en vez de a su home por rol.
         SavedRequest savedRequest = requestCache.getRequest(request, response);
         if (savedRequest != null) {
             response.sendRedirect(savedRequest.getRedirectUrl());

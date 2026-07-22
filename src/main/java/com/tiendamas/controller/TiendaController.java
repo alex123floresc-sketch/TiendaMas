@@ -165,8 +165,6 @@ public class TiendaController {
         if (usuario == null || usuario.getPersona() == null) {
             return "redirect:/tienda";
         }
-        // El id siempre se toma de la cuenta autenticada, nunca del formulario:
-        // evita que un cliente edite la ficha de otra persona.
         persona.setId(usuario.getPersona().getId());
         personaService.guardar(persona);
         return "redirect:/tienda/checkout";

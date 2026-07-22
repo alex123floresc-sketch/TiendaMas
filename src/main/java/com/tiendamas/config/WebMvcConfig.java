@@ -6,7 +6,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.nio.file.Path;
 
-/** Expone la carpeta externa "uploads/" (imágenes subidas por el usuario) como recursos estáticos. */
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 

@@ -18,7 +18,6 @@ public class Sueldo {
 
     private Double monto;
 
-    /** Periodo al que corresponde el pago, p. ej. "2026-07". */
     private String periodo;
 
     private LocalDate fechaPago;

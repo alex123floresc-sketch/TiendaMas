@@ -50,7 +50,6 @@ public class ProductoService {
         return null;
     }
 
-    /** Productos de la misma categoría (para "productos relacionados" en la tienda). */
     public List<Producto> obtenerRelacionados(Producto producto, int limite) {
         if (producto == null || producto.getCategoria() == null) {
             return List.of();

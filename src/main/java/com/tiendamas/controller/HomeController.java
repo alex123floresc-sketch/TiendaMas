@@ -9,9 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class HomeController {
 
-    // El panel con menú lateral (home.html) es solo el "inicio" del ADMIN.
-    // Si un vendedor o cliente llega aquí (p. ej. escribiendo la URL a mano),
-    // lo mandamos a su propia pantalla en vez de mostrarle el menú administrativo.
     @GetMapping("/")
     public String index(Model model, Authentication authentication) {
         if (tieneRol(authentication, "ROLE_VENDEDOR")) {
@@ -26,7 +23,7 @@ public class HomeController {
 
     @GetMapping("/login")
     public String login() {
-        return "login"; // Esto buscará el archivo login.html en templates
+        return "login";
     }
 
     private boolean tieneRol(Authentication authentication, String rol) {

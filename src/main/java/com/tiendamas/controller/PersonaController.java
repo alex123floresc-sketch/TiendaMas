@@ -27,7 +27,6 @@ public class PersonaController {
     @Autowired
     private PedidoService pedidoService;
 
-    // 1. LISTAR PERSONAS
     @GetMapping
     public String listar(Model model) {
         List<Persona> lista = personaService.obtenerTodas();
@@ -48,7 +47,6 @@ public class PersonaController {
         return "personas/index";
     }
 
-    // 2. MOSTRAR FORMULARIO DE NUEVA PERSONA
     @GetMapping("/nuevo")
     public String mostrarFormularioCrear(Model model) {
         model.addAttribute("persona", new Persona());
@@ -56,14 +54,12 @@ public class PersonaController {
         return "personas/form";
     }
 
-    // 3. GUARDAR PERSONA (CREAR O ACTUALIZAR)
     @PostMapping
     public String guardar(Persona persona) {
         personaService.guardar(persona);
         return "redirect:/personas";
     }
 
-    // 4. VER DETALLE DE UNA PERSONA (+ resumen de compras)
     @GetMapping("/{id}")
     public String ver(@PathVariable("id") Long id, Model model) {
         Persona persona = personaService.obtenerPorId(id);
@@ -82,7 +78,6 @@ public class PersonaController {
         return "personas/ver";
     }
 
-    // 5. MOSTRAR FORMULARIO DE EDICIÓN
     @GetMapping("/{id}/editar")
     public String mostrarFormularioEditar(@PathVariable("id") Long id, Model model) {
         Persona persona = personaService.obtenerPorId(id);
@@ -94,7 +89,6 @@ public class PersonaController {
         return "redirect:/personas";
     }
 
-    // 6. ELIMINAR PERSONA (POST para evitar borrados accidentales vía GET/CSRF)
     @PostMapping("/{id}/eliminar")
     public String eliminar(@PathVariable("id") Long id) {
         try {

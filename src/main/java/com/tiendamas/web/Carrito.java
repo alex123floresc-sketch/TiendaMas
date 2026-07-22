@@ -8,11 +8,6 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * Carrito de compras en memoria de sesión. Lo comparten el punto de venta
- * (vendedor en tienda física) y la tienda en línea (cliente): misma lógica
- * de agregar/quitar/actualizar/total en un solo lugar.
- */
 @Component
 @SessionScope
 public class Carrito {

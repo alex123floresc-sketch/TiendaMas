@@ -36,7 +36,6 @@ public class Pedido {
     @Enumerated(EnumType.STRING)
     private CanalVenta canal;
 
-    /** Username del vendedor que atendió la venta; null en canal ONLINE. */
     private String vendedorUsername;
 
     public Pedido() {

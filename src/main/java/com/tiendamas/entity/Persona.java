@@ -27,7 +27,6 @@ public class Persona {
 
     private String numeroDocumento;
 
-    /** Solo aplica cuando tipoDocumento = RUC (para emitir factura). */
     private String razonSocial;
 
     private LocalDate fechaNacimiento;
@@ -35,7 +34,6 @@ public class Persona {
     @Enumerated(EnumType.STRING)
     private Genero genero;
 
-    /** Notas libres: preferencias de contacto, alergias, forma de pago preferida, etc. */
     private String preferencias;
 
     public Persona() {

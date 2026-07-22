@@ -15,11 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
 
-/**
- * Perfil de cuenta para ADMIN y VENDEDOR (nombre/apellido + cambio de contraseña).
- * Un CLIENTE tiene un perfil más completo en /tienda/perfil (datos de facturación),
- * así que aquí simplemente lo redirigimos allá.
- */
 @Controller
 @RequestMapping("/perfil")
 public class PerfilController {
@@ -50,9 +45,6 @@ public class PerfilController {
 
     @PostMapping("/password")
     public String cambiarPassword(@ModelAttribute CambioPasswordForm form, Principal principal) {
-        // Un CLIENTE llega aquí desde /tienda/perfil, así que lo devolvemos ahí
-        // (si volviera a /perfil, este mismo controlador lo redirigiría de nuevo,
-        // perdiendo el mensaje de confirmación en el camino).
         Usuario usuario = usuarioService.buscarPorUsername(principal.getName()).orElse(null);
         String volverA = (usuario != null && usuario.getRol() == RolUsuario.CLIENTE) ? "/tienda/perfil" : "/perfil";
 

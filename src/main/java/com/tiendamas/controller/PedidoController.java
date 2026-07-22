@@ -55,8 +55,6 @@ public class PedidoController {
         return "redirect:/pedidos";
     }
 
-    // Ver comprobante: accesible para cualquier rol autenticado, pero un
-    // CLIENTE solo puede ver los pedidos vinculados a su propia Persona.
     @GetMapping("/{id}")
     public String ver(@PathVariable Long id, Model model, Principal principal) {
         Pedido pedido = pedidoService.obtenerPorId(id);
