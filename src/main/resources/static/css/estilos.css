@@ -1,7 +1,3 @@
-/* =========================================================
-   TiendaMas — Paleta limpia: base slate (neutros fríos) + acento índigo
-   ========================================================= */
-
 :root {
     --color-navy: #1E293B;        /* slate-800 — texto fuerte, cabeceras de tabla, navbar */
     --color-navy-dark: #0F172A;   /* slate-900 — fondo navbar, hover oscuro */
@@ -16,7 +12,6 @@
     --color-success: #059669;     /* verde — precios, valores positivos */
 }
 
-/* --- 1. RESET Y BASE --- */
 * {
     box-sizing: border-box;
 }
@@ -29,9 +24,6 @@ body {
     min-height: 100vh;
 }
 
-/* --- 2. LAYOUT DEL PANEL DE ADMINISTRACIÓN (navbar superior + contenido) --- */
-
-/* Navbar superior del panel de administración — diseño plano y limpio */
 :root {
     --admin-nav-bg: var(--color-navy-dark);
     --admin-nav-text: #CBD5E1;
@@ -105,7 +97,6 @@ body {
     padding: 10px;
 }
 
-/* --- Enlaces y grupos desplegables --- */
 .admin-nav-links {
     display: flex;
     align-items: center;
@@ -133,7 +124,7 @@ body {
     background-color: rgba(255, 255, 255, 0.08);
     color: var(--color-white) !important;
 }
-.admin-nav-item.active {
+.admin-nav-item.seccion-actual {
     background-color: var(--color-blue);
     color: var(--color-white) !important;
 }

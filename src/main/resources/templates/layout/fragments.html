@@ -15,7 +15,7 @@
 
     <div class="admin-nav-links">
 
-      <div class="ui dropdown admin-nav-item" th:classappend="${uri != null and (uri.startsWith('/productos') or uri.startsWith('/categorias'))} ? 'active'">
+      <div class="ui dropdown admin-nav-item" th:classappend="${uri != null and (uri.startsWith('/productos') or uri.startsWith('/categorias'))} ? 'seccion-actual'">
         <i class="cube icon"></i> Catálogo <i class="dropdown icon"></i>
         <div class="menu">
           <a href="/productos" class="item"><i class="cube icon"></i> Productos</a>
@@ -23,7 +23,7 @@
         </div>
       </div>
 
-      <div class="ui dropdown admin-nav-item" th:classappend="${uri != null and (uri.startsWith('/pedidos') or uri.startsWith('/reportes'))} ? 'active'">
+      <div class="ui dropdown admin-nav-item" th:classappend="${uri != null and (uri.startsWith('/pedidos') or uri.startsWith('/reportes'))} ? 'seccion-actual'">
         <i class="shopping cart icon"></i> Ventas <i class="dropdown icon"></i>
         <div class="menu">
           <a href="/pedidos" class="item"><i class="list icon"></i> Pedidos</a>
@@ -31,7 +31,7 @@
         </div>
       </div>
 
-      <div class="ui dropdown admin-nav-item" th:classappend="${uri != null and (uri.startsWith('/gastos') or uri.startsWith('/sueldos'))} ? 'active'">
+      <div class="ui dropdown admin-nav-item" th:classappend="${uri != null and (uri.startsWith('/gastos') or uri.startsWith('/sueldos'))} ? 'seccion-actual'">
         <i class="money bill wave icon"></i> Finanzas <i class="dropdown icon"></i>
         <div class="menu">
           <a href="/gastos" class="item"><i class="money bill wave icon"></i> Gastos</a>
@@ -39,17 +39,17 @@
         </div>
       </div>
 
-      <a href="/personas" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/personas')} ? 'active'">
+      <a href="/personas" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/personas')} ? 'seccion-actual'">
         <i class="users icon"></i> Clientes
       </a>
 
-      <a href="/usuarios" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/usuarios')} ? 'active'">
+      <a href="/usuarios" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/usuarios')} ? 'seccion-actual'">
         <i class="user shield icon"></i> Usuarios
       </a>
 
       <div class="admin-nav-spacer"></div>
 
-      <div class="ui dropdown admin-nav-item admin-nav-account" th:classappend="${uri != null and uri.startsWith('/perfil')} ? 'active'">
+      <div class="ui dropdown admin-nav-item admin-nav-account" th:classappend="${uri != null and uri.startsWith('/perfil')} ? 'seccion-actual'">
         <i class="user icon"></i> <span th:text="${usuarioAutenticado}">Usuario</span> <i class="dropdown icon"></i>
         <div class="menu">
           <a href="/perfil" class="item"><i class="id card icon"></i> Mi perfil</a>
@@ -66,7 +66,7 @@
 
   <script th:inline="javascript">
     document.addEventListener('DOMContentLoaded', function () {
-      $('.admin-navbar .ui.dropdown').dropdown();
+      $('.admin-navbar .ui.dropdown').dropdown({ action: 'nothing' });
     });
   </script>
 </nav>
