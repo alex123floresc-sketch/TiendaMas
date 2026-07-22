@@ -699,9 +699,15 @@ body {
     font-weight: 600;
 }
 .tienda-nav-links .item:hover,
-.tienda-nav-links .item.active {
+.tienda-nav-links .item.seccion-actual {
     background-color: var(--color-navy-dark);
     color: var(--color-white) !important;
+}
+.tienda-catalogo-dropdown {
+    cursor: pointer;
+}
+.tienda-catalogo-dropdown .menu {
+    color: var(--color-text);
 }
 .tienda-search {
     display: flex;

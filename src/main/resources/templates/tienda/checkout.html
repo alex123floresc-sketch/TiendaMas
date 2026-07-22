@@ -59,12 +59,24 @@
 
             <div class="field required">
                 <label>Método de pago</label>
-                <select name="metodoPago" class="ui fluid dropdown" required>
-                    <option value="EFECTIVO">Efectivo (contra entrega)</option>
-                    <option value="TARJETA">Tarjeta de crédito/débito</option>
-                    <option value="YAPE_PLIN">Yape / Plin</option>
-                    <option value="TRANSFERENCIA">Transferencia bancaria</option>
-                </select>
+                <div class="tienda-entrega-opciones">
+                    <label class="tienda-entrega-opcion">
+                        <input type="radio" name="metodoPago" value="EFECTIVO" checked>
+                        <i class="money bill alternate icon"></i> Efectivo (contra entrega)
+                    </label>
+                    <label class="tienda-entrega-opcion">
+                        <input type="radio" name="metodoPago" value="TARJETA">
+                        <i class="credit card icon"></i> Tarjeta de crédito/débito
+                    </label>
+                    <label class="tienda-entrega-opcion">
+                        <input type="radio" name="metodoPago" value="YAPE_PLIN">
+                        <i class="mobile alternate icon"></i> Yape / Plin
+                    </label>
+                    <label class="tienda-entrega-opcion">
+                        <input type="radio" name="metodoPago" value="TRANSFERENCIA">
+                        <i class="exchange icon"></i> Transferencia bancaria
+                    </label>
+                </div>
             </div>
 
             <button type="submit" class="ui positive big fluid button">
