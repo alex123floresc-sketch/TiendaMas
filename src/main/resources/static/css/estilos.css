@@ -1,15 +1,15 @@
 :root {
-    --color-navy: #1E293B;        /* slate-800 — texto fuerte, cabeceras de tabla, navbar */
-    --color-navy-dark: #0F172A;   /* slate-900 — fondo navbar, hover oscuro */
-    --color-blue: #4F46E5;        /* índigo-600 — acento primario, acciones */
-    --color-blue-light: #818CF8;  /* índigo-400 — acentos suaves, focos, badges */
-    --color-cream: #F8FAFC;       /* slate-50 — fondo general */
-    --color-beige: #F1F5F9;       /* slate-100 — superficies secundarias, hover */
-    --color-beige-dark: #E2E8F0;  /* slate-200 — bordes, franjas */
+    --color-navy: #101B2D;        /* grafito-azulado — texto fuerte, sidebar, cabeceras de tabla */
+    --color-navy-dark: #0A121F;   /* fondo del sidebar/navbar, hover oscuro */
+    --color-blue: #2563EB;        /* azul-600 — acento primario, acciones */
+    --color-blue-light: #60A5FA;  /* azul-400 — acentos suaves, focos, badges */
+    --color-cream: #F5F7FA;       /* gris azulado muy claro — fondo general */
+    --color-beige: #EEF1F6;       /* superficies secundarias, hover */
+    --color-beige-dark: #DFE4EC;  /* bordes, franjas */
     --color-white: #FFFFFF;       /* blanco — tarjetas y formularios */
-    --color-text: #1E293B;        /* texto principal */
-    --color-text-muted: #64748B;  /* texto secundario */
-    --color-success: #059669;     /* verde — precios, valores positivos */
+    --color-text: #101B2D;        /* texto principal */
+    --color-text-muted: #5B6B82;  /* texto secundario */
+    --color-success: #16A34A;     /* verde — precios, valores positivos */
 }
 
 * {
@@ -25,25 +25,62 @@ body {
 }
 
 :root {
-    --admin-nav-bg: var(--color-navy-dark);
-    --admin-nav-text: #CBD5E1;
-    --admin-nav-text-dim: #94A3B8;
+    --sidebar-width: 264px;
+    --sidebar-bg: var(--color-navy-dark);
+    --sidebar-text: #94A3B8;
+    --topbar-height: 58px;
 }
 
-.admin-navbar {
-    background: var(--admin-nav-bg);
-    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.25);
+/* --- Barra superior (solo visible en móvil, contiene el botón hamburguesa) --- */
+.admin-topbar {
+    display: none;
+    align-items: center;
+    gap: 14px;
+    background: var(--sidebar-bg);
+    padding: 0 16px;
+    height: var(--topbar-height);
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 110;
+    box-shadow: 0 2px 10px rgba(10, 18, 31, 0.3);
 }
-.admin-navbar-bar {
-    max-width: 1400px;
-    margin: 0 auto;
+.admin-topbar-brand {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 0 24px;
+    gap: 10px;
+    color: var(--color-white) !important;
+    text-decoration: none !important;
+    font-weight: 700;
+}
+
+/* --- Botón hamburguesa (móvil) --- */
+.admin-nav-toggle {
+    background: none;
+    border: none;
+    color: var(--color-white);
+    font-size: 1.3em;
+    cursor: pointer;
+    padding: 8px;
+    line-height: 1;
+}
+
+/* Fondo oscuro detrás del sidebar cuando está abierto en móvil */
+.admin-sidebar-overlay {
+    display: none;
+}
+
+/* --- Sidebar (menú lateral izquierdo) --- */
+.admin-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--sidebar-width);
+    height: 100vh;
+    background: var(--sidebar-bg);
+    display: flex;
+    flex-direction: column;
+    z-index: 120;
+    overflow-y: auto;
 }
 
 /* --- Marca --- */
@@ -51,7 +88,7 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 14px 16px 14px 0;
+    padding: 22px 20px;
     text-decoration: none !important;
     flex-shrink: 0;
 }
@@ -78,50 +115,48 @@ body {
     line-height: 1.25;
 }
 .admin-brand-text small {
-    color: var(--admin-nav-text-dim);
+    color: var(--sidebar-text);
     font-weight: 400;
     font-size: 0.62em;
     text-transform: uppercase;
     letter-spacing: 0.06em;
 }
 
-/* --- Botón hamburguesa (móvil) --- */
-.admin-nav-toggle {
-    display: none;
-    margin-left: auto;
-    background: none;
-    border: none;
-    color: var(--color-white);
-    font-size: 1.3em;
-    cursor: pointer;
-    padding: 10px;
-}
-
-.admin-nav-links {
+/* --- Navegación del sidebar --- */
+.admin-sidebar-nav {
+    flex: 1;
+    padding: 4px 14px 20px;
     display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: 2px;
-    flex: 1;
 }
-.admin-nav-spacer {
-    flex: 1;
+.admin-nav-section-label {
+    color: #64748B;
+    font-size: 0.72em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 16px 12px 6px;
+}
+.admin-nav-section-label:first-child {
+    padding-top: 2px;
 }
 .admin-nav-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    color: var(--admin-nav-text) !important;
+    gap: 12px;
+    color: var(--sidebar-text) !important;
     text-decoration: none !important;
     font-weight: 600;
     font-size: 0.92em;
-    padding: 10px 14px;
+    padding: 10px 12px;
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.2s ease, color 0.2s ease;
     white-space: nowrap;
 }
 .admin-nav-item:hover {
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: rgba(255, 255, 255, 0.06);
     color: var(--color-white) !important;
 }
 .admin-nav-item.seccion-actual {
@@ -130,33 +165,22 @@ body {
 }
 .admin-nav-item .icon {
     margin: 0 !important;
-}
-.admin-nav-account {
-    margin-left: 4px;
+    width: 18px;
+    text-align: center;
 }
 
-/* Submenús desplegables (Semantic UI dropdown) */
-.admin-nav-item.ui.dropdown .menu {
-    border-radius: 10px !important;
-    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18) !important;
-    border: 1px solid var(--color-beige-dark) !important;
-    margin-top: 8px !important;
-}
-.admin-nav-item.ui.dropdown .menu > .item {
-    display: flex !important;
-    align-items: center;
-    gap: 10px;
-    color: var(--color-text) !important;
-    font-weight: 500 !important;
-    padding: 10px 16px !important;
-}
-.admin-nav-item.ui.dropdown .menu > .item:hover {
-    background-color: var(--color-beige) !important;
-    color: var(--color-blue) !important;
+/* --- Pie del sidebar (perfil, POS, salir) --- */
+.admin-sidebar-footer {
+    flex-shrink: 0;
+    padding: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
 /* Botón "Salir" disfrazado de enlace de menú (el logout real es un POST).
-   Se reutiliza tanto en el navbar de administración como en el de la tienda. */
+   Se reutiliza tanto en el sidebar de administración como en el navbar de la tienda. */
 .logout-link-button {
     background: none;
     border: none;
@@ -168,7 +192,8 @@ body {
     gap: 10px;
     text-align: left;
     cursor: pointer;
-    padding: 10px 16px;
+    padding: 10px 12px;
+    border-radius: 8px;
 }
 .logout-link-form {
     padding: 0 !important;
@@ -177,12 +202,19 @@ body {
     background-color: #FEF2F2;
     color: #DC2626;
 }
+.admin-sidebar-footer .logout-link-button {
+    color: var(--sidebar-text);
+    font-weight: 600;
+}
 
-/* Contenido principal (debajo del navbar superior) */
+/* Contenido principal (a la derecha del sidebar) */
+.admin-main {
+    margin-left: var(--sidebar-width);
+}
 .admin-content {
     padding: 40px;
     background-color: var(--color-cream);
-    min-height: calc(100vh - 60px);
+    min-height: 100vh;
 }
 
 /* --- 3. CONTENEDOR CENTRAL (Caja blanca) --- */
@@ -1133,43 +1165,37 @@ body {
 }
 
 @media (max-width: 768px) {
-    /* Panel admin: el navbar superior colapsa a menú desplegable con botón hamburguesa */
-    .admin-navbar-bar {
-        flex-wrap: wrap;
-        padding: 0 16px;
-    }
-    .admin-nav-toggle {
-        display: block;
-    }
-    .admin-nav-links {
-        display: none;
-        flex-direction: column;
-        align-items: stretch;
-        width: 100%;
-        gap: 4px;
-        padding: 10px 0 16px 0;
-    }
-    .admin-nav-links.open {
+    /* Panel admin: el sidebar pasa a un panel deslizante (off-canvas) con botón hamburguesa */
+    .admin-topbar {
         display: flex;
     }
-    .admin-nav-spacer {
-        display: none;
+    .admin-sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.35);
     }
-    .admin-nav-item.ui.dropdown .menu {
-        position: static !important;
-        box-shadow: none !important;
-        border: none !important;
-        background: rgba(255, 255, 255, 0.04) !important;
-        margin: 4px 0 4px 12px !important;
-        width: auto !important;
+    .admin-sidebar.open {
+        transform: translateX(0);
     }
-    .admin-nav-item.ui.dropdown .menu > .item {
-        color: var(--admin-nav-text) !important;
+    .admin-sidebar-overlay {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 18, 31, 0.5);
+        z-index: 115;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
     }
-    .admin-nav-account {
-        margin: 6px 0 0 0;
-        padding-top: 10px;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    .admin-sidebar-overlay.open {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .admin-main {
+        margin-left: 0;
+    }
+    .admin-nav-item {
+        min-height: 44px;
     }
     .admin-content {
         padding: 20px;
@@ -1270,8 +1296,7 @@ body {
         padding: 8px 6px;
     }
 
-    /* Objetivos táctiles consistentes en los tres menús al estar en modo celular */
-    .admin-nav-links.open .admin-nav-item,
+    /* Objetivos táctiles consistentes en los menús al estar en modo celular */
     .tienda-nav-links.open .item,
     .pos-topbar-actions.open .ui.button {
         min-height: 44px;

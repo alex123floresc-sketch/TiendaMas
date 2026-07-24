@@ -12,9 +12,11 @@
 </head>
 <body class="admin-body">
 <div th:replace="~{layout/fragments :: menu}"></div>
-<div class="admin-content">
-  <div class="container">
-    <div th:insert="~{this :: content}"></div>
+<div class="admin-main">
+  <div class="admin-content">
+    <div class="container">
+      <div th:insert="~{this :: content}"></div>
+    </div>
   </div>
 </div>
 </body>
