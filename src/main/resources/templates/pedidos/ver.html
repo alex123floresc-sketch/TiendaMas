@@ -10,8 +10,8 @@
         </div>
         <div class="comprobante-meta">
             <div><strong>Fecha:</strong> <span th:text="${pedido.fechaTexto}"></span></div>
-            <div><strong>Canal:</strong> <span th:text="${pedido.canal}"></span></div>
-            <div><strong>Método de pago:</strong> <span th:text="${pedido.metodoPago}"></span></div>
+            <div><strong>Canal:</strong> <span th:text="${pedido.canal != null ? pedido.canal.etiqueta : ''}"></span></div>
+            <div><strong>Método de pago:</strong> <span th:text="${pedido.metodoPago != null ? pedido.metodoPago.etiqueta : ''}"></span></div>
             <div th:if="${pedido.vendedorUsername != null}"><strong>Atendido por:</strong> <span th:text="${pedido.vendedorUsername}"></span></div>
             <div th:if="${pedido.tipoEntrega != null}"><strong>Entrega:</strong> <span th:text="${pedido.tipoEntrega.etiqueta}"></span></div>
             <div th:if="${pedido.direccionEntrega != null and !pedido.direccionEntrega.isEmpty()}"><strong>Dirección de entrega:</strong> <span th:text="${pedido.direccionEntrega}"></span></div>
@@ -57,7 +57,11 @@
         </thead>
         <tbody>
         <tr th:each="det : ${pedido.detalles}">
-            <td th:text="${det.producto.nombre}" style="font-weight: bold;"></td>
+            <td>
+                <span style="font-weight: bold;" th:text="${det.producto.nombre}"></span>
+                <div class="hint" th:if="${det.talla != null or det.color != null}"
+                     th:text="(${det.talla} ?: '') + (${det.color != null and !det.color.isEmpty()} ? ' · ' + ${det.color} : '')"></div>
+            </td>
             <td th:text="'S/ ' + ${det.precioUnitario}"></td>
             <td th:text="${det.cantidad}"></td>
             <td th:text="'S/ ' + ${det.subtotal}"></td>

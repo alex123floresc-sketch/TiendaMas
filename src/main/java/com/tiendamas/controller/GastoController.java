@@ -2,7 +2,9 @@ package com.tiendamas.controller;
 
 import com.tiendamas.entity.Gasto;
 import com.tiendamas.service.GastoService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +31,14 @@ public class GastoController {
     }
 
     @PostMapping
-    public String guardar(Gasto gasto) {
+    public String guardar(@Valid Gasto gasto) {
+        gastoService.guardar(gasto);
+        return "redirect:/gastos";
+    }
+
+    @PostMapping("/{id}")
+    public String actualizar(@PathVariable Long id, @Valid Gasto gasto) {
+        gasto.setId(id);
         gastoService.guardar(gasto);
         return "redirect:/gastos";
     }
@@ -53,7 +62,11 @@ public class GastoController {
 
     @PostMapping("/{id}/eliminar")
     public String eliminar(@PathVariable Long id) {
-        gastoService.eliminar(id);
+        try {
+            gastoService.eliminar(id);
+        } catch (EmptyResultDataAccessException e) {
+            return "redirect:/gastos?error=noEncontrado";
+        }
         return "redirect:/gastos";
     }
 }

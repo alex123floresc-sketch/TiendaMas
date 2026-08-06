@@ -1,20 +1,25 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base}">
 <body>
-<div th:fragment="content" style="max-width: 700px; margin: 0 auto;">
+<div th:fragment="content" style="max-width: 800px; margin: 0 auto;">
 
     <h1 class="ui dividing header">
-        <i class="box icon"></i>
+        <i class="tshirt icon"></i>
         <div class="content">
-            <span th:text="${producto.id != null} ? 'Editar Producto' : 'Nuevo Producto'"></span>
-            <div class="sub header">Gestione los datos del artículo y su asignación de inventario.</div>
+            <span th:text="${productoForm.id != null} ? 'Editar Producto' : 'Nuevo Producto'"></span>
+            <div class="sub header">Gestione los datos de la prenda y su inventario por talla y color.</div>
         </div>
     </h1>
 
+    <div class="ui negative message" th:if="${param.error != null and param.error[0] == 'varianteConVentas'}">
+        <div class="header">No se pudo guardar los cambios</div>
+        <p>Puede deberse a dos causas: (1) hay dos filas con la misma combinación de talla y color, o (2) intentaste quitar una talla/color que ya tiene ventas registradas — en ese caso, deja su stock en 0 en lugar de eliminarla.</p>
+    </div>
+
     <div class="ui segment">
 
-        <form th:object="${producto}"
-              th:action="${producto.id == null} ? @{/productos} : @{/productos/{id}(id=${producto.id})}"
+        <form th:object="${productoForm}"
+              th:action="${productoForm.id == null} ? @{/productos} : @{/productos/{id}(id=${productoForm.id})}"
               method="POST" enctype="multipart/form-data" class="ui form">
 
             <input type="hidden" th:field="*{id}" />
@@ -22,18 +27,18 @@
             <div class="field">
                 <label>Imagen del producto</label>
                 <div class="producto-imagen-preview">
-                    <img th:if="${producto.imagenUrl != null}" th:src="@{${producto.imagenUrl}}" alt="Imagen actual del producto">
-                    <i th:unless="${producto.imagenUrl != null}" class="image icon huge"></i>
+                    <img th:if="${producto != null and producto.imagenUrl != null}" th:src="@{${producto.imagenUrl}}" alt="Imagen actual del producto">
+                    <i th:if="${producto == null or producto.imagenUrl == null}" class="image icon huge"></i>
                 </div>
                 <input type="file" name="imagen" accept="image/*">
-                <small class="hint" th:if="${producto.imagenUrl != null}">Selecciona un archivo solo si quieres reemplazar la imagen actual.</small>
+                <small class="hint" th:if="${producto != null and producto.imagenUrl != null}">Selecciona un archivo solo si quieres reemplazar la imagen actual.</small>
             </div>
 
             <div class="field required">
-                <label for="nombre">Nombre del Producto</label>
+                <label for="nombre">Nombre de la prenda</label>
                 <div class="ui left icon input">
                     <i class="font icon"></i>
-                    <input type="text" id="nombre" th:field="*{nombre}" placeholder="Ej. Laptop, Teclado" required>
+                    <input type="text" id="nombre" th:field="*{nombre}" placeholder="Ej. Camisa Oxford, Jean Slim" required>
                 </div>
             </div>
 
@@ -41,7 +46,7 @@
                 <label for="descripcion">Descripción</label>
                 <div class="ui left icon input">
                     <i class="file text icon"></i>
-                    <input type="text" id="descripcion" th:field="*{descripcion}" placeholder="Breve detalle del artículo">
+                    <input type="text" id="descripcion" th:field="*{descripcion}" placeholder="Material, corte, detalles de la prenda">
                 </div>
             </div>
 
@@ -50,48 +55,63 @@
                     <label for="precio">Precio (S/)</label>
                     <div class="ui left icon input">
                         <i class="money bill alternate icon"></i>
-                        <input type="number" step="0.01" min="0" id="precio" th:field="*{precio}" placeholder="0.00" required>
+                        <input type="number" step="0.01" min="0.01" id="precio" th:field="*{precio}" placeholder="0.00" required>
                     </div>
                 </div>
-
-                <div class="field required">
-                    <label for="stock">Stock Inicial</label>
-                    <div class="ui left icon input">
-                        <i class="warehouse icon"></i>
-                        <input type="number" min="0" id="stock" th:field="*{stock}" placeholder="0" required>
-                    </div>
+                <div class="field">
+                    <label for="marca">Marca</label>
+                    <input type="text" id="marca" th:field="*{marca}" placeholder="Ej. TiendaMas, Levi's, Nike">
                 </div>
             </div>
 
             <div class="field required">
                 <label for="categoriaId">Categoría</label>
-                <select id="categoriaId" name="categoriaId" class="ui search fluid dropdown" required>
+                <select id="categoriaId" th:field="*{categoriaId}" class="ui search fluid dropdown" required>
                     <option value="">-- Seleccione una Categoría --</option>
-                    <option th:each="cat : ${categorias}"
-                            th:value="${cat.id}"
-                            th:text="${cat.nombre}"
-                            th:selected="${producto.categoria != null and producto.categoria.id == cat.id}">
-                    </option>
+                    <option th:each="cat : ${categorias}" th:value="${cat.id}" th:text="${cat.nombre}"></option>
                 </select>
             </div>
 
-            <div class="field">
-                <label for="codigoBarras">Código de barras</label>
-                <div class="ui left icon input">
-                    <i class="barcode icon"></i>
-                    <input type="text" id="codigoBarras" th:field="*{codigoBarras}" placeholder="Ej. 7750001000011 (para escanear en el POS)">
-                </div>
-            </div>
+            <div class="ui divider"></div>
 
-            <div class="two fields">
-                <div class="field">
-                    <label for="marca">Marca</label>
-                    <input type="text" id="marca" th:field="*{marca}" placeholder="Ej. Gloria, Samsung">
-                </div>
-                <div class="field">
-                    <label for="unidadMedida">Unidad de medida</label>
-                    <input type="text" id="unidadMedida" th:field="*{unidadMedida}" placeholder="Ej. kg, unidad, paquete, litro">
-                </div>
+            <div class="field">
+                <label>Tallas y colores disponibles</label>
+                <small class="hint" style="margin-bottom:10px;">Cada combinación de talla y color es una variante independiente, con su propio stock y (opcionalmente) su propio código de barras para el POS.</small>
+                <table class="ui celled striped table">
+                    <thead>
+                    <tr>
+                        <th style="width:110px">Talla</th>
+                        <th>Color</th>
+                        <th style="width:60px">Tono</th>
+                        <th style="width:100px">Stock</th>
+                        <th>Código de barras</th>
+                        <th style="width:50px"></th>
+                    </tr>
+                    </thead>
+                    <tbody id="variantesBody">
+                    <tr th:each="v, vStat : *{variantes}">
+                        <td>
+                            <input type="hidden" th:field="*{variantes[__${vStat.index}__].id}" />
+                            <select th:field="*{variantes[__${vStat.index}__].talla}" class="ui fluid dropdown" required>
+                                <option value="">--</option>
+                                <option th:each="t : ${tallas}" th:value="${t}" th:text="${t.etiqueta}"></option>
+                            </select>
+                        </td>
+                        <td><input type="text" th:field="*{variantes[__${vStat.index}__].color}" placeholder="Ej. Negro"></td>
+                        <td><input type="color" th:field="*{variantes[__${vStat.index}__].colorHex}"></td>
+                        <td><input type="number" min="0" th:field="*{variantes[__${vStat.index}__].stock}" required></td>
+                        <td><input type="text" th:field="*{variantes[__${vStat.index}__].codigoBarras}" placeholder="Opcional"></td>
+                        <td class="center aligned">
+                            <button type="button" class="ui red icon button" title="Quitar" onclick="eliminarFilaVariante(this)">
+                                <i class="trash icon"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <button type="button" class="ui blue small button" onclick="agregarFilaVariante()">
+                    <i class="plus icon"></i> Agregar talla/color
+                </button>
             </div>
 
             <div class="ui divider"></div>
@@ -106,9 +126,84 @@
             </div>
         </form>
 
-        <script>
+        <select id="tallaRef" style="display:none">
+            <option value="">--</option>
+            <option th:each="t : ${tallas}" th:value="${t}" th:text="${t.etiqueta}"></option>
+        </select>
+
+        <script th:inline="javascript">
+            let varianteIndex = /*[[${productoForm.variantes.size()}]]*/ 0;
+
+            function agregarFilaVariante() {
+                const tbody = document.getElementById('variantesBody');
+                const idx = varianteIndex++;
+                const tr = document.createElement('tr');
+
+                const tdTalla = document.createElement('td');
+                const select = document.getElementById('tallaRef').cloneNode(true);
+                select.id = '';
+                select.name = 'variantes[' + idx + '].talla';
+                select.className = 'ui fluid dropdown';
+                select.required = true;
+                tdTalla.appendChild(select);
+                tr.appendChild(tdTalla);
+
+                const tdColor = document.createElement('td');
+                const inputColor = document.createElement('input');
+                inputColor.type = 'text';
+                inputColor.name = 'variantes[' + idx + '].color';
+                inputColor.placeholder = 'Ej. Negro';
+                tdColor.appendChild(inputColor);
+                tr.appendChild(tdColor);
+
+                const tdHex = document.createElement('td');
+                const inputHex = document.createElement('input');
+                inputHex.type = 'color';
+                inputHex.name = 'variantes[' + idx + '].colorHex';
+                tdHex.appendChild(inputHex);
+                tr.appendChild(tdHex);
+
+                const tdStock = document.createElement('td');
+                const inputStock = document.createElement('input');
+                inputStock.type = 'number';
+                inputStock.min = '0';
+                inputStock.value = '0';
+                inputStock.required = true;
+                inputStock.name = 'variantes[' + idx + '].stock';
+                tdStock.appendChild(inputStock);
+                tr.appendChild(tdStock);
+
+                const tdCodigo = document.createElement('td');
+                const inputCodigo = document.createElement('input');
+                inputCodigo.type = 'text';
+                inputCodigo.placeholder = 'Opcional';
+                inputCodigo.name = 'variantes[' + idx + '].codigoBarras';
+                tdCodigo.appendChild(inputCodigo);
+                tr.appendChild(tdCodigo);
+
+                const tdBtn = document.createElement('td');
+                tdBtn.className = 'center aligned';
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'ui red icon button';
+                btn.innerHTML = '<i class="trash icon"></i>';
+                btn.onclick = function () { eliminarFilaVariante(this); };
+                tdBtn.appendChild(btn);
+                tr.appendChild(tdBtn);
+
+                tbody.appendChild(tr);
+                $(select).dropdown();
+            }
+
+            function eliminarFilaVariante(btn) {
+                btn.closest('tr').remove();
+            }
+
             $(document).ready(function () {
                 $('.ui.dropdown').dropdown();
+                if (document.querySelectorAll('#variantesBody tr').length === 0) {
+                    agregarFilaVariante();
+                }
             });
         </script>
     </div>

@@ -1,10 +1,12 @@
 package com.tiendamas.controller;
 
 import com.tiendamas.entity.Producto;
+import com.tiendamas.entity.VarianteProducto;
 import com.tiendamas.repository.CategoriaRepository;
 import com.tiendamas.repository.PedidoRepository;
 import com.tiendamas.repository.PersonaRepository;
 import com.tiendamas.repository.ProductoRepository;
+import com.tiendamas.repository.VarianteProductoRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
@@ -19,13 +21,16 @@ public class HomeController {
     private static final int STOCK_MINIMO = 5;
 
     private final ProductoRepository productoRepository;
+    private final VarianteProductoRepository varianteProductoRepository;
     private final PersonaRepository personaRepository;
     private final PedidoRepository pedidoRepository;
     private final CategoriaRepository categoriaRepository;
 
-    public HomeController(ProductoRepository productoRepository, PersonaRepository personaRepository,
-                           PedidoRepository pedidoRepository, CategoriaRepository categoriaRepository) {
+    public HomeController(ProductoRepository productoRepository, VarianteProductoRepository varianteProductoRepository,
+                           PersonaRepository personaRepository, PedidoRepository pedidoRepository,
+                           CategoriaRepository categoriaRepository) {
         this.productoRepository = productoRepository;
+        this.varianteProductoRepository = varianteProductoRepository;
         this.personaRepository = personaRepository;
         this.pedidoRepository = pedidoRepository;
         this.categoriaRepository = categoriaRepository;
@@ -45,8 +50,9 @@ public class HomeController {
         double ingresosTotales = pedidoRepository.findAll().stream()
                 .mapToDouble(p -> p.getTotal() != null ? p.getTotal() : 0)
                 .sum();
-        List<Producto> stockBajo = productos.stream()
-                .filter(p -> p.getStock() != null && p.getStock() <= STOCK_MINIMO)
+        List<VarianteProducto> stockBajo = varianteProductoRepository.findAll().stream()
+                .filter(v -> v.getStock() != null && v.getStock() <= STOCK_MINIMO)
+                .sorted((a, b) -> a.getStock().compareTo(b.getStock()))
                 .toList();
 
         model.addAttribute("totalProductos", productos.size());

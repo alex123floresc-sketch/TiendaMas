@@ -4,7 +4,9 @@ import com.tiendamas.entity.Sueldo;
 import com.tiendamas.entity.Usuario;
 import com.tiendamas.service.SueldoService;
 import com.tiendamas.service.UsuarioService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +37,7 @@ public class SueldoController {
     }
 
     @PostMapping
-    public String guardar(@RequestParam Long usuarioId, @ModelAttribute Sueldo sueldo) {
+    public String guardar(@RequestParam Long usuarioId, @Valid @ModelAttribute Sueldo sueldo) {
         Usuario empleado = usuarioService.obtenerEmpleados().stream()
                 .filter(u -> u.getId().equals(usuarioId))
                 .findFirst()
@@ -56,7 +58,11 @@ public class SueldoController {
 
     @PostMapping("/{id}/eliminar")
     public String eliminar(@PathVariable Long id) {
-        sueldoService.eliminar(id);
+        try {
+            sueldoService.eliminar(id);
+        } catch (EmptyResultDataAccessException e) {
+            return "redirect:/sueldos?error=noEncontrado";
+        }
         return "redirect:/sueldos";
     }
 }

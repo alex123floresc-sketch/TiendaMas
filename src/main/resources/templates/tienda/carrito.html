@@ -5,6 +5,11 @@
 
     <h1 class="ui dividing header"><i class="shopping cart icon"></i> Mi Carrito</h1>
 
+    <div class="ui negative message" th:if="${param.error != null and param.error[0] == 'stockInsuficiente'}">
+        <div class="header">Stock insuficiente</div>
+        <p>Alguno de los productos de tu carrito ya no tiene stock suficiente. Ajusta las cantidades e inténtalo de nuevo.</p>
+    </div>
+
     <div class="ui icon info message" th:if="${carrito.empty}">
         <i class="info circle icon"></i>
         <div class="content">Tu carrito está vacío. <a th:href="@{/tienda}">Ir al catálogo</a></div>
@@ -22,18 +27,27 @@
         </thead>
         <tbody>
         <tr th:each="item : ${carrito.items}">
-            <td th:text="${item.nombre}" style="font-weight:bold;"></td>
+            <td class="carrito-item-cell">
+                <img th:if="${item.imagenUrl != null}" th:src="@{${item.imagenUrl}}" class="carrito-item-thumb" alt="">
+                <div>
+                    <span style="font-weight:bold;" th:text="${item.nombre}"></span>
+                    <div class="hint" th:if="${item.talla != null or item.color != null}">
+                        <span class="tienda-variante-swatch" th:if="${item.colorHex != null and !item.colorHex.isEmpty()}" th:style="'background:' + ${item.colorHex}"></span>
+                        <span th:text="(${item.talla} ?: '') + (${item.color != null and !item.color.isEmpty()} ? ' · ' + ${item.color} : '')"></span>
+                    </div>
+                </div>
+            </td>
             <td th:text="'S/ ' + ${item.precioUnitario}"></td>
             <td>
                 <form th:action="@{/tienda/carrito/cantidad}" method="post">
-                    <input type="hidden" name="productoId" th:value="${item.productoId}">
-                    <input type="number" name="cantidad" th:value="${item.cantidad}" min="1"
+                    <input type="hidden" name="varianteId" th:value="${item.varianteId}">
+                    <input type="number" name="cantidad" th:value="${item.cantidad}" min="1" th:max="${item.stockDisponible}"
                            style="width:80px;" onchange="this.form.submit()">
                 </form>
             </td>
             <td th:text="'S/ ' + ${#numbers.formatDecimal(item.subtotal, 1, 2)}"></td>
             <td>
-                <form th:action="@{/tienda/carrito/quitar/{id}(id=${item.productoId})}" method="post" style="display:contents">
+                <form th:action="@{/tienda/carrito/quitar/{id}(id=${item.varianteId})}" method="post" style="display:contents">
                     <button type="submit" class="ui red icon button" title="Quitar"><i class="trash icon"></i></button>
                 </form>
             </td>
@@ -72,13 +86,10 @@
                         <div class="tienda-card-precio" th:text="'S/ ' + ${p.precio}"></div>
                     </div>
                 </a>
-                <form th:action="@{/tienda/carrito/agregar}" method="post">
-                    <input type="hidden" name="productoId" th:value="${p.id}">
-                    <input type="hidden" name="cantidad" value="1">
-                    <button type="submit" class="ui fluid primary button" th:disabled="${p.stock == null or p.stock <= 0}">
-                        <i class="cart plus icon"></i> Agregar
-                    </button>
-                </form>
+                <a th:href="@{/tienda/productos/{id}(id=${p.id})}" class="ui fluid primary button" th:classappend="${p.stock == null or p.stock <= 0} ? 'disabled'">
+                    <i class="tag icon"></i>
+                    <span th:text="${p.stock != null and p.stock > 0} ? 'Ver tallas y colores' : 'Sin stock'"></span>
+                </a>
             </div>
         </div>
     </div>

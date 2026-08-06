@@ -6,6 +6,7 @@ import com.tiendamas.service.PedidoService;
 import com.tiendamas.service.PersonaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -60,6 +61,13 @@ public class PersonaController {
         return "redirect:/personas";
     }
 
+    @PostMapping("/{id}")
+    public String actualizar(@PathVariable("id") Long id, Persona persona) {
+        persona.setId(id);
+        personaService.guardar(persona);
+        return "redirect:/personas";
+    }
+
     @GetMapping("/{id}")
     public String ver(@PathVariable("id") Long id, Model model) {
         Persona persona = personaService.obtenerPorId(id);
@@ -95,6 +103,8 @@ public class PersonaController {
             personaService.eliminar(id);
         } catch (DataIntegrityViolationException e) {
             return "redirect:/personas?error=conRelaciones";
+        } catch (EmptyResultDataAccessException e) {
+            return "redirect:/personas?error=noEncontrado";
         }
         return "redirect:/personas";
     }

@@ -18,6 +18,13 @@ public class DetallePedido {
     @JoinColumn(name = "producto_id", nullable = false)
     private Producto producto;
 
+    @ManyToOne
+    @JoinColumn(name = "variante_id", nullable = false)
+    private VarianteProducto variante;
+
+    private String talla;
+    private String color;
+
     private Integer cantidad;
     private Double precioUnitario;
     private Double subtotal;
@@ -32,6 +39,15 @@ public class DetallePedido {
 
     public Producto getProducto() { return producto; }
     public void setProducto(Producto producto) { this.producto = producto; }
+
+    public VarianteProducto getVariante() { return variante; }
+    public void setVariante(VarianteProducto variante) { this.variante = variante; }
+
+    public String getTalla() { return talla; }
+    public void setTalla(String talla) { this.talla = talla; }
+
+    public String getColor() { return color; }
+    public void setColor(String color) { this.color = color; }
 
     public Integer getCantidad() { return cantidad; }
     public void setCantidad(Integer cantidad) { this.cantidad = cantidad; }

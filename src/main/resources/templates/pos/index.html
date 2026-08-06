@@ -14,6 +14,7 @@
                     <span th:case="'productoNoEncontrado'">Producto no encontrado.</span>
                     <span th:case="'carritoVacio'">El carrito está vacío.</span>
                     <span th:case="'clienteInvalido'">Selecciona un cliente válido.</span>
+                    <span th:case="'stockInsuficiente'">No hay stock suficiente para completar la venta. Revisa las cantidades del carrito.</span>
                     <span th:case="*">Ocurrió un error, inténtalo de nuevo.</span>
                 </p>
             </div>
@@ -69,17 +70,26 @@
                 </thead>
                 <tbody id="carritoBody">
                 <tr th:each="item : ${carrito.items}">
-                    <td th:text="${item.nombre}" style="font-weight:bold;"></td>
+                    <td class="carrito-item-cell">
+                        <img th:if="${item.imagenUrl != null}" th:src="@{${item.imagenUrl}}" class="carrito-item-thumb" alt="">
+                        <div>
+                            <span style="font-weight:bold;" th:text="${item.nombre}"></span>
+                            <div class="hint" th:if="${item.talla != null or item.color != null}">
+                                <span class="tienda-variante-swatch" th:if="${item.colorHex != null and !item.colorHex.isEmpty()}" th:style="'background:' + ${item.colorHex}"></span>
+                                <span th:text="(${item.talla} ?: '') + (${item.color != null and !item.color.isEmpty()} ? ' · ' + ${item.color} : '')"></span>
+                            </div>
+                        </div>
+                    </td>
                     <td th:text="'S/ ' + ${item.precioUnitario}"></td>
                     <td>
-                        <input type="number" th:value="${item.cantidad}" min="1"
+                        <input type="number" th:value="${item.cantidad}" min="1" th:max="${item.stockDisponible}"
                                class="ui input" style="width:80px;"
-                               th:attr="onchange=|actualizarCantidad(${item.productoId}, this.value)|">
+                               th:attr="onchange=|actualizarCantidad(${item.varianteId}, this.value)|">
                     </td>
                     <td th:text="'S/ ' + ${#numbers.formatDecimal(item.subtotal, 1, 2)}"></td>
                     <td>
                         <button type="button" class="ui red icon button" title="Quitar"
-                                th:attr="onclick=|quitarDelCarrito(${item.productoId})|">
+                                th:attr="onclick=|quitarDelCarrito(${item.varianteId})|">
                             <i class="trash icon"></i>
                         </button>
                     </td>
@@ -233,18 +243,22 @@
         const items = data.items || [];
         tbody.innerHTML = '';
         items.forEach(function (item) {
+            const subtitulo = [item.talla, item.color].filter(Boolean).join(' · ');
+            const swatchHtml = item.colorHex ? '<span class="tienda-variante-swatch" style="background:' + escapeHtml(item.colorHex) + '"></span>' : '';
+            const thumbHtml = item.imagenUrl ? '<img src="' + escapeHtml(item.imagenUrl) + '" class="carrito-item-thumb" alt="">' : '';
             const tr = document.createElement('tr');
             tr.innerHTML =
-                '<td style="font-weight:bold;">' + escapeHtml(item.nombre) + '</td>' +
+                '<td class="carrito-item-cell">' + thumbHtml + '<div><span style="font-weight:bold;">' + escapeHtml(item.nombre) + '</span>' +
+                (subtitulo ? '<div class="hint">' + swatchHtml + escapeHtml(subtitulo) + '</div>' : '') + '</div></td>' +
                 '<td>' + formatearMoneda(item.precioUnitario) + '</td>' +
-                '<td><input type="number" min="1" value="' + item.cantidad + '" class="ui input" style="width:80px;"></td>' +
+                '<td><input type="number" min="1" max="' + item.stockDisponible + '" value="' + item.cantidad + '" class="ui input" style="width:80px;"></td>' +
                 '<td>' + formatearMoneda(item.subtotal) + '</td>' +
                 '<td><button type="button" class="ui red icon button" title="Quitar"><i class="trash icon"></i></button></td>';
             tr.querySelector('input[type=number]').addEventListener('change', function () {
-                actualizarCantidad(item.productoId, this.value);
+                actualizarCantidad(item.varianteId, this.value);
             });
             tr.querySelector('button').addEventListener('click', function () {
-                quitarDelCarrito(item.productoId);
+                quitarDelCarrito(item.varianteId);
             });
             tbody.appendChild(tr);
         });
@@ -258,14 +272,14 @@
         document.getElementById('colCobrar').style.display = vacio ? 'none' : '';
     }
 
-    function actualizarCantidad(productoId, cantidad) {
-        postAjax(URL_CANTIDAD, { productoId: productoId, cantidad: cantidad }).then(function (r) {
+    function actualizarCantidad(varianteId, cantidad) {
+        postAjax(URL_CANTIDAD, { varianteId: varianteId, cantidad: cantidad }).then(function (r) {
             if (r.ok) renderCarrito(r.data);
         });
     }
 
-    function quitarDelCarrito(productoId) {
-        postAjax(URL_QUITAR_BASE + productoId, {}).then(function (r) {
+    function quitarDelCarrito(varianteId) {
+        postAjax(URL_QUITAR_BASE + varianteId, {}).then(function (r) {
             if (r.ok) renderCarrito(r.data);
         });
     }
@@ -276,8 +290,8 @@
         });
     }
 
-    function agregarProducto(productoId, nombre) {
-        postAjax(URL_AGREGAR, { productoId: productoId, cantidad: 1 }).then(function (r) {
+    function agregarVariante(varianteId, nombre) {
+        postAjax(URL_AGREGAR, { varianteId: varianteId, cantidad: 1 }).then(function (r) {
             if (r.ok && r.data.success) {
                 renderCarrito(r.data);
                 toast('exito', (r.data.productoAgregado || nombre) + ' agregado al carrito');
@@ -321,7 +335,8 @@
             return;
         }
         lista.forEach(function (p) {
-            const sinStock = p.stock == null || p.stock <= 0;
+            const variantesConStock = (p.variantes || []).filter(function (v) { return v.stock != null && v.stock > 0; });
+            const sinStock = variantesConStock.length === 0;
             const card = document.createElement('div');
             card.className = 'pos-product-card' + (sinStock ? ' is-disabled' : '');
             const imagenHtml = p.imagenUrl
@@ -329,13 +344,28 @@
                 : '<div class="pos-product-img-placeholder"><i class="image outline icon"></i></div>';
             card.innerHTML =
                 imagenHtml +
+                (p.categoriaNombre ? '<div class="pos-product-cat">' + escapeHtml(p.categoriaNombre) + '</div>' : '') +
                 '<div class="pos-product-nombre">' + escapeHtml(p.nombre) + '</div>' +
                 '<div class="pos-product-marca">' + escapeHtml(p.marca || '') + '</div>' +
                 '<div class="pos-product-precio">' + formatearMoneda(p.precio) + '</div>' +
-                '<span class="pos-stock-badge ' + (sinStock ? 'sin-stock' : 'en-stock') + '">' +
-                (sinStock ? 'Sin stock' : p.stock + ' disp.') + '</span>';
+                (sinStock ? '<span class="pos-stock-badge sin-stock">Sin stock</span>' : '');
+
             if (!sinStock) {
-                card.addEventListener('click', function () { agregarProducto(p.id, p.nombre); });
+                const variantesWrap = document.createElement('div');
+                variantesWrap.className = 'pos-variantes-wrap';
+                variantesConStock.forEach(function (v) {
+                    const chip = document.createElement('span');
+                    chip.className = 'pos-variante-chip';
+                    if (v.colorHex) chip.style.borderLeftColor = v.colorHex;
+                    if (v.codigoBarras) chip.title = 'Código: ' + v.codigoBarras;
+                    const etiqueta = [v.talla, v.color].filter(Boolean).join(' · ');
+                    chip.textContent = etiqueta + ' (' + v.stock + ')';
+                    chip.addEventListener('click', function () {
+                        agregarVariante(v.id, p.nombre + ' — ' + etiqueta);
+                    });
+                    variantesWrap.appendChild(chip);
+                });
+                card.appendChild(variantesWrap);
             }
             cont.appendChild(card);
         });

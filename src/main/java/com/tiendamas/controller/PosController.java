@@ -6,8 +6,8 @@ import com.tiendamas.dto.ProductoBusquedaDto;
 import com.tiendamas.entity.CanalVenta;
 import com.tiendamas.entity.MetodoPago;
 import com.tiendamas.entity.Pedido;
-import com.tiendamas.entity.Producto;
 import com.tiendamas.entity.TipoEntrega;
+import com.tiendamas.entity.VarianteProducto;
 import com.tiendamas.service.CategoriaService;
 import com.tiendamas.service.PedidoService;
 import com.tiendamas.service.PersonaService;
@@ -78,39 +78,39 @@ public class PosController {
     @ResponseBody
     public ResponseEntity<Map<String, Object>> apiAgregarPorCodigo(@RequestParam String codigoBarras,
                                                                     @RequestParam(required = false, defaultValue = "1") Integer cantidad) {
-        Producto producto = productoService.obtenerPorCodigoBarras(codigoBarras);
-        if (producto == null) {
+        VarianteProducto variante = productoService.obtenerVariantePorCodigoBarras(codigoBarras);
+        if (variante == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("success", false, "error", "codigoNoEncontrado"));
         }
-        carrito.agregar(producto, cantidad != null && cantidad > 0 ? cantidad : 1);
-        return ResponseEntity.ok(respuestaExito(producto));
+        carrito.agregar(variante, cantidad != null && cantidad > 0 ? cantidad : 1);
+        return ResponseEntity.ok(respuestaExito(variante));
     }
 
     @PostMapping("/api/carrito/agregar")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> apiAgregarManual(@RequestParam Long productoId,
+    public ResponseEntity<Map<String, Object>> apiAgregarManual(@RequestParam Long varianteId,
                                                                  @RequestParam(required = false, defaultValue = "1") Integer cantidad) {
-        Producto producto = productoService.obtenerPorId(productoId);
-        if (producto == null) {
+        VarianteProducto variante = productoService.obtenerVariante(varianteId);
+        if (variante == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("success", false, "error", "productoNoEncontrado"));
         }
-        carrito.agregar(producto, cantidad != null && cantidad > 0 ? cantidad : 1);
-        return ResponseEntity.ok(respuestaExito(producto));
+        carrito.agregar(variante, cantidad != null && cantidad > 0 ? cantidad : 1);
+        return ResponseEntity.ok(respuestaExito(variante));
     }
 
     @PostMapping("/api/carrito/cantidad")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> apiActualizarCantidad(@RequestParam Long productoId, @RequestParam Integer cantidad) {
-        carrito.actualizarCantidad(productoId, cantidad);
+    public ResponseEntity<Map<String, Object>> apiActualizarCantidad(@RequestParam Long varianteId, @RequestParam Integer cantidad) {
+        carrito.actualizarCantidad(varianteId, cantidad);
         return ResponseEntity.ok(snapshotCarrito());
     }
 
-    @PostMapping("/api/carrito/quitar/{productoId}")
+    @PostMapping("/api/carrito/quitar/{varianteId}")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> apiQuitar(@PathVariable Long productoId) {
-        carrito.quitar(productoId);
+    public ResponseEntity<Map<String, Object>> apiQuitar(@PathVariable Long varianteId) {
+        carrito.quitar(varianteId);
         return ResponseEntity.ok(snapshotCarrito());
     }
 
@@ -126,34 +126,34 @@ public class PosController {
     @PostMapping("/carrito/agregar-por-codigo")
     public String agregarPorCodigo(@RequestParam String codigoBarras,
                                     @RequestParam(required = false, defaultValue = "1") Integer cantidad) {
-        Producto producto = productoService.obtenerPorCodigoBarras(codigoBarras);
-        if (producto == null) {
+        VarianteProducto variante = productoService.obtenerVariantePorCodigoBarras(codigoBarras);
+        if (variante == null) {
             return "redirect:/pos?error=codigoNoEncontrado";
         }
-        carrito.agregar(producto, cantidad != null && cantidad > 0 ? cantidad : 1);
+        carrito.agregar(variante, cantidad != null && cantidad > 0 ? cantidad : 1);
         return "redirect:/pos";
     }
 
     @PostMapping("/carrito/agregar")
-    public String agregarManual(@RequestParam Long productoId,
+    public String agregarManual(@RequestParam Long varianteId,
                                  @RequestParam(required = false, defaultValue = "1") Integer cantidad) {
-        Producto producto = productoService.obtenerPorId(productoId);
-        if (producto == null) {
+        VarianteProducto variante = productoService.obtenerVariante(varianteId);
+        if (variante == null) {
             return "redirect:/pos?error=productoNoEncontrado";
         }
-        carrito.agregar(producto, cantidad != null && cantidad > 0 ? cantidad : 1);
+        carrito.agregar(variante, cantidad != null && cantidad > 0 ? cantidad : 1);
         return "redirect:/pos";
     }
 
     @PostMapping("/carrito/cantidad")
-    public String actualizarCantidad(@RequestParam Long productoId, @RequestParam Integer cantidad) {
-        carrito.actualizarCantidad(productoId, cantidad);
+    public String actualizarCantidad(@RequestParam Long varianteId, @RequestParam Integer cantidad) {
+        carrito.actualizarCantidad(varianteId, cantidad);
         return "redirect:/pos";
     }
 
-    @PostMapping("/carrito/quitar/{productoId}")
-    public String quitar(@PathVariable Long productoId) {
-        carrito.quitar(productoId);
+    @PostMapping("/carrito/quitar/{varianteId}")
+    public String quitar(@PathVariable Long varianteId) {
+        carrito.quitar(varianteId);
         return "redirect:/pos";
     }
 
@@ -169,7 +169,7 @@ public class PosController {
             return "redirect:/pos?error=carritoVacio";
         }
         List<ItemVenta> items = carrito.getItems().stream()
-                .map(i -> new ItemVenta(i.getProductoId(), i.getCantidad()))
+                .map(i -> new ItemVenta(i.getVarianteId(), i.getCantidad()))
                 .collect(Collectors.toList());
 
         Pedido pedido;
@@ -177,7 +177,7 @@ public class PosController {
             pedido = pedidoService.crearVenta(personaId, items, CanalVenta.TIENDA_FISICA, metodoPago, principal.getName(),
                     TipoEntrega.RETIRO_TIENDA, null);
         } catch (IllegalArgumentException e) {
-            return "redirect:/pos?error=clienteInvalido";
+            return "redirect:/pos?error=stockInsuficiente";
         }
         carrito.vaciar();
         return "redirect:/pedidos/" + pedido.getId();
@@ -199,10 +199,10 @@ public class PosController {
         return data;
     }
 
-    private Map<String, Object> respuestaExito(Producto producto) {
+    private Map<String, Object> respuestaExito(VarianteProducto variante) {
         Map<String, Object> data = snapshotCarrito();
-        data.put("productoAgregado", producto.getNombre());
-        data.put("stockDisponible", producto.getStock());
+        data.put("productoAgregado", variante.getProducto().getNombre() + " (" + variante.getEtiqueta() + ")");
+        data.put("stockDisponible", variante.getStock());
         return data;
     }
 }

@@ -12,6 +12,8 @@ import com.tiendamas.entity.Persona;
 import com.tiendamas.entity.Producto;
 import com.tiendamas.entity.TipoComprobante;
 import com.tiendamas.entity.TipoEntrega;
+import com.tiendamas.entity.VarianteProducto;
+import com.tiendamas.repository.DetallePedidoRepository;
 import com.tiendamas.repository.PedidoRepository;
 import com.tiendamas.service.PedidoService;
 import com.tiendamas.service.PersonaService;
@@ -33,6 +35,9 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Autowired
     private PedidoRepository pedidoRepository;
+
+    @Autowired
+    private DetallePedidoRepository detallePedidoRepository;
 
     @Autowired
     private PersonaService personaService;
@@ -69,7 +74,7 @@ public class PedidoServiceImpl implements PedidoService {
         List<ItemVenta> items = new ArrayList<>();
         for (DetalleForm df : form.getDetalles()) {
             if (df == null) continue;
-            items.add(new ItemVenta(df.getProductoId(), df.getCantidad()));
+            items.add(new ItemVenta(df.getVarianteId(), df.getCantidad()));
         }
         return crearVenta(form.getPersonaId(), items, CanalVenta.TIENDA_FISICA, form.getMetodoPago(), creadoPor,
                 TipoEntrega.RETIRO_TIENDA, null);
@@ -104,20 +109,33 @@ public class PedidoServiceImpl implements PedidoService {
         if (items != null) {
             for (ItemVenta iv : items) {
                 if (iv == null || iv.getCantidad() == null || iv.getCantidad() <= 0
-                        || iv.getProductoId() == null) {
+                        || iv.getVarianteId() == null) {
                     continue;
                 }
-                Producto producto = productoService.obtenerPorId(iv.getProductoId());
-                if (producto == null) continue;
+                VarianteProducto variante = productoService.obtenerVariante(iv.getVarianteId());
+                if (variante == null) continue;
+                Producto producto = variante.getProducto();
+
+                int stockDisponible = variante.getStock() != null ? variante.getStock() : 0;
+                if (iv.getCantidad() > stockDisponible) {
+                    throw new IllegalArgumentException("Stock insuficiente para " + producto.getNombre()
+                            + " (" + variante.getEtiqueta() + "): quedan " + stockDisponible + " unidades");
+                }
 
                 DetallePedido detalle = new DetallePedido();
                 detalle.setProducto(producto);
+                detalle.setVariante(variante);
+                detalle.setTalla(variante.getTalla() != null ? variante.getTalla().getEtiqueta() : null);
+                detalle.setColor(variante.getColor());
                 detalle.setCantidad(iv.getCantidad());
                 detalle.setPrecioUnitario(producto.getPrecio());
                 detalle.setSubtotal(producto.getPrecio() * iv.getCantidad());
 
                 pedido.agregarDetalle(detalle);
                 total += detalle.getSubtotal();
+
+                variante.setStock(stockDisponible - iv.getCantidad());
+                productoService.guardarVariante(variante);
             }
         }
 
@@ -153,17 +171,13 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     public Map<Long, Integer> obtenerUnidadesVendidasDesde(LocalDateTime desde) {
-        Map<Long, Integer> unidadesPorProductoId = new HashMap<>();
-        for (Pedido pedido : pedidoRepository.findAll()) {
-            if (pedido.getFecha() == null || pedido.getFecha().isBefore(desde)) continue;
-            for (DetallePedido detalle : pedido.getDetalles()) {
-                Producto producto = detalle.getProducto();
-                if (producto == null) continue;
-                int cantidad = detalle.getCantidad() != null ? detalle.getCantidad() : 0;
-                unidadesPorProductoId.merge(producto.getId(), cantidad, Integer::sum);
-            }
+        Map<Long, Integer> unidadesPorVarianteId = new HashMap<>();
+        for (Object[] fila : detallePedidoRepository.sumarCantidadPorVarianteDesde(desde)) {
+            Long varianteId = (Long) fila[0];
+            Number unidades = (Number) fila[1];
+            unidadesPorVarianteId.put(varianteId, unidades.intValue());
         }
-        return unidadesPorProductoId;
+        return unidadesPorVarianteId;
     }
 
     @Override

@@ -10,7 +10,16 @@
         <table class="ui celled table">
             <tbody>
             <tr th:each="item : ${carrito.items}">
-                <td th:text="${item.nombre}"></td>
+                <td class="carrito-item-cell">
+                    <img th:if="${item.imagenUrl != null}" th:src="@{${item.imagenUrl}}" class="carrito-item-thumb" alt="">
+                    <div>
+                        <span th:text="${item.nombre}"></span>
+                        <div class="hint" th:if="${item.talla != null or item.color != null}">
+                            <span class="tienda-variante-swatch" th:if="${item.colorHex != null and !item.colorHex.isEmpty()}" th:style="'background:' + ${item.colorHex}"></span>
+                            <span th:text="(${item.talla} ?: '') + (${item.color != null and !item.color.isEmpty()} ? ' · ' + ${item.color} : '')"></span>
+                        </div>
+                    </div>
+                </td>
                 <td th:text="${item.cantidad} + ' x S/ ' + ${item.precioUnitario}"></td>
                 <td class="right aligned" th:text="'S/ ' + ${#numbers.formatDecimal(item.subtotal, 1, 2)}"></td>
             </tr>

@@ -4,10 +4,10 @@
 <div th:fragment="content">
 
     <h1 class="ui dividing header">
-        <i class="box icon"></i>
+        <i class="tshirt icon"></i>
         <div class="content">
             Gestión de Productos
-            <div class="sub header">Controla el inventario general, precios, existencias y clasificaciones de venta.</div>
+            <div class="sub header">Controla el catálogo de prendas, sus tallas, colores y existencias por variante.</div>
         </div>
     </h1>
 
@@ -62,10 +62,10 @@
             <th class="one wide">ID</th>
             <th class="one wide">Imagen</th>
             <th class="three wide">Nombre</th>
-            <th class="four wide">Descripción</th>
+            <th class="four wide">Tallas / colores</th>
             <th class="one wide">Precio</th>
             <th class="one wide">Stock</th>
-            <th class="three wide">Categoría</th>
+            <th class="two wide">Categoría</th>
             <th class="three wide center aligned">Acciones</th>
         </tr>
         </thead>
@@ -80,12 +80,14 @@
             </td>
             <td>
                 <div style="font-weight: bold;" th:text="${producto.nombre}"></div>
-                <div class="hint" th:if="${producto.marca != null and !producto.marca.isEmpty()}"
-                     th:text="${producto.marca} + (${producto.unidadMedida != null and !producto.unidadMedida.isEmpty()} ? ' · ' + ${producto.unidadMedida} : '')"></div>
-                <div class="hint" th:if="${producto.codigoBarras != null and !producto.codigoBarras.isEmpty()}"
-                     th:text="'Código: ' + ${producto.codigoBarras}"></div>
+                <div class="hint" th:if="${producto.marca != null and !producto.marca.isEmpty()}" th:text="${producto.marca}"></div>
             </td>
-            <td th:text="${producto.descripcion}"></td>
+            <td>
+                <span th:if="${producto.variantes.isEmpty()}" class="hint">Sin tallas cargadas</span>
+                <span class="ui tiny label" th:each="v : ${producto.variantes}"
+                      th:classappend="${v.stock != null and v.stock > 0} ? '' : 'grey'"
+                      th:text="${v.talla != null ? v.talla.etiqueta : '?'} + (${v.color != null and !v.color.isEmpty()} ? ' · ' + ${v.color} : '') + ' (' + ${v.stock} + ')'"></span>
+            </td>
             <td th:text="'S/ ' + ${producto.precio}" style="font-weight: bold; color: #21ba45;"></td>
             <td th:text="${producto.stock}" class="center aligned"></td>
             <td>

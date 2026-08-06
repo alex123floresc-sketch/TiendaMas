@@ -18,26 +18,23 @@
         <h1 class="ui header" th:text="${producto.nombre}"></h1>
         <p th:text="${producto.descripcion}"></p>
 
-        <h2 style="color:#21ba45;">
-            S/ <span th:text="${producto.precio}"></span>
-            <span class="hint" style="display:inline; font-size: 0.5em;"
-                  th:if="${producto.unidadMedida != null and !producto.unidadMedida.isEmpty()}"
-                  th:text="'/ ' + ${producto.unidadMedida}"></span>
-        </h2>
+        <h2 style="color:#21ba45;">S/ <span th:text="${producto.precio}"></span></h2>
 
-        <p>
-            <span th:if="${producto.stock != null and producto.stock > 0}"
-                  th:text="${producto.stock} + ' unidades disponibles'"></span>
-            <span th:unless="${producto.stock != null and producto.stock > 0}" style="color:#db2828; font-weight:bold;">Sin stock</span>
-        </p>
-
-        <form th:action="@{/tienda/carrito/agregar}" method="post" class="ui form"
-              th:if="${producto.stock != null and producto.stock > 0}">
-            <input type="hidden" name="productoId" th:value="${producto.id}">
+        <form th:action="@{/tienda/carrito/agregar}" method="post" class="ui form" th:if="${producto.tieneStock()}">
+            <div class="field required">
+                <label>Elige talla y color</label>
+                <div class="tienda-variante-opciones">
+                    <label class="tienda-variante-opcion" th:each="v : ${producto.variantes}" th:if="${v.tieneStock()}">
+                        <input type="radio" name="varianteId" th:value="${v.id}" required>
+                        <span class="tienda-variante-swatch" th:if="${v.colorHex != null and !v.colorHex.isEmpty()}" th:style="'background:' + ${v.colorHex}"></span>
+                        <span th:text="${v.etiqueta} + ' — ' + ${v.stock} + ' disp.'"></span>
+                    </label>
+                </div>
+            </div>
             <div class="fields" style="align-items: flex-end;">
                 <div class="six wide field">
                     <label>Cantidad</label>
-                    <input type="number" name="cantidad" min="1" th:max="${producto.stock}" value="1">
+                    <input type="number" name="cantidad" min="1" value="1">
                 </div>
                 <div class="ten wide field">
                     <button type="submit" class="ui primary fluid button">
@@ -46,6 +43,9 @@
                 </div>
             </div>
         </form>
+        <div class="ui negative message" th:unless="${producto.tieneStock()}">
+            <i class="times circle icon"></i> Sin stock disponible por el momento.
+        </div>
     </div>
 
     <div th:if="${relacionados != null and not #lists.isEmpty(relacionados)}">
@@ -63,13 +63,10 @@
                         <div class="tienda-card-precio" th:text="'S/ ' + ${p.precio}"></div>
                     </div>
                 </a>
-                <form th:action="@{/tienda/carrito/agregar}" method="post">
-                    <input type="hidden" name="productoId" th:value="${p.id}">
-                    <input type="hidden" name="cantidad" value="1">
-                    <button type="submit" class="ui fluid primary button" th:disabled="${p.stock == null or p.stock <= 0}">
-                        <i class="cart plus icon"></i> Agregar
-                    </button>
-                </form>
+                <a th:href="@{/tienda/productos/{id}(id=${p.id})}" class="ui fluid primary button" th:classappend="${p.stock == null or p.stock <= 0} ? 'disabled'">
+                    <i class="tag icon"></i>
+                    <span th:text="${p.stock != null and p.stock > 0} ? 'Ver tallas y colores' : 'Sin stock'"></span>
+                </a>
             </div>
         </div>
     </div>

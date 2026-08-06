@@ -5,6 +5,7 @@ import com.tiendamas.entity.EstadoPedido;
 import com.tiendamas.entity.Pedido;
 import com.tiendamas.entity.RolUsuario;
 import com.tiendamas.entity.Usuario;
+import com.tiendamas.entity.VarianteProducto;
 import com.tiendamas.service.PedidoService;
 import com.tiendamas.service.PersonaService;
 import com.tiendamas.service.ProductoService;
@@ -17,6 +18,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @Controller
 @RequestMapping("/pedidos")
@@ -45,14 +47,21 @@ public class PedidoController {
     public String mostrarFormulario(Model model) {
         model.addAttribute("pedidoForm", new PedidoForm());
         model.addAttribute("personas", personaService.obtenerTodas());
-        model.addAttribute("productos", productoService.obtenerTodos());
+        List<VarianteProducto> variantes = productoService.obtenerTodos().stream()
+                .flatMap(p -> p.getVariantes().stream())
+                .toList();
+        model.addAttribute("variantes", variantes);
         model.addAttribute("titulo", "Nueva Venta");
         return "pedidos/form";
     }
 
     @PostMapping
     public String guardar(@ModelAttribute PedidoForm pedidoForm, Principal principal) {
-        pedidoService.crearPedido(pedidoForm, principal.getName());
+        try {
+            pedidoService.crearPedido(pedidoForm, principal.getName());
+        } catch (IllegalArgumentException e) {
+            return "redirect:/pedidos/nuevo?error=datosInvalidos";
+        }
         return "redirect:/pedidos";
     }
 

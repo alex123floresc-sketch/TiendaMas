@@ -32,18 +32,20 @@
     </div>
 
     <div class="ui segment" th:if="${not #lists.isEmpty(stockBajo)}">
-        <h3 class="ui header"><i class="exclamation triangle icon"></i> Productos con stock bajo</h3>
+        <h3 class="ui header"><i class="exclamation triangle icon"></i> Tallas / colores con stock bajo</h3>
         <table class="ui celled table">
             <thead>
             <tr>
                 <th>Producto</th>
+                <th>Talla / color</th>
                 <th>Stock</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="p : ${stockBajo}">
-                <td th:text="${p.nombre}">Producto</td>
-                <td th:text="${p.stock}">0</td>
+            <tr th:each="v : ${stockBajo}">
+                <td th:text="${v.producto.nombre}">Producto</td>
+                <td th:text="${v.etiqueta}"></td>
+                <td th:text="${v.stock}">0</td>
             </tr>
             </tbody>
         </table>
@@ -55,8 +57,8 @@
         <div class="ui four stackable cards">
             <a href="/productos" class="ui card">
                 <div class="content">
-                    <i class="cube icon"></i> <span class="header">Productos</span>
-                    <div class="description">Catálogo, precios y existencias.</div>
+                    <i class="tshirt icon"></i> <span class="header">Productos</span>
+                    <div class="description">Catálogo, tallas, colores y existencias.</div>
                 </div>
             </a>
             <a href="/pedidos" class="ui card">

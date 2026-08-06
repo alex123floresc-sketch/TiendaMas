@@ -9,7 +9,9 @@ import com.tiendamas.entity.Persona;
 import com.tiendamas.entity.Producto;
 import com.tiendamas.entity.RolUsuario;
 import com.tiendamas.entity.Sueldo;
+import com.tiendamas.entity.Talla;
 import com.tiendamas.entity.TipoDocumento;
+import com.tiendamas.entity.VarianteProducto;
 import com.tiendamas.repository.CategoriaRepository;
 import com.tiendamas.repository.GastoRepository;
 import com.tiendamas.repository.PersonaRepository;
@@ -48,10 +50,16 @@ public class DataSeeder implements CommandLineRunner {
     @Autowired
     private SueldoRepository sueldoRepository;
 
+    private int contadorCodigo = 0;
+
     @Override
     public void run(String... args) {
         if (personaRepository.count() <= 0) {
-            sembrarCatalogoYClientesDemo();
+            sembrarClientesDemo();
+        }
+
+        if (productoRepository.count() <= 0) {
+            sembrarCatalogoDemo();
         }
 
         if (usuarioRepository.count() <= 0) {
@@ -67,7 +75,7 @@ public class DataSeeder implements CommandLineRunner {
         }
     }
 
-    private void sembrarCatalogoYClientesDemo() {
+    private void sembrarClientesDemo() {
         personaRepository.save(new Persona("Ana", "Gómez", "ana.gomez@example.com",
                 "987654321", "Av. Los Álamos 123", TipoDocumento.DNI, "45678912"));
         personaRepository.save(new Persona("Luis", "Ramírez", "luis.ramirez@example.com",
@@ -77,38 +85,111 @@ public class DataSeeder implements CommandLineRunner {
         personaRepository.save(new Persona("Jorge", "Salazar", "jorge.salazar@example.com",
                 "987654324", "Av. Industrial 321", TipoDocumento.DNI, "42345678"));
 
-        Persona comercialLosAndes = new Persona("Comercial", "Los Andes S.A.C.", "ventas@losandes.com",
+        Persona boutiqueElEstilo = new Persona("Boutique", "El Estilo S.A.C.", "compras@elestilo.com",
                 "014567890", "Av. Comercio 1000", TipoDocumento.RUC, "20481234567");
-        comercialLosAndes.setRazonSocial("Comercial Los Andes S.A.C.");
-        personaRepository.save(comercialLosAndes);
+        boutiqueElEstilo.setRazonSocial("Boutique El Estilo S.A.C.");
+        personaRepository.save(boutiqueElEstilo);
 
-        Persona distribuidoraElSol = new Persona("Distribuidora", "El Sol E.I.R.L.", "contacto@elsol.com",
+        Persona uniformesEscolares = new Persona("Uniformes", "Escolares E.I.R.L.", "contacto@uniformesescolares.com",
                 "014567891", "Jr. Industria 500", TipoDocumento.RUC, "20567891234");
-        distribuidoraElSol.setRazonSocial("Distribuidora El Sol E.I.R.L.");
-        personaRepository.save(distribuidoraElSol);
+        uniformesEscolares.setRazonSocial("Uniformes Escolares E.I.R.L.");
+        personaRepository.save(uniformesEscolares);
+    }
 
-        Categoria abarrotes = categoriaRepository.save(new Categoria("Abarrotes", "Alimentos y productos de despensa"));
-        Categoria bebidas = categoriaRepository.save(new Categoria("Bebidas", "Bebidas frías y calientes"));
-        Categoria limpieza = categoriaRepository.save(new Categoria("Limpieza", "Productos de limpieza para el hogar"));
-        Categoria electronica = categoriaRepository.save(new Categoria("Electrónica", "Accesorios y artículos electrónicos"));
-        Categoria ropa = categoriaRepository.save(new Categoria("Ropa", "Prendas de vestir"));
+    private void sembrarCatalogoDemo() {
+        Categoria hombre = categoriaRepository.save(new Categoria("Hombre", "Ropa y prendas para hombre"));
+        Categoria mujer = categoriaRepository.save(new Categoria("Mujer", "Ropa y prendas para mujer"));
+        Categoria ninos = categoriaRepository.save(new Categoria("Niños", "Ropa para niños y niñas"));
+        Categoria accesorios = categoriaRepository.save(new Categoria("Accesorios", "Complementos para todo el guardarropa"));
 
-        List<Producto> productos = List.of(
-                conCodigo(new Producto("Arroz Extra 1kg", "Arroz blanco extra", 4.50, 80, abarrotes), "7750001000011"),
-                conCodigo(new Producto("Azúcar Rubia 1kg", "Azúcar rubia doméstica", 4.20, 60, abarrotes), "7750001000028"),
-                conCodigo(new Producto("Aceite Vegetal 1L", "Aceite vegetal para cocina", 9.90, 40, abarrotes), "7750001000035"),
-                conCodigo(new Producto("Fideos Spaghetti 500g", "Fideos de sémola", 3.20, 70, abarrotes), "7750001000042"),
-                conCodigo(new Producto("Agua Mineral 625ml", "Agua sin gas", 2.00, 120, bebidas), "7750001000059"),
-                conCodigo(new Producto("Gaseosa Cola 1.5L", "Bebida gaseosa sabor cola", 6.50, 55, bebidas), "7750001000066"),
-                conCodigo(new Producto("Jugo de Naranja 1L", "Néctar de naranja", 5.90, 45, bebidas), "7750001000073"),
-                conCodigo(new Producto("Detergente 1kg", "Detergente en polvo", 12.90, 30, limpieza), "7750001000080"),
-                conCodigo(new Producto("Lejía 1L", "Lejía desinfectante", 3.50, 50, limpieza), "7750001000097"),
-                conCodigo(new Producto("Audífonos Bluetooth", "Audífonos inalámbricos", 59.90, 15, electronica), "7750001000103"),
-                conCodigo(new Producto("Cargador USB-C", "Cargador rápido 20W", 34.90, 25, electronica), "7750001000110"),
-                conCodigo(new Producto("Polo Algodón", "Polo básico de algodón", 24.90, 20, ropa), "7750001000127"),
-                conCodigo(new Producto("Pantalón Jean", "Pantalón de mezclilla", 69.90, 3, ropa), "7750001000134")
-        );
-        productoRepository.saveAll(productos);
+        // ---------- Hombre ----------
+        Producto camisaOxford = nuevoProducto("Camisa Oxford Manga Larga", "Camisa de algodón, corte clásico, ideal para oficina o salidas.", 79.90, "TiendaMas", hombre);
+        variante(camisaOxford, Talla.S, "Celeste", "#87CEEB", 12);
+        variante(camisaOxford, Talla.M, "Celeste", "#87CEEB", 18);
+        variante(camisaOxford, Talla.L, "Blanco", "#FFFFFF", 15);
+        variante(camisaOxford, Talla.XL, "Blanco", "#FFFFFF", 4);
+        guardarConVariantes(camisaOxford);
+
+        Producto poloPique = nuevoProducto("Polo Piqué Básico", "Polo de algodón piqué, ajuste regular, básico infaltable.", 39.90, "TiendaMas", hombre);
+        variante(poloPique, Talla.S, "Negro", "#111111", 20);
+        variante(poloPique, Talla.M, "Negro", "#111111", 25);
+        variante(poloPique, Talla.L, "Blanco", "#FFFFFF", 22);
+        variante(poloPique, Talla.XL, "Azul Marino", "#1F2A44", 10);
+        variante(poloPique, Talla.XXL, "Azul Marino", "#1F2A44", 3);
+        guardarConVariantes(poloPique);
+
+        Producto jeanSlimHombre = nuevoProducto("Jean Slim Hombre", "Pantalón de mezclilla stretch, corte slim.", 129.90, "DenimCo", hombre);
+        variante(jeanSlimHombre, Talla.S, "Azul", "#3B5998", 8);
+        variante(jeanSlimHombre, Talla.M, "Azul", "#3B5998", 14);
+        variante(jeanSlimHombre, Talla.L, "Negro", "#111111", 9);
+        variante(jeanSlimHombre, Talla.XL, "Negro", "#111111", 2);
+        guardarConVariantes(jeanSlimHombre);
+
+        Producto camperaRompevientos = nuevoProducto("Campera Rompevientos", "Campera liviana impermeable, ideal para entretiempo.", 189.90, "TiendaMas", hombre);
+        variante(camperaRompevientos, Talla.M, "Negro", "#111111", 7);
+        variante(camperaRompevientos, Talla.L, "Verde", "#2F6B3A", 6);
+        variante(camperaRompevientos, Talla.XL, "Verde", "#2F6B3A", 3);
+        guardarConVariantes(camperaRompevientos);
+
+        // ---------- Mujer ----------
+        Producto blusaCuelloV = nuevoProducto("Blusa Cuello V", "Blusa liviana de gasa, ideal para el día a día.", 49.90, "TiendaMas", mujer);
+        variante(blusaCuelloV, Talla.S, "Blanco", "#FFFFFF", 16);
+        variante(blusaCuelloV, Talla.M, "Rosa", "#F4B6C2", 20);
+        variante(blusaCuelloV, Talla.L, "Rosa", "#F4B6C2", 11);
+        guardarConVariantes(blusaCuelloV);
+
+        Producto vestidoCasual = nuevoProducto("Vestido Casual Midi", "Vestido midi de tela fluida, para uso diario o salidas.", 99.90, "TiendaMas", mujer);
+        variante(vestidoCasual, Talla.S, "Negro", "#111111", 9);
+        variante(vestidoCasual, Talla.M, "Estampado Floral", "#D96C6C", 13);
+        variante(vestidoCasual, Talla.L, "Estampado Floral", "#D96C6C", 5);
+        variante(vestidoCasual, Talla.XL, "Negro", "#111111", 4);
+        guardarConVariantes(vestidoCasual);
+
+        Producto jeanSkinnyMujer = nuevoProducto("Jean Skinny Tiro Alto", "Jean skinny de tiro alto con stretch, realza la figura.", 119.90, "DenimCo", mujer);
+        variante(jeanSkinnyMujer, Talla.S, "Azul", "#3B5998", 15);
+        variante(jeanSkinnyMujer, Talla.M, "Azul", "#3B5998", 17);
+        variante(jeanSkinnyMujer, Talla.L, "Negro", "#111111", 8);
+        guardarConVariantes(jeanSkinnyMujer);
+
+        Producto cardigan = nuevoProducto("Cardigan Tejido", "Cardigan tejido abierto, cómodo y abrigador.", 89.90, "TiendaMas", mujer);
+        variante(cardigan, Talla.S, "Beige", "#D8C3A5", 10);
+        variante(cardigan, Talla.M, "Gris", "#9CA3AF", 12);
+        variante(cardigan, Talla.L, "Gris", "#9CA3AF", 1);
+        guardarConVariantes(cardigan);
+
+        // ---------- Niños ----------
+        Producto poloEscolar = nuevoProducto("Polo Escolar Piqué", "Polo escolar de algodón piqué, alta durabilidad al lavado.", 29.90, "TiendaMas", ninos);
+        variante(poloEscolar, Talla.S, "Blanco", "#FFFFFF", 25);
+        variante(poloEscolar, Talla.M, "Blanco", "#FFFFFF", 30);
+        variante(poloEscolar, Talla.L, "Blanco", "#FFFFFF", 14);
+        guardarConVariantes(poloEscolar);
+
+        Producto shortDeportivoNino = nuevoProducto("Short Deportivo Niño", "Short deportivo transpirable, ideal para educación física.", 34.90, "SportKids", ninos);
+        variante(shortDeportivoNino, Talla.S, "Azul Marino", "#1F2A44", 18);
+        variante(shortDeportivoNino, Talla.M, "Azul Marino", "#1F2A44", 16);
+        variante(shortDeportivoNino, Talla.L, "Negro", "#111111", 6);
+        guardarConVariantes(shortDeportivoNino);
+
+        // ---------- Accesorios ----------
+        Producto gorraBordada = nuevoProducto("Gorra Bordada", "Gorra ajustable con visera curva, bordado frontal.", 39.90, "TiendaMas", accesorios);
+        variante(gorraBordada, Talla.UNICA, "Negro", "#111111", 22);
+        variante(gorraBordada, Talla.UNICA, "Azul Marino", "#1F2A44", 17);
+        guardarConVariantes(gorraBordada);
+
+        Producto cinturonCuero = nuevoProducto("Cinturón de Cuero", "Cinturón de cuero genuino con hebilla metálica.", 49.90, "TiendaMas", accesorios);
+        variante(cinturonCuero, Talla.UNICA, "Marrón", "#5C4033", 14);
+        variante(cinturonCuero, Talla.UNICA, "Negro", "#111111", 3);
+        guardarConVariantes(cinturonCuero);
+
+        Producto bufandaTejida = nuevoProducto("Bufanda Tejida", "Bufanda tejida de punto grueso, abrigo para el invierno.", 34.90, "TiendaMas", accesorios);
+        variante(bufandaTejida, Talla.UNICA, "Gris", "#9CA3AF", 11);
+        variante(bufandaTejida, Talla.UNICA, "Rojo", "#B91C1C", 2);
+        guardarConVariantes(bufandaTejida);
+
+        Producto mediasPack = nuevoProducto("Medias Pack x3", "Pack de 3 pares de medias de algodón.", 24.90, "TiendaMas", accesorios);
+        variante(mediasPack, Talla.UNICA, "Blanco", "#FFFFFF", 30);
+        variante(mediasPack, Talla.UNICA, "Negro", "#111111", 28);
+        guardarConVariantes(mediasPack);
     }
 
     private void sembrarUsuariosDemo() {
@@ -124,9 +205,9 @@ public class DataSeeder implements CommandLineRunner {
 
         Persona personaCliente2 = personaConDocumento(TipoDocumento.RUC)
                 .orElseGet(() -> {
-                    Persona p = new Persona("Comercial", "Los Andes S.A.C.", "ventas@losandes.com",
+                    Persona p = new Persona("Boutique", "El Estilo S.A.C.", "compras@elestilo.com",
                             "014567890", "Av. Comercio 1000", TipoDocumento.RUC, "20481234567");
-                    p.setRazonSocial("Comercial Los Andes S.A.C.");
+                    p.setRazonSocial("Boutique El Estilo S.A.C.");
                     return personaRepository.save(p);
                 });
         usuarioService.crearUsuario("cliente2", "cliente123", RolUsuario.CLIENTE,
@@ -153,9 +234,9 @@ public class DataSeeder implements CommandLineRunner {
         gastoRepository.save(servicios);
 
         Gasto insumos = new Gasto();
-        insumos.setConcepto("Reposición de mercadería");
+        insumos.setConcepto("Reposición de mercadería (temporada)");
         insumos.setCategoria(CategoriaGasto.INSUMOS);
-        insumos.setMonto(650.0);
+        insumos.setMonto(2500.0);
         insumos.setFecha(LocalDate.now().withDayOfMonth(Math.min(10, LocalDate.now().lengthOfMonth())));
         insumos.setRecurrente(false);
         insumos.setFrecuencia(FrecuenciaGasto.UNICO);
@@ -193,8 +274,18 @@ public class DataSeeder implements CommandLineRunner {
                 .findFirst();
     }
 
-    private Producto conCodigo(Producto producto, String codigo) {
-        producto.setCodigoBarras(codigo);
+    private Producto nuevoProducto(String nombre, String descripcion, double precio, String marca, Categoria categoria) {
+        Producto producto = new Producto(nombre, descripcion, precio, categoria);
+        producto.setMarca(marca);
         return producto;
+    }
+
+    private void variante(Producto producto, Talla talla, String color, String colorHex, int stock) {
+        String codigo = "775" + String.format("%010d", ++contadorCodigo);
+        producto.agregarVariante(new VarianteProducto(producto, talla, color, colorHex, stock, codigo));
+    }
+
+    private void guardarConVariantes(Producto producto) {
+        productoRepository.save(producto);
     }
 }

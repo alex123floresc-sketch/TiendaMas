@@ -21,6 +21,7 @@ public interface PedidoService {
 
     List<Producto> obtenerMasVendidos(int limite);
 
+    /** Unidades vendidas desde la fecha indicada, agrupadas por id de variante (talla/color). */
     Map<Long, Integer> obtenerUnidadesVendidasDesde(LocalDateTime desde);
 
     Pedido crearPedido(PedidoForm form, String creadoPor);

@@ -72,6 +72,15 @@
                 <div class="reporte-chart-wrap">
                     <canvas id="chartVentasSemanal"></canvas>
                 </div>
+                <table class="ui very compact celled table" style="margin-top:12px; font-size:12.5px;">
+                    <thead><tr><th>Semana</th><th class="right aligned">Total</th></tr></thead>
+                    <tbody>
+                    <tr th:each="r : ${resumenSemanal}">
+                        <td th:text="${r.etiqueta}"></td>
+                        <td class="right aligned" th:text="'S/ ' + ${#numbers.formatDecimal(r.total, 1, 2)}"></td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
         <div class="column">
@@ -80,6 +89,15 @@
                 <div class="reporte-chart-wrap">
                     <canvas id="chartVentasMensual"></canvas>
                 </div>
+                <table class="ui very compact celled table" style="margin-top:12px; font-size:12.5px;">
+                    <thead><tr><th>Mes</th><th class="right aligned">Total</th></tr></thead>
+                    <tbody>
+                    <tr th:each="r : ${resumenMensualVentas}">
+                        <td th:text="${r.etiqueta}"></td>
+                        <td class="right aligned" th:text="'S/ ' + ${#numbers.formatDecimal(r.total, 1, 2)}"></td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -232,6 +250,7 @@
         <thead>
         <tr>
             <th>Producto</th>
+            <th>Talla / color</th>
             <th>Categoría</th>
             <th class="right aligned">Stock actual</th>
             <th class="right aligned">Vendidos (30 días)</th>
@@ -242,8 +261,9 @@
         <tbody>
         <tr th:each="r : ${recomendacionesReabastecimiento}">
             <td th:text="${r.producto.nombre}" style="font-weight: bold;"></td>
+            <td th:text="${r.variante.etiqueta}"></td>
             <td th:text="${r.producto.categoria != null ? r.producto.categoria.nombre : 'Sin categoría'}"></td>
-            <td class="right aligned" th:text="${r.producto.stock}"></td>
+            <td class="right aligned" th:text="${r.variante.stock}"></td>
             <td class="right aligned" th:text="${r.unidadesVendidas30d}"></td>
             <td class="right aligned" th:text="${r.diasRestantes != null} ? ${#numbers.formatDecimal(r.diasRestantes, 1, 1)} : 'Sin ventas recientes'"></td>
             <td class="center aligned">

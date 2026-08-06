@@ -1,6 +1,9 @@
 package com.tiendamas.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDate;
 
@@ -12,11 +15,14 @@ public class Gasto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "El concepto es obligatorio")
     private String concepto;
 
     @Enumerated(EnumType.STRING)
     private CategoriaGasto categoria;
 
+    @NotNull(message = "El monto es obligatorio")
+    @Positive(message = "El monto debe ser mayor a cero")
     private Double monto;
     private LocalDate fecha;
 

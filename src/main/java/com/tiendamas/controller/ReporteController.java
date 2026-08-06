@@ -10,6 +10,7 @@ import com.tiendamas.entity.Pedido;
 import com.tiendamas.entity.Producto;
 import com.tiendamas.entity.Sueldo;
 import com.tiendamas.entity.Usuario;
+import com.tiendamas.entity.VarianteProducto;
 import com.tiendamas.service.GastoService;
 import com.tiendamas.service.PedidoService;
 import com.tiendamas.service.PersonaService;
@@ -118,8 +119,11 @@ public class ReporteController {
 
         Map<Long, Integer> unidadesUltimos30Dias = pedidoService.obtenerUnidadesVendidasDesde(
                 LocalDateTime.now().minusDays(VENTANA_REABASTECIMIENTO_DIAS));
+        List<VarianteProducto> variantes = productos.stream()
+                .flatMap(p -> p.getVariantes().stream())
+                .toList();
         List<RecomendacionReabastecimiento> recomendacionesReabastecimiento =
-                calcularReabastecimiento(productos, unidadesUltimos30Dias);
+                calcularReabastecimiento(variantes, unidadesUltimos30Dias);
 
         List<ResumenMensual> resumenMensual = calcularResumenMensual(pedidos, gastoService.obtenerTodos(), sueldoService.obtenerTodos());
         double maxResumenMensual = resumenMensual.stream()
@@ -152,12 +156,12 @@ public class ReporteController {
         return "reportes/index";
     }
 
-    private List<RecomendacionReabastecimiento> calcularReabastecimiento(List<Producto> productos, Map<Long, Integer> unidadesUltimos30Dias) {
+    private List<RecomendacionReabastecimiento> calcularReabastecimiento(List<VarianteProducto> variantes, Map<Long, Integer> unidadesUltimos30Dias) {
         List<RecomendacionReabastecimiento> resultado = new ArrayList<>();
 
-        for (Producto producto : productos) {
-            int stock = producto.getStock() != null ? producto.getStock() : 0;
-            int vendidas = unidadesUltimos30Dias.getOrDefault(producto.getId(), 0);
+        for (VarianteProducto variante : variantes) {
+            int stock = variante.getStock() != null ? variante.getStock() : 0;
+            int vendidas = unidadesUltimos30Dias.getOrDefault(variante.getId(), 0);
             double velocidadDiaria = vendidas / (double) VENTANA_REABASTECIMIENTO_DIAS;
             Double diasRestantes = velocidadDiaria > 0 ? stock / velocidadDiaria : null;
 
@@ -166,7 +170,7 @@ public class ReporteController {
 
             if (!urgente && !moderado) continue;
 
-            resultado.add(new RecomendacionReabastecimiento(producto, vendidas, diasRestantes, urgente ? "URGENTE" : "MODERADO"));
+            resultado.add(new RecomendacionReabastecimiento(variante, vendidas, diasRestantes, urgente ? "URGENTE" : "MODERADO"));
         }
 
         resultado.sort((a, b) -> {

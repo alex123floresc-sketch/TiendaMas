@@ -9,6 +9,7 @@ import com.tiendamas.entity.Persona;
 import com.tiendamas.entity.Producto;
 import com.tiendamas.entity.TipoEntrega;
 import com.tiendamas.entity.Usuario;
+import com.tiendamas.entity.VarianteProducto;
 import com.tiendamas.service.CategoriaService;
 import com.tiendamas.service.PedidoService;
 import com.tiendamas.service.PersonaService;
@@ -75,10 +76,10 @@ public class TiendaController {
     }
 
     @PostMapping("/carrito/agregar")
-    public String agregar(@RequestParam Long productoId, @RequestParam(required = false, defaultValue = "1") Integer cantidad) {
-        Producto producto = productoService.obtenerPorId(productoId);
-        if (producto != null) {
-            carrito.agregar(producto, cantidad != null && cantidad > 0 ? cantidad : 1);
+    public String agregar(@RequestParam Long varianteId, @RequestParam(required = false, defaultValue = "1") Integer cantidad) {
+        VarianteProducto variante = productoService.obtenerVariante(varianteId);
+        if (variante != null) {
+            carrito.agregar(variante, cantidad != null && cantidad > 0 ? cantidad : 1);
         }
         return "redirect:/tienda/carrito";
     }
@@ -100,14 +101,14 @@ public class TiendaController {
     }
 
     @PostMapping("/carrito/cantidad")
-    public String actualizarCantidad(@RequestParam Long productoId, @RequestParam Integer cantidad) {
-        carrito.actualizarCantidad(productoId, cantidad);
+    public String actualizarCantidad(@RequestParam Long varianteId, @RequestParam Integer cantidad) {
+        carrito.actualizarCantidad(varianteId, cantidad);
         return "redirect:/tienda/carrito";
     }
 
-    @PostMapping("/carrito/quitar/{productoId}")
-    public String quitar(@PathVariable Long productoId) {
-        carrito.quitar(productoId);
+    @PostMapping("/carrito/quitar/{varianteId}")
+    public String quitar(@PathVariable Long varianteId) {
+        carrito.quitar(varianteId);
         return "redirect:/tienda/carrito";
     }
 
@@ -151,11 +152,16 @@ public class TiendaController {
                 : null;
 
         List<ItemVenta> items = carrito.getItems().stream()
-                .map(i -> new ItemVenta(i.getProductoId(), i.getCantidad()))
+                .map(i -> new ItemVenta(i.getVarianteId(), i.getCantidad()))
                 .collect(Collectors.toList());
 
-        Pedido pedido = pedidoService.crearVenta(persona.getId(), items, CanalVenta.ONLINE, metodoPago, null,
-                tipoEntrega, direccion);
+        Pedido pedido;
+        try {
+            pedido = pedidoService.crearVenta(persona.getId(), items, CanalVenta.ONLINE, metodoPago, null,
+                    tipoEntrega, direccion);
+        } catch (IllegalArgumentException e) {
+            return "redirect:/tienda/carrito?error=stockInsuficiente";
+        }
         carrito.vaciar();
         return "redirect:/pedidos/" + pedido.getId();
     }

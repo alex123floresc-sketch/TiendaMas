@@ -352,6 +352,52 @@ body {
     margin: 0;
 }
 
+.tienda-variante-opciones {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+.tienda-variante-opcion {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--color-beige-dark);
+    border-radius: 8px;
+    padding: 8px 14px;
+    cursor: pointer;
+    font-size: 13.5px;
+}
+.tienda-variante-opcion:has(input:checked) {
+    border-color: var(--color-blue);
+    background: var(--color-beige);
+}
+.tienda-variante-opcion input {
+    margin: 0;
+}
+.tienda-variante-swatch {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1px solid var(--color-beige-dark);
+    vertical-align: middle;
+    margin-right: 4px;
+}
+.carrito-item-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.carrito-item-thumb {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 6px;
+    background: var(--color-beige);
+    flex-shrink: 0;
+}
+
 /* Gráficos de reportes (Chart.js) */
 .reporte-chart-card {
     background: var(--color-white);
@@ -590,15 +636,32 @@ body {
     background: var(--color-white);
     transition: box-shadow .15s ease, transform .15s ease;
 }
-.pos-product-card:not(.is-disabled) {
-    cursor: pointer;
-}
 .pos-product-card:not(.is-disabled):hover {
     box-shadow: 0 6px 16px rgba(20, 49, 93, 0.12);
     transform: translateY(-2px);
 }
 .pos-product-card.is-disabled {
     opacity: .55;
+}
+.pos-variantes-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 4px;
+}
+.pos-variante-chip {
+    font-size: 11px;
+    border: 1px solid var(--color-beige-dark);
+    border-left: 4px solid var(--color-beige-dark);
+    border-radius: 6px;
+    padding: 3px 8px;
+    cursor: pointer;
+    background: var(--color-white);
+    transition: background .12s ease, box-shadow .12s ease;
+}
+.pos-variante-chip:hover {
+    background: var(--color-beige);
+    box-shadow: 0 2px 6px rgba(20, 49, 93, 0.12);
 }
 .pos-product-card .pos-product-img {
     width: 100%;
@@ -617,6 +680,12 @@ body {
     justify-content: center;
     color: var(--color-text-muted);
     font-size: 1.6em;
+}
+.pos-product-cat {
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--color-text-muted);
 }
 .pos-product-nombre {
     font-weight: 600;
@@ -1009,6 +1078,20 @@ body {
     color: var(--color-success);
     font-weight: 700;
     font-size: 1.1em;
+}
+.tienda-card-tallas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 2px 0 6px;
+}
+.tienda-card-talla-badge {
+    font-size: 10.5px;
+    font-weight: 600;
+    border: 1px solid var(--color-beige-dark);
+    border-radius: 4px;
+    padding: 1px 6px;
+    color: var(--color-text-muted);
 }
 
 /* --- Resumen financiero mensual (reportes) --- */

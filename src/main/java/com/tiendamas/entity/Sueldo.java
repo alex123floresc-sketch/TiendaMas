@@ -1,6 +1,8 @@
 package com.tiendamas.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDate;
 
@@ -16,6 +18,8 @@ public class Sueldo {
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
+    @NotNull(message = "El monto es obligatorio")
+    @Positive(message = "El monto debe ser mayor a cero")
     private Double monto;
 
     private String periodo;

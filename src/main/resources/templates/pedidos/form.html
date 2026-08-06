@@ -11,6 +11,10 @@
         </div>
     </h1>
 
+    <div class="ui negative message" th:if="${param.error}">
+        <p>No se pudo registrar la venta: verifica el cliente y que haya stock suficiente en las tallas/colores elegidos.</p>
+    </div>
+
     <div class="ui segment">
 
         <form th:object="${pedidoForm}" th:action="@{/pedidos}" method="POST" class="ui form">
@@ -31,7 +35,7 @@
                     <thead>
                     <tr>
                         <th style="width:50px">#</th>
-                        <th>Producto</th>
+                        <th>Producto (talla / color)</th>
                         <th style="width:150px">Cantidad</th>
                         <th style="width:80px">Acción</th>
                     </tr>
@@ -68,10 +72,10 @@
     </div>
 
 <select id="productoRef" style="display:none">
-    <option value="">-- Selecciona un producto --</option>
-    <option th:each="p : ${productos}"
-            th:value="${p.id}"
-            th:text="${p.nombre + ' ($' + p.precio + ')'}"></option>
+    <option value="">-- Selecciona talla y color --</option>
+    <option th:each="v : ${variantes}"
+            th:value="${v.id}"
+            th:text="${v.etiquetaCompleta} + ' — S/ ' + ${v.producto.precio} + ' (stock ' + ${v.stock} + ')'"></option>
 </select>
 
 <style>
@@ -99,7 +103,7 @@
         const select = refSelect.cloneNode(true);
         select.id = '';
         select.style.display = 'block';
-        select.name     = 'detalles[' + idx + '].productoId';
+        select.name     = 'detalles[' + idx + '].varianteId';
         select.className = 'ui search fluid dropdown';
         select.required  = true;
         const tdSelect = document.createElement('td');

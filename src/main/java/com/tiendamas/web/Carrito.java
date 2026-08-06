@@ -1,6 +1,6 @@
 package com.tiendamas.web;
 
-import com.tiendamas.entity.Producto;
+import com.tiendamas.entity.VarianteProducto;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
 
@@ -14,28 +14,31 @@ public class Carrito {
 
     private final Map<Long, CarritoItem> items = new LinkedHashMap<>();
 
-    public void agregar(Producto producto, int cantidad) {
-        CarritoItem existente = items.get(producto.getId());
+    public void agregar(VarianteProducto variante, int cantidad) {
+        int stockDisponible = variante.getStock() != null ? variante.getStock() : 0;
+        CarritoItem existente = items.get(variante.getId());
         if (existente != null) {
-            existente.setCantidad(existente.getCantidad() + cantidad);
+            int nuevaCantidad = Math.min(existente.getCantidad() + cantidad, Math.max(stockDisponible, 1));
+            existente.setCantidad(nuevaCantidad);
         } else {
-            items.put(producto.getId(), new CarritoItem(producto, cantidad));
+            CarritoItem item = new CarritoItem(variante, Math.min(cantidad, Math.max(stockDisponible, 1)));
+            items.put(variante.getId(), item);
         }
     }
 
-    public void actualizarCantidad(Long productoId, int cantidad) {
+    public void actualizarCantidad(Long varianteId, int cantidad) {
         if (cantidad <= 0) {
-            items.remove(productoId);
+            items.remove(varianteId);
             return;
         }
-        CarritoItem item = items.get(productoId);
+        CarritoItem item = items.get(varianteId);
         if (item != null) {
-            item.setCantidad(cantidad);
+            item.setCantidad(Math.min(cantidad, Math.max(item.getStockDisponible(), 1)));
         }
     }
 
-    public void quitar(Long productoId) {
-        items.remove(productoId);
+    public void quitar(Long varianteId) {
+        items.remove(varianteId);
     }
 
     public void vaciar() {
