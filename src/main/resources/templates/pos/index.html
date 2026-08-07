@@ -72,6 +72,7 @@
                 <tr th:each="item : ${carrito.items}">
                     <td class="carrito-item-cell">
                         <img th:if="${item.imagenUrl != null}" th:src="@{${item.imagenUrl}}" class="carrito-item-thumb" alt="">
+                        <i th:unless="${item.imagenUrl != null}" class="image icon carrito-item-thumb"></i>
                         <div>
                             <span style="font-weight:bold;" th:text="${item.nombre}"></span>
                             <div class="hint" th:if="${item.talla != null or item.color != null}">
@@ -245,7 +246,9 @@
         items.forEach(function (item) {
             const subtitulo = [item.talla, item.color].filter(Boolean).join(' · ');
             const swatchHtml = item.colorHex ? '<span class="tienda-variante-swatch" style="background:' + escapeHtml(item.colorHex) + '"></span>' : '';
-            const thumbHtml = item.imagenUrl ? '<img src="' + escapeHtml(item.imagenUrl) + '" class="carrito-item-thumb" alt="">' : '';
+            const thumbHtml = item.imagenUrl
+                ? '<img src="' + escapeHtml(item.imagenUrl) + '" class="carrito-item-thumb" alt="">'
+                : '<i class="image icon carrito-item-thumb"></i>';
             const tr = document.createElement('tr');
             tr.innerHTML =
                 '<td class="carrito-item-cell">' + thumbHtml + '<div><span style="font-weight:bold;">' + escapeHtml(item.nombre) + '</span>' +

@@ -3,44 +3,59 @@
 <body>
 <div th:fragment="content">
 
+    <nav class="tienda-breadcrumbs">
+        <a th:href="@{/tienda}">Tienda</a>
+        <i class="chevron right icon"></i>
+        <span>Mis pedidos</span>
+    </nav>
+
     <h1 class="ui dividing header"><i class="list icon"></i> Mis Pedidos</h1>
 
-    <div class="ui icon info message" th:if="${pedidos.isEmpty()}">
-        <i class="info circle icon"></i>
-        <div class="content">Todavía no tienes pedidos. <a th:href="@{/tienda}">Ir al catálogo</a></div>
+    <div class="tienda-empty" th:if="${pedidos.isEmpty()}">
+        <i class="list icon"></i>
+        <h3>Todavía no tienes pedidos</h3>
+        <p>Cuando compres algo en la tienda, tus pedidos van a aparecer acá.</p>
+        <a th:href="@{/tienda}" class="ui primary button">Ir al catálogo</a>
     </div>
 
-    <table class="ui celled striped table" th:unless="${pedidos.isEmpty()}">
-        <thead>
-        <tr>
-            <th>Comprobante</th>
-            <th>Fecha</th>
-            <th>Entrega</th>
-            <th>Estado</th>
-            <th>Método de pago</th>
-            <th>Total</th>
-            <th class="center aligned">Ver</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="pedido : ${pedidos}">
-            <td th:text="${pedido.tipoComprobante} + ' ' + ${pedido.numeroCompleto}" style="font-weight:bold;"></td>
-            <td th:text="${pedido.fechaTexto}"></td>
-            <td th:text="${pedido.tipoEntrega != null ? pedido.tipoEntrega.etiqueta : '—'}"></td>
-            <td>
-                <span class="ui label"
-                      th:if="${pedido.estado != null}"
-                      th:classappend="${pedido.estado.name() == 'PENDIENTE'} ? 'yellow' : (${pedido.estado.name() == 'EN_CAMINO'} ? 'blue' : (${pedido.estado.name() == 'ENTREGADO'} ? 'green' : 'red'))"
-                      th:text="${pedido.estado.etiqueta}"></span>
-            </td>
-            <td th:text="${pedido.metodoPago != null ? pedido.metodoPago.etiqueta : ''}"></td>
-            <td th:text="'S/ ' + ${pedido.total}" style="color:#21ba45; font-weight:bold;"></td>
-            <td class="center aligned">
-                <a th:href="@{/pedidos/{id}(id=${pedido.id})}" class="ui info button"><i class="eye icon"></i></a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <div class="tienda-pedidos-lista" th:unless="${pedidos.isEmpty()}">
+        <div class="tienda-pedido-card" th:each="pedido : ${pedidos}">
+            <div class="tienda-pedido-card-header">
+                <div>
+                    <div class="tienda-pedido-card-numero" th:text="${pedido.tipoComprobante} + ' ' + ${pedido.numeroCompleto}"></div>
+                    <div class="hint" th:text="${pedido.fechaTexto}"></div>
+                </div>
+                <div class="tienda-pedido-card-total" th:text="'S/ ' + ${#numbers.formatDecimal(pedido.total, 1, 2)}"></div>
+            </div>
+
+            <div class="tienda-timeline" th:if="${pedido.estado != null and pedido.estado.name() != 'CANCELADO'}">
+                <div class="tienda-timeline-paso completado">
+                    <span class="dot"></span><span class="label">Pendiente</span>
+                </div>
+                <div class="tienda-timeline-linea"
+                     th:classappend="${pedido.estado.name() == 'EN_CAMINO' or pedido.estado.name() == 'ENTREGADO'} ? 'completado'"></div>
+                <div class="tienda-timeline-paso"
+                     th:classappend="${pedido.estado.name() == 'EN_CAMINO' or pedido.estado.name() == 'ENTREGADO'} ? 'completado'">
+                    <span class="dot"></span><span class="label">En camino</span>
+                </div>
+                <div class="tienda-timeline-linea" th:classappend="${pedido.estado.name() == 'ENTREGADO'} ? 'completado'"></div>
+                <div class="tienda-timeline-paso" th:classappend="${pedido.estado.name() == 'ENTREGADO'} ? 'completado'">
+                    <span class="dot"></span><span class="label">Entregado</span>
+                </div>
+            </div>
+            <div class="ui red label" th:if="${pedido.estado != null and pedido.estado.name() == 'CANCELADO'}" style="width:fit-content;">
+                <i class="times circle icon"></i> Pedido cancelado
+            </div>
+
+            <div class="tienda-pedido-card-footer">
+                <span><i class="truck icon"></i> <span th:text="${pedido.tipoEntrega != null ? pedido.tipoEntrega.etiqueta : '—'}"></span></span>
+                <span><i class="money bill alternate icon"></i> <span th:text="${pedido.metodoPago != null ? pedido.metodoPago.etiqueta : '—'}"></span></span>
+                <a th:href="@{/pedidos/{id}(id=${pedido.id})}" class="ui small info button" style="margin-left:auto;">
+                    <i class="eye icon"></i> Ver comprobante
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 </html>

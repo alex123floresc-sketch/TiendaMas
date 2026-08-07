@@ -1,98 +1,115 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/tienda}">
 <body>
-<div th:fragment="content" style="max-width: 700px; margin: 0 auto;">
+<div th:fragment="content">
+
+    <nav class="tienda-breadcrumbs">
+        <a th:href="@{/tienda}">Tienda</a>
+        <i class="chevron right icon"></i>
+        <a th:href="@{/tienda/carrito}">Carrito</a>
+        <i class="chevron right icon"></i>
+        <span>Finalizar compra</span>
+    </nav>
 
     <h1 class="ui dividing header"><i class="credit card icon"></i> Finalizar compra</h1>
 
-    <div class="ui segment">
-        <h3 class="ui header">Resumen del pedido</h3>
-        <table class="ui celled table">
-            <tbody>
-            <tr th:each="item : ${carrito.items}">
-                <td class="carrito-item-cell">
-                    <img th:if="${item.imagenUrl != null}" th:src="@{${item.imagenUrl}}" class="carrito-item-thumb" alt="">
-                    <div>
-                        <span th:text="${item.nombre}"></span>
-                        <div class="hint" th:if="${item.talla != null or item.color != null}">
-                            <span class="tienda-variante-swatch" th:if="${item.colorHex != null and !item.colorHex.isEmpty()}" th:style="'background:' + ${item.colorHex}"></span>
-                            <span th:text="(${item.talla} ?: '') + (${item.color != null and !item.color.isEmpty()} ? ' · ' + ${item.color} : '')"></span>
+    <div class="tienda-checkout-pasos">
+        <div class="tienda-checkout-paso completado"><span>1</span> Carrito</div>
+        <div class="tienda-checkout-paso activo"><span>2</span> Envío y pago</div>
+        <div class="tienda-checkout-paso"><span>3</span> Confirmación</div>
+    </div>
+
+    <form th:action="@{/tienda/checkout}" method="post" class="ui form" id="formCheckout">
+        <div class="tienda-checkout-layout">
+            <div class="tienda-checkout-form">
+
+                <div class="tienda-checkout-step">
+                    <h3 class="ui header">Comprobante a nombre de</h3>
+                    <p>
+                        <strong th:text="${persona.nombre + ' ' + persona.apellido}"></strong><br>
+                        <span th:text="${persona.tipoDocumento} + ' ' + ${persona.numeroDocumento}"></span><br>
+                        <span th:text="${persona.direccion}"></span>
+                    </p>
+                    <a th:href="@{/tienda/perfil}" class="ui small button">Editar mis datos</a>
+                </div>
+
+                <div class="tienda-checkout-step">
+                    <h3 class="ui header">Tipo de entrega</h3>
+                    <div class="field required">
+                        <div class="tienda-entrega-opciones">
+                            <label class="tienda-entrega-opcion">
+                                <input type="radio" name="tipoEntrega" value="RETIRO_TIENDA" checked
+                                       onchange="document.getElementById('bloqueDireccionEntrega').style.display='none'; document.getElementById('direccionEntrega').required=false;">
+                                <i class="store icon"></i> Retiro en tienda
+                            </label>
+                            <label class="tienda-entrega-opcion">
+                                <input type="radio" name="tipoEntrega" value="DOMICILIO"
+                                       onchange="document.getElementById('bloqueDireccionEntrega').style.display='block'; document.getElementById('direccionEntrega').required=true;">
+                                <i class="truck icon"></i> Envío a domicilio
+                            </label>
                         </div>
                     </div>
-                </td>
-                <td th:text="${item.cantidad} + ' x S/ ' + ${item.precioUnitario}"></td>
-                <td class="right aligned" th:text="'S/ ' + ${#numbers.formatDecimal(item.subtotal, 1, 2)}"></td>
-            </tr>
-            </tbody>
-            <tfoot>
-            <tr>
-                <th colspan="2" style="text-align:right;">Total:</th>
-                <th class="right aligned" style="color:#21ba45;"
-                    th:text="'S/ ' + ${#numbers.formatDecimal(carrito.total, 1, 2)}"></th>
-            </tr>
-            </tfoot>
-        </table>
 
-        <h3 class="ui header">Comprobante a nombre de</h3>
-        <p>
-            <strong th:text="${persona.nombre + ' ' + persona.apellido}"></strong><br>
-            <span th:text="${persona.tipoDocumento} + ' ' + ${persona.numeroDocumento}"></span><br>
-            <span th:text="${persona.direccion}"></span>
-        </p>
-        <a th:href="@{/tienda/perfil}" class="ui small button">Editar mis datos</a>
-
-        <div class="ui divider"></div>
-
-        <form th:action="@{/tienda/checkout}" method="post" class="ui form" id="formCheckout">
-            <div class="field required">
-                <label>Tipo de entrega</label>
-                <div class="tienda-entrega-opciones">
-                    <label class="tienda-entrega-opcion">
-                        <input type="radio" name="tipoEntrega" value="RETIRO_TIENDA" checked
-                               onchange="document.getElementById('bloqueDireccionEntrega').style.display='none'; document.getElementById('direccionEntrega').required=false;">
-                        <i class="store icon"></i> Retiro en tienda
-                    </label>
-                    <label class="tienda-entrega-opcion">
-                        <input type="radio" name="tipoEntrega" value="DOMICILIO"
-                               onchange="document.getElementById('bloqueDireccionEntrega').style.display='block'; document.getElementById('direccionEntrega').required=true;">
-                        <i class="truck icon"></i> Envío a domicilio
-                    </label>
+                    <div class="field" id="bloqueDireccionEntrega" style="display:none;">
+                        <label>Dirección de entrega</label>
+                        <textarea name="direccionEntrega" id="direccionEntrega" rows="2"
+                                  placeholder="Calle, número, referencia..." th:text="${persona.direccion}"></textarea>
+                    </div>
                 </div>
-            </div>
 
-            <div class="field" id="bloqueDireccionEntrega" style="display:none;">
-                <label>Dirección de entrega</label>
-                <textarea name="direccionEntrega" id="direccionEntrega" rows="2"
-                          placeholder="Calle, número, referencia..." th:text="${persona.direccion}"></textarea>
-            </div>
-
-            <div class="field required">
-                <label>Método de pago</label>
-                <div class="tienda-entrega-opciones">
-                    <label class="tienda-entrega-opcion">
-                        <input type="radio" name="metodoPago" value="EFECTIVO" checked>
-                        <i class="money bill alternate icon"></i> Efectivo (contra entrega)
-                    </label>
-                    <label class="tienda-entrega-opcion">
-                        <input type="radio" name="metodoPago" value="TARJETA">
-                        <i class="credit card icon"></i> Tarjeta de crédito/débito
-                    </label>
-                    <label class="tienda-entrega-opcion">
-                        <input type="radio" name="metodoPago" value="YAPE_PLIN">
-                        <i class="mobile alternate icon"></i> Yape / Plin
-                    </label>
-                    <label class="tienda-entrega-opcion">
-                        <input type="radio" name="metodoPago" value="TRANSFERENCIA">
-                        <i class="exchange icon"></i> Transferencia bancaria
-                    </label>
+                <div class="tienda-checkout-step">
+                    <h3 class="ui header">Método de pago</h3>
+                    <div class="field required">
+                        <div class="tienda-entrega-opciones">
+                            <label class="tienda-entrega-opcion">
+                                <input type="radio" name="metodoPago" value="EFECTIVO" checked>
+                                <i class="money bill alternate icon"></i> Efectivo (contra entrega)
+                            </label>
+                            <label class="tienda-entrega-opcion">
+                                <input type="radio" name="metodoPago" value="TARJETA">
+                                <i class="credit card icon"></i> Tarjeta de crédito/débito
+                            </label>
+                            <label class="tienda-entrega-opcion">
+                                <input type="radio" name="metodoPago" value="YAPE_PLIN">
+                                <i class="mobile alternate icon"></i> Yape / Plin
+                            </label>
+                            <label class="tienda-entrega-opcion">
+                                <input type="radio" name="metodoPago" value="TRANSFERENCIA">
+                                <i class="exchange icon"></i> Transferencia bancaria
+                            </label>
+                        </div>
+                    </div>
                 </div>
+
+                <button type="submit" class="ui positive big fluid button tienda-checkout-confirmar">
+                    <i class="check circle icon"></i> Confirmar pedido
+                </button>
             </div>
 
-            <button type="submit" class="ui positive big fluid button">
-                <i class="check circle icon"></i> Confirmar pedido
-            </button>
-        </form>
-    </div>
+            <aside class="tienda-carrito-resumen">
+                <h3 class="ui header">Resumen del pedido</h3>
+                <div class="tienda-checkout-resumen-items">
+                    <div class="tienda-checkout-resumen-item" th:each="item : ${carrito.items}">
+                        <img th:if="${item.imagenUrl != null}" th:src="@{${item.imagenUrl}}" alt="">
+                        <i th:unless="${item.imagenUrl != null}" class="image icon"></i>
+                        <div class="tienda-checkout-resumen-item-info">
+                            <span th:text="${item.nombre}"></span>
+                            <span class="hint" th:text="${item.cantidad} + ' x S/ ' + ${item.precioUnitario}"></span>
+                        </div>
+                        <span th:text="'S/ ' + ${#numbers.formatDecimal(item.subtotal, 1, 2)}"></span>
+                    </div>
+                </div>
+                <div class="tienda-resumen-fila">
+                    <span>Subtotal</span>
+                    <span th:text="'S/ ' + ${#numbers.formatDecimal(carrito.total, 1, 2)}"></span>
+                </div>
+                <div class="tienda-resumen-fila tienda-resumen-total">
+                    <span>Total</span>
+                    <span th:text="'S/ ' + ${#numbers.formatDecimal(carrito.total, 1, 2)}"></span>
+                </div>
+            </aside>
+        </div>
+    </form>
 </div>
 </body>
 </html>

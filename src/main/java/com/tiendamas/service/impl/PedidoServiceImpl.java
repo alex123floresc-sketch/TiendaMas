@@ -15,6 +15,7 @@ import com.tiendamas.entity.TipoEntrega;
 import com.tiendamas.entity.VarianteProducto;
 import com.tiendamas.repository.DetallePedidoRepository;
 import com.tiendamas.repository.PedidoRepository;
+import com.tiendamas.service.EmailService;
 import com.tiendamas.service.PedidoService;
 import com.tiendamas.service.PersonaService;
 import com.tiendamas.service.ProductoService;
@@ -47,6 +48,9 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Autowired
     private SerieCorrelativoService serieCorrelativoService;
+
+    @Autowired
+    private EmailService emailService;
 
     @Override
     public List<Pedido> obtenerTodos() {
@@ -144,7 +148,9 @@ public class PedidoServiceImpl implements PedidoService {
         }
 
         pedido.setTotal(total);
-        return pedidoRepository.save(pedido);
+        Pedido guardado = pedidoRepository.save(pedido);
+        emailService.enviarConfirmacionPedido(guardado);
+        return guardado;
     }
 
     @Override
@@ -188,7 +194,8 @@ public class PedidoServiceImpl implements PedidoService {
             throw new IllegalArgumentException("Pedido no encontrado");
         }
         pedido.setEstado(nuevoEstado);
-        pedidoRepository.save(pedido);
+        Pedido guardado = pedidoRepository.save(pedido);
+        emailService.enviarCambioEstadoPedido(guardado);
     }
 
     @Override

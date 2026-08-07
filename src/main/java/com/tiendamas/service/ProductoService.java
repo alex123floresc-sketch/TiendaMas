@@ -3,6 +3,7 @@ package com.tiendamas.service;
 import com.tiendamas.dto.ProductoForm;
 import com.tiendamas.dto.VarianteForm;
 import com.tiendamas.entity.Categoria;
+import com.tiendamas.entity.ImagenProducto;
 import com.tiendamas.entity.Producto;
 import com.tiendamas.entity.VarianteProducto;
 import com.tiendamas.repository.ProductoRepository;
@@ -98,6 +99,38 @@ public class ProductoService {
         producto.getVariantes().removeIf(v -> v.getId() != null && !idsConservados.contains(v.getId()));
 
         return productoRepository.save(producto);
+    }
+
+    public void agregarImagenes(Long productoId, List<String> urls) {
+        if (urls == null || urls.isEmpty()) return;
+        Producto producto = productoRepository.findById(productoId).orElse(null);
+        if (producto == null) return;
+
+        int siguienteOrden = producto.getImagenes().size();
+        for (String url : urls) {
+            if (url == null || url.isBlank()) continue;
+            producto.agregarImagen(new ImagenProducto(url, producto, siguienteOrden++));
+        }
+        productoRepository.save(producto);
+    }
+
+    /** Elimina una imagen de la galería y devuelve su URL (para borrar el archivo del disco), o null si no existía. */
+    public String eliminarImagen(Long productoId, Long imagenId) {
+        Producto producto = productoRepository.findById(productoId).orElse(null);
+        if (producto == null) return null;
+
+        String[] urlEliminada = new String[1];
+        producto.getImagenes().removeIf(img -> {
+            if (img.getId().equals(imagenId)) {
+                urlEliminada[0] = img.getUrl();
+                return true;
+            }
+            return false;
+        });
+        if (urlEliminada[0] != null) {
+            productoRepository.save(producto);
+        }
+        return urlEliminada[0];
     }
 
     private VarianteProducto nuevaVariante(VarianteForm vf) {

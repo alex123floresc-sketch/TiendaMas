@@ -28,6 +28,10 @@ public class Producto {
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VarianteProducto> variantes = new ArrayList<>();
 
+    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("orden ASC")
+    private List<ImagenProducto> imagenes = new ArrayList<>();
+
     public Producto() {}
 
     public Producto(String nombre, String descripcion, Double precio, Categoria categoria) {
@@ -64,6 +68,14 @@ public class Producto {
     public void agregarVariante(VarianteProducto variante) {
         variante.setProducto(this);
         this.variantes.add(variante);
+    }
+
+    public List<ImagenProducto> getImagenes() { return imagenes; }
+    public void setImagenes(List<ImagenProducto> imagenes) { this.imagenes = imagenes; }
+
+    public void agregarImagen(ImagenProducto imagen) {
+        imagen.setProducto(this);
+        this.imagenes.add(imagen);
     }
 
     @Transient

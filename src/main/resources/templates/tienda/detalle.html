@@ -1,54 +1,88 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/tienda}">
 <body>
-<div th:fragment="content" style="max-width: 900px; margin: 0 auto;">
+<div th:fragment="content" style="max-width: 1050px; margin: 0 auto;">
 
-    <a th:href="@{/tienda}" class="ui button" style="margin-bottom: 20px;">
-        <i class="arrow left icon"></i> Volver al catálogo
-    </a>
+    <nav class="tienda-breadcrumbs">
+        <a th:href="@{/tienda}">Tienda</a>
+        <i class="chevron right icon"></i>
+        <a th:if="${producto.categoria != null}" th:href="@{/tienda(categoriaId=${producto.categoria.id})}"
+           th:text="${producto.categoria.nombre}"></a>
+        <i th:if="${producto.categoria != null}" class="chevron right icon"></i>
+        <span th:text="${producto.nombre}"></span>
+    </nav>
 
     <div class="ui segment">
-        <div class="tienda-detalle-img">
-            <img th:if="${producto.imagenUrl != null}" th:src="@{${producto.imagenUrl}}" alt="Imagen del producto">
-            <i th:unless="${producto.imagenUrl != null}" class="box icon massive"></i>
-        </div>
-        <span class="ui teal label" th:text="${producto.categoria != null ? producto.categoria.nombre : 'Sin categoría'}"></span>
-        <span class="ui label" th:if="${producto.marca != null and !producto.marca.isEmpty()}" th:text="${producto.marca}"></span>
-
-        <h1 class="ui header" th:text="${producto.nombre}"></h1>
-        <p th:text="${producto.descripcion}"></p>
-
-        <h2 style="color:#21ba45;">S/ <span th:text="${producto.precio}"></span></h2>
-
-        <form th:action="@{/tienda/carrito/agregar}" method="post" class="ui form" th:if="${producto.tieneStock()}">
-            <div class="field required">
-                <label>Elige talla y color</label>
-                <div class="tienda-variante-opciones">
-                    <label class="tienda-variante-opcion" th:each="v : ${producto.variantes}" th:if="${v.tieneStock()}">
-                        <input type="radio" name="varianteId" th:value="${v.id}" required>
-                        <span class="tienda-variante-swatch" th:if="${v.colorHex != null and !v.colorHex.isEmpty()}" th:style="'background:' + ${v.colorHex}"></span>
-                        <span th:text="${v.etiqueta} + ' — ' + ${v.stock} + ' disp.'"></span>
-                    </label>
+        <div class="tienda-detalle-layout">
+            <div class="tienda-detalle-media">
+                <div class="tienda-detalle-img">
+                    <span class="tienda-badge-agotado" th:unless="${producto.tieneStock()}">Sin stock</span>
+                    <img id="tiendaDetalleImgPrincipal" th:if="${producto.imagenUrl != null}" th:src="@{${producto.imagenUrl}}" alt="Imagen del producto">
+                    <img id="tiendaDetalleImgPrincipal" th:if="${producto.imagenUrl == null and not #lists.isEmpty(producto.imagenes)}"
+                         th:src="@{${producto.imagenes[0].url}}" alt="Imagen del producto">
+                    <i th:if="${producto.imagenUrl == null and #lists.isEmpty(producto.imagenes)}" class="box icon massive"></i>
+                </div>
+                <div class="tienda-detalle-galeria" th:if="${not #lists.isEmpty(producto.imagenes)}">
+                    <img th:if="${producto.imagenUrl != null}" th:src="@{${producto.imagenUrl}}"
+                         class="tienda-detalle-galeria-thumb" alt="Miniatura"
+                         onclick="document.getElementById('tiendaDetalleImgPrincipal').src=this.src">
+                    <img th:each="img : ${producto.imagenes}" th:src="@{${img.url}}"
+                         class="tienda-detalle-galeria-thumb" alt="Miniatura"
+                         onclick="document.getElementById('tiendaDetalleImgPrincipal').src=this.src">
                 </div>
             </div>
-            <div class="fields" style="align-items: flex-end;">
-                <div class="six wide field">
-                    <label>Cantidad</label>
-                    <input type="number" name="cantidad" min="1" value="1">
+
+            <div class="tienda-detalle-info">
+                <span class="ui teal label" th:text="${producto.categoria != null ? producto.categoria.nombre : 'Sin categoría'}"></span>
+                <span class="ui label" th:if="${producto.marca != null and !producto.marca.isEmpty()}" th:text="${producto.marca}"></span>
+
+                <h1 class="ui header" th:text="${producto.nombre}"></h1>
+                <p class="tienda-detalle-desc" th:text="${producto.descripcion}"></p>
+
+                <div class="tienda-detalle-precio">S/ <span th:text="${#numbers.formatDecimal(producto.precio, 1, 2)}"></span></div>
+
+                <div class="tienda-stock-aviso" th:if="${producto.tieneStock() and producto.stock <= 5}">
+                    <i class="exclamation triangle icon"></i> ¡Últimas <span th:text="${producto.stock}"></span> unidades!
                 </div>
-                <div class="ten wide field">
-                    <button type="submit" class="ui primary fluid button">
+
+                <form th:action="@{/tienda/carrito/agregar}" method="post" class="ui form" th:if="${producto.tieneStock()}">
+                    <div class="field required">
+                        <label>Elige talla y color</label>
+                        <div class="tienda-variante-opciones">
+                            <label class="tienda-variante-opcion" th:each="v : ${producto.variantes}" th:if="${v.tieneStock()}">
+                                <input type="radio" name="varianteId" th:value="${v.id}" required>
+                                <span class="tienda-variante-swatch" th:if="${v.colorHex != null and !v.colorHex.isEmpty()}" th:style="'background:' + ${v.colorHex}"></span>
+                                <span th:text="${v.etiqueta}"></span>
+                                <small th:classappend="${v.stock <= 5} ? 'tienda-variante-stock-bajo'" th:text="${v.stock} + ' disp.'"></small>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Cantidad</label>
+                        <div class="tienda-cantidad-stepper">
+                            <button type="button" class="tienda-stepper-btn" onclick="ajustarCantidad(-1)" aria-label="Restar">−</button>
+                            <input type="number" name="cantidad" id="cantidadInput" min="1" value="1" required>
+                            <button type="button" class="tienda-stepper-btn" onclick="ajustarCantidad(1)" aria-label="Sumar">+</button>
+                        </div>
+                    </div>
+                    <button type="submit" class="ui primary fluid big button">
                         <i class="cart plus icon"></i> Agregar al carrito
                     </button>
+                </form>
+                <div class="ui negative message" th:unless="${producto.tieneStock()}">
+                    <i class="times circle icon"></i> Sin stock disponible por el momento.
+                </div>
+
+                <div class="tienda-detalle-beneficios">
+                    <div><i class="truck icon"></i> Envío a todo el país</div>
+                    <div><i class="sync alternate icon"></i> Cambios sin costo dentro de 15 días</div>
+                    <div><i class="lock icon"></i> Compra 100% segura</div>
                 </div>
             </div>
-        </form>
-        <div class="ui negative message" th:unless="${producto.tieneStock()}">
-            <i class="times circle icon"></i> Sin stock disponible por el momento.
         </div>
     </div>
 
-    <div th:if="${relacionados != null and not #lists.isEmpty(relacionados)}">
+    <div th:if="${relacionados != null and not #lists.isEmpty(relacionados)}" style="margin-top: 30px;">
         <h3 class="ui header"><i class="thumbs up icon"></i> También te puede interesar</h3>
         <div class="tienda-grid">
             <div class="tienda-card" th:each="p : ${relacionados}">
@@ -70,6 +104,15 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function ajustarCantidad(delta) {
+            const input = document.getElementById('cantidadInput');
+            let valor = parseInt(input.value || '1', 10) + delta;
+            if (valor < 1) valor = 1;
+            input.value = valor;
+        }
+    </script>
 </div>
 </body>
 </html>

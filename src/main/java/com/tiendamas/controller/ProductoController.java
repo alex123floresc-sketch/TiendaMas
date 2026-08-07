@@ -17,6 +17,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/productos")
 public class ProductoController {
@@ -49,10 +51,12 @@ public class ProductoController {
 
     @PostMapping
     public String guardar(@Valid @ModelAttribute("productoForm") ProductoForm form,
-                          @RequestParam(value = "imagen", required = false) MultipartFile imagen) {
+                          @RequestParam(value = "imagen", required = false) MultipartFile imagen,
+                          @RequestParam(value = "imagenesAdicionales", required = false) List<MultipartFile> imagenesAdicionales) {
         Categoria categoria = categoriaService.obtenerPorId(form.getCategoriaId());
         String imagenUrl = (imagen != null && !imagen.isEmpty()) ? imagenStorage.guardar(imagen) : null;
-        productoService.guardarConVariantes(form, categoria, imagenUrl);
+        Producto producto = productoService.guardarConVariantes(form, categoria, imagenUrl);
+        productoService.agregarImagenes(producto.getId(), guardarImagenes(imagenesAdicionales));
         return "redirect:/productos";
     }
 
@@ -91,7 +95,8 @@ public class ProductoController {
     @PostMapping("/{id}")
     public String actualizar(@PathVariable Long id,
                              @Valid @ModelAttribute("productoForm") ProductoForm form,
-                             @RequestParam(value = "imagen", required = false) MultipartFile imagen) {
+                             @RequestParam(value = "imagen", required = false) MultipartFile imagen,
+                             @RequestParam(value = "imagenesAdicionales", required = false) List<MultipartFile> imagenesAdicionales) {
         Categoria categoria = categoriaService.obtenerPorId(form.getCategoriaId());
         Producto existente = productoService.obtenerPorId(id);
         String imagenUrl;
@@ -106,7 +111,17 @@ public class ProductoController {
         } catch (DataIntegrityViolationException e) {
             return "redirect:/productos/" + id + "/editar?error=varianteConVentas";
         }
+        productoService.agregarImagenes(id, guardarImagenes(imagenesAdicionales));
         return "redirect:/productos";
+    }
+
+    @PostMapping("/{id}/imagenes/{imagenId}/eliminar")
+    public String eliminarImagen(@PathVariable Long id, @PathVariable Long imagenId) {
+        String url = productoService.eliminarImagen(id, imagenId);
+        if (url != null) {
+            imagenStorage.eliminar(url);
+        }
+        return "redirect:/productos/" + id + "/editar";
     }
 
     @PostMapping("/{id}/eliminar")
@@ -118,6 +133,15 @@ public class ProductoController {
             return "redirect:/productos?error=conRelaciones";
         }
         imagenStorage.eliminar(producto.getImagenUrl());
+        producto.getImagenes().forEach(img -> imagenStorage.eliminar(img.getUrl()));
         return "redirect:/productos";
+    }
+
+    private List<String> guardarImagenes(List<MultipartFile> archivos) {
+        if (archivos == null) return List.of();
+        return archivos.stream()
+                .filter(f -> f != null && !f.isEmpty())
+                .map(imagenStorage::guardar)
+                .toList();
     }
 }

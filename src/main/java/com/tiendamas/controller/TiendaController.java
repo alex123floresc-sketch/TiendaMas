@@ -22,6 +22,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,18 +50,34 @@ public class TiendaController {
 
     @GetMapping
     public String index(@RequestParam(required = false) String q,
-                         @RequestParam(required = false) Long categoriaId, Model model) {
-        List<Producto> productos = productoService.buscar(q, categoriaId);
+                         @RequestParam(required = false) Long categoriaId,
+                         @RequestParam(required = false, defaultValue = "relevancia") String orden, Model model) {
+        List<Producto> productos = ordenar(productoService.buscar(q, categoriaId), orden);
 
         model.addAttribute("productos", productos);
         model.addAttribute("categorias", categoriaService.obtenerTodas());
         model.addAttribute("categoriaSeleccionada", categoriaId);
         model.addAttribute("q", q);
+        model.addAttribute("orden", orden);
         if ((q == null || q.isBlank()) && categoriaId == null) {
             model.addAttribute("masVendidos", pedidoService.obtenerMasVendidos(4));
         }
         model.addAttribute("titulo", "Tienda");
         return "tienda/index";
+    }
+
+    private List<Producto> ordenar(List<Producto> productos, String orden) {
+        Comparator<Producto> comparador = switch (orden == null ? "" : orden) {
+            case "precio_asc" -> Comparator.comparing(Producto::getPrecio, Comparator.nullsLast(Double::compareTo));
+            case "precio_desc" -> Comparator.comparing(Producto::getPrecio, Comparator.nullsLast(Double::compareTo)).reversed();
+            case "nombre_az" -> Comparator.comparing(Producto::getNombre, String.CASE_INSENSITIVE_ORDER);
+            case "nombre_za" -> Comparator.comparing(Producto::getNombre, String.CASE_INSENSITIVE_ORDER).reversed();
+            default -> null;
+        };
+        if (comparador == null) {
+            return productos;
+        }
+        return productos.stream().sorted(comparador).collect(Collectors.toList());
     }
 
     @GetMapping("/productos/{id}")
@@ -81,7 +98,7 @@ public class TiendaController {
         if (variante != null) {
             carrito.agregar(variante, cantidad != null && cantidad > 0 ? cantidad : 1);
         }
-        return "redirect:/tienda/carrito";
+        return "redirect:/tienda/carrito?agregado=1";
     }
 
     @GetMapping("/carrito")
@@ -163,7 +180,21 @@ public class TiendaController {
             return "redirect:/tienda/carrito?error=stockInsuficiente";
         }
         carrito.vaciar();
-        return "redirect:/pedidos/" + pedido.getId();
+        return "redirect:/tienda/confirmacion/" + pedido.getId();
+    }
+
+    @GetMapping("/confirmacion/{id}")
+    public String confirmacion(@PathVariable Long id, Model model, Principal principal) {
+        Pedido pedido = pedidoService.obtenerPorId(id);
+        Persona persona = personaDelUsuario(principal);
+        boolean esDueno = pedido != null && persona != null && pedido.getPersona() != null
+                && pedido.getPersona().getId().equals(persona.getId());
+        if (!esDueno) {
+            return "redirect:/tienda";
+        }
+        model.addAttribute("pedido", pedido);
+        model.addAttribute("titulo", "Pedido confirmado");
+        return "tienda/confirmacion";
     }
 
     @GetMapping("/perfil")

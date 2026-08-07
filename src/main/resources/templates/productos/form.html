@@ -34,6 +34,25 @@
                 <small class="hint" th:if="${producto != null and producto.imagenUrl != null}">Selecciona un archivo solo si quieres reemplazar la imagen actual.</small>
             </div>
 
+            <div class="field">
+                <label>Fotos adicionales</label>
+                <small class="hint" style="margin-bottom:10px;">Podés sumar varias fotos extra del producto (galería), además de la imagen principal de arriba.</small>
+
+                <div class="producto-galeria" th:if="${producto != null and not #lists.isEmpty(producto.imagenes)}">
+                    <div class="producto-galeria-item" th:each="img : ${producto.imagenes}">
+                        <img th:src="@{${img.url}}" alt="Foto adicional del producto">
+                        <form th:action="@{/productos/{id}/imagenes/{imagenId}/eliminar(id=${producto.id},imagenId=${img.id})}"
+                              method="post" th:onsubmit="return confirm('¿Quitar esta foto de la galería?')">
+                            <button type="submit" class="ui red mini icon button" title="Quitar foto">
+                                <i class="trash icon"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <input type="file" name="imagenesAdicionales" accept="image/*" multiple>
+            </div>
+
             <div class="field required">
                 <label for="nombre">Nombre de la prenda</label>
                 <div class="ui left icon input">

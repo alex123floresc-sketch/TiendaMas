@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/tienda}">
+<body>
+<div th:fragment="content" style="max-width: 700px; margin: 0 auto;">
+
+    <div class="tienda-confirmacion-hero">
+        <i class="check circle icon"></i>
+        <h1>¡Gracias por tu compra!</h1>
+        <p>Registramos tu pedido <strong th:text="${pedido.numeroCompleto}"></strong> correctamente.</p>
+    </div>
+
+    <div class="ui segment">
+        <div class="tienda-confirmacion-meta">
+            <div>
+                <div class="hint">Comprobante</div>
+                <div style="font-weight:700;" th:text="${pedido.tipoComprobante} + ' ' + ${pedido.numeroCompleto}"></div>
+            </div>
+            <div>
+                <div class="hint">Fecha</div>
+                <div style="font-weight:700;" th:text="${pedido.fechaTexto}"></div>
+            </div>
+            <div>
+                <div class="hint">Entrega</div>
+                <div style="font-weight:700;" th:text="${pedido.tipoEntrega != null ? pedido.tipoEntrega.etiqueta : '—'}"></div>
+            </div>
+            <div>
+                <div class="hint">Método de pago</div>
+                <div style="font-weight:700;" th:text="${pedido.metodoPago != null ? pedido.metodoPago.etiqueta : '—'}"></div>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        <table class="ui celled table">
+            <tbody>
+            <tr th:each="d : ${pedido.detalles}">
+                <td>
+                    <span th:text="${d.producto.nombre}"></span>
+                    <div class="hint" th:if="${d.talla != null or d.color != null}"
+                         th:text="(${d.talla} ?: '') + (${d.color != null and !d.color.isEmpty()} ? ' · ' + ${d.color} : '')"></div>
+                </td>
+                <td th:text="${d.cantidad} + ' x S/ ' + ${d.precioUnitario}"></td>
+                <td class="right aligned" th:text="'S/ ' + ${#numbers.formatDecimal(d.subtotal, 1, 2)}"></td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <th colspan="2" style="text-align:right;">Total:</th>
+                <th class="right aligned" style="color:#21ba45;"
+                    th:text="'S/ ' + ${#numbers.formatDecimal(pedido.total, 1, 2)}"></th>
+            </tr>
+            </tfoot>
+        </table>
+
+        <div th:if="${pedido.tipoEntrega != null and pedido.tipoEntrega.name() == 'DOMICILIO'}" class="ui info message">
+            <i class="truck icon"></i> Te avisaremos por correo cuando tu pedido salga en camino.
+        </div>
+
+        <div class="form-actions" style="margin-top: 20px;">
+            <a th:href="@{/pedidos/{id}(id=${pedido.id})}" class="ui blue button">
+                <i class="file alternate icon"></i> Ver comprobante
+            </a>
+            <a th:href="@{/tienda/pedidos}" class="ui button">
+                <i class="list icon"></i> Mis pedidos
+            </a>
+            <a th:href="@{/tienda}" class="ui button">
+                <i class="shop icon"></i> Seguir comprando
+            </a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
