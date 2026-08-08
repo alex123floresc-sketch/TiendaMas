@@ -28,11 +28,43 @@
     </div>
 
     <div class="tienda-filtros" id="catalogo">
-        <a th:href="@{/tienda}" class="ui label" th:classappend="${categoriaSeleccionada == null} ? 'blue'">Todas</a>
-        <a th:each="cat : ${categorias}" th:href="@{/tienda(categoriaId=${cat.id})}"
+        <a th:href="@{/tienda(q=${q}, talla=${tallaSeleccionada}, precioRango=${precioRango}, orden=${orden})}"
+           class="ui label" th:classappend="${categoriaSeleccionada == null} ? 'blue'">Todas</a>
+        <a th:each="cat : ${categorias}"
+           th:href="@{/tienda(q=${q}, categoriaId=${cat.id}, talla=${tallaSeleccionada}, precioRango=${precioRango}, orden=${orden})}"
            class="ui label"
            th:classappend="${categoriaSeleccionada != null and categoriaSeleccionada == cat.id} ? 'blue'"
            th:text="${cat.nombre}"></a>
+    </div>
+
+    <div class="tienda-filtros-panel">
+        <div class="tienda-filtro-grupo">
+            <span class="tienda-filtro-label"><i class="expand icon"></i> Talla</span>
+            <div class="tienda-filtro-chips">
+                <a th:each="t : ${tallas}"
+                   th:href="@{/tienda(q=${q}, categoriaId=${categoriaSeleccionada}, talla=${tallaSeleccionada == t ? null : t}, precioRango=${precioRango}, orden=${orden})}"
+                   class="tienda-chip" th:classappend="${tallaSeleccionada == t} ? 'activo'"
+                   th:text="${t.etiqueta}"></a>
+            </div>
+        </div>
+        <div class="tienda-filtro-grupo">
+            <span class="tienda-filtro-label"><i class="dollar sign icon"></i> Precio</span>
+            <div class="tienda-filtro-chips">
+                <a th:href="@{/tienda(q=${q}, categoriaId=${categoriaSeleccionada}, talla=${tallaSeleccionada}, precioRango=${precioRango == '0-50' ? null : '0-50'}, orden=${orden})}"
+                   class="tienda-chip" th:classappend="${precioRango == '0-50'} ? 'activo'">Hasta S/ 50</a>
+                <a th:href="@{/tienda(q=${q}, categoriaId=${categoriaSeleccionada}, talla=${tallaSeleccionada}, precioRango=${precioRango == '50-100' ? null : '50-100'}, orden=${orden})}"
+                   class="tienda-chip" th:classappend="${precioRango == '50-100'} ? 'activo'">S/ 50 – S/ 100</a>
+                <a th:href="@{/tienda(q=${q}, categoriaId=${categoriaSeleccionada}, talla=${tallaSeleccionada}, precioRango=${precioRango == '100-200' ? null : '100-200'}, orden=${orden})}"
+                   class="tienda-chip" th:classappend="${precioRango == '100-200'} ? 'activo'">S/ 100 – S/ 200</a>
+                <a th:href="@{/tienda(q=${q}, categoriaId=${categoriaSeleccionada}, talla=${tallaSeleccionada}, precioRango=${precioRango == '200+' ? null : '200+'}, orden=${orden})}"
+                   class="tienda-chip" th:classappend="${precioRango == '200+'} ? 'activo'">Más de S/ 200</a>
+            </div>
+        </div>
+        <a th:if="${tallaSeleccionada != null or precioRango != null}"
+           th:href="@{/tienda(q=${q}, categoriaId=${categoriaSeleccionada}, orden=${orden})}"
+           class="tienda-filtro-limpiar">
+            <i class="times icon"></i> Quitar filtros
+        </a>
     </div>
 
     <div class="ui message" th:if="${q != null and !q.isBlank()}">

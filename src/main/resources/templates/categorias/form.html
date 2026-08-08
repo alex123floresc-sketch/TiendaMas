@@ -21,7 +21,7 @@
                 <label for="nombre">Nombre:</label>
                 <div class="ui left icon input">
                     <i class="font icon"></i>
-                    <input type="text" id="nombre" th:field="*{nombre}" placeholder="Ej. Hombre, Mujer, Niños, Accesorios" required>
+                    <input type="text" id="nombre" th:field="*{nombre}" placeholder="Ej. Hombre, Buzos, Zapatillas" required>
                 </div>
             </div>
 
@@ -31,6 +31,21 @@
                     <i class="file text icon"></i>
                     <input type="text" id="descripcion" th:field="*{descripcion}" placeholder="Detalla los productos de esta categoría">
                 </div>
+            </div>
+
+            <div class="field">
+                <label for="categoriaPadreId">Categoría padre:</label>
+                <select id="categoriaPadreId" name="categoriaPadreId" class="ui fluid dropdown">
+                    <option value="">— Ninguna (categoría principal) —</option>
+                    <option th:each="p : ${categoriasPrincipales}" th:value="${p.id}"
+                            th:selected="${categoria.categoriaPadre != null and categoria.categoriaPadre.id == p.id}"
+                            th:text="${p.nombre}"></option>
+                </select>
+                <p class="hint" style="margin-top:6px;">
+                    Dejar en "Ninguna" para que sea una categoría principal (como Hombre o Mujer). Elegí una
+                    categoría padre para crear una subcategoría (como Buzos dentro de Hombre) — así aparecerá
+                    en el menú desplegable de la tienda al pasar el cursor sobre su categoría principal.
+                </p>
             </div>
 
             <div class="ui divider"></div>
@@ -46,6 +61,12 @@
         </form>
 
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            $('.ui.dropdown').dropdown();
+        });
+    </script>
 </div>
 </body>
 </html>

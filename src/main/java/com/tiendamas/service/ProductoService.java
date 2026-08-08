@@ -5,6 +5,7 @@ import com.tiendamas.dto.VarianteForm;
 import com.tiendamas.entity.Categoria;
 import com.tiendamas.entity.ImagenProducto;
 import com.tiendamas.entity.Producto;
+import com.tiendamas.entity.Talla;
 import com.tiendamas.entity.VarianteProducto;
 import com.tiendamas.repository.ProductoRepository;
 import com.tiendamas.repository.VarianteProductoRepository;
@@ -51,8 +52,12 @@ public class ProductoService {
     }
 
     public List<Producto> buscar(String query, Long categoriaId) {
+        return buscar(query, categoriaId, null, null, null);
+    }
+
+    public List<Producto> buscar(String query, Long categoriaId, Talla talla, Double precioMin, Double precioMax) {
         String q = (query == null || query.isBlank()) ? null : query.trim().toLowerCase();
-        return productoRepository.buscar(q, categoriaId);
+        return productoRepository.buscar(q, categoriaId, talla, precioMin, precioMax);
     }
 
     public Producto guardarConVariantes(ProductoForm form, Categoria categoria, String imagenUrl) {

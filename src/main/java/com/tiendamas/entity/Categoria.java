@@ -14,6 +14,14 @@ public class Categoria {
     private String nombre;
     private String descripcion;
 
+    @ManyToOne
+    @JoinColumn(name = "categoria_padre_id")
+    private Categoria categoriaPadre;
+
+    @OneToMany(mappedBy = "categoriaPadre")
+    @OrderBy("nombre ASC")
+    private List<Categoria> subcategorias;
+
     @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL)
     private List<Producto> productos;
 
@@ -32,6 +40,17 @@ public class Categoria {
 
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+
+    public Categoria getCategoriaPadre() { return categoriaPadre; }
+    public void setCategoriaPadre(Categoria categoriaPadre) { this.categoriaPadre = categoriaPadre; }
+
+    public List<Categoria> getSubcategorias() { return subcategorias; }
+    public void setSubcategorias(List<Categoria> subcategorias) { this.subcategorias = subcategorias; }
+
+    @Transient
+    public boolean isPrincipal() {
+        return categoriaPadre == null;
+    }
 
     public List<Producto> getProductos() { return productos; }
     public void setProductos(List<Producto> productos) { this.productos = productos; }

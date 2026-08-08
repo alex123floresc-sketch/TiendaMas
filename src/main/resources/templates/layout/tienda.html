@@ -19,12 +19,20 @@
   </button>
 
   <div class="tienda-nav-links">
-    <div class="ui dropdown item tienda-catalogo-dropdown" th:classappend="${currentUri == '/tienda'} ? 'seccion-actual'">
-      <a th:href="@{/tienda}" style="color:inherit; text-decoration:none;">Catálogo</a> <i class="dropdown icon"></i>
-      <div class="menu">
-        <a th:href="@{/tienda}" class="item"><i class="th icon"></i> Todas las categorías</a>
-        <div class="divider" th:if="${categoriasMenu != null and !categoriasMenu.isEmpty()}"></div>
-        <a th:each="cat : ${categoriasMenu}" th:href="@{/tienda(categoriaId=${cat.id})}" class="item" th:text="${cat.nombre}"></a>
+    <div class="tienda-nav-categorias">
+      <div class="tienda-nav-cat-item" th:each="cat : ${categoriasMenu}">
+        <a th:href="@{/tienda(categoriaId=${cat.id})}" class="tienda-nav-cat-link"
+           th:classappend="${categoriaSeleccionada != null and categoriaSeleccionada == cat.id} ? 'activo'">
+          <span th:text="${cat.nombre}"></span>
+          <i class="chevron down icon" th:if="${cat.subcategorias != null and !cat.subcategorias.isEmpty()}"></i>
+        </a>
+        <div class="tienda-mega-menu" th:if="${cat.subcategorias != null and !cat.subcategorias.isEmpty()}">
+          <a th:each="sub : ${cat.subcategorias}" th:href="@{/tienda(categoriaId=${sub.id})}"
+             class="tienda-mega-menu-item" th:text="${sub.nombre}"></a>
+          <a th:href="@{/tienda(categoriaId=${cat.id})}" class="tienda-mega-menu-item tienda-mega-menu-vertodo">
+            Ver todo <span th:text="${cat.nombre}"></span> <i class="arrow right icon"></i>
+          </a>
+        </div>
       </div>
     </div>
 
@@ -146,7 +154,6 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         $('.tienda-cuenta-dropdown').dropdown({ action: 'nothing' });
-        $('.tienda-catalogo-dropdown').dropdown({ action: 'nothing' });
     });
 </script>
 

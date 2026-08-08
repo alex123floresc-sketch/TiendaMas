@@ -7,6 +7,7 @@ import com.tiendamas.entity.MetodoPago;
 import com.tiendamas.entity.Pedido;
 import com.tiendamas.entity.Persona;
 import com.tiendamas.entity.Producto;
+import com.tiendamas.entity.Talla;
 import com.tiendamas.entity.TipoEntrega;
 import com.tiendamas.entity.Usuario;
 import com.tiendamas.entity.VarianteProducto;
@@ -51,15 +52,31 @@ public class TiendaController {
     @GetMapping
     public String index(@RequestParam(required = false) String q,
                          @RequestParam(required = false) Long categoriaId,
+                         @RequestParam(required = false) Talla talla,
+                         @RequestParam(required = false) String precioRango,
                          @RequestParam(required = false, defaultValue = "relevancia") String orden, Model model) {
-        List<Producto> productos = ordenar(productoService.buscar(q, categoriaId), orden);
+        Double precioMin = null;
+        Double precioMax = null;
+        if (precioRango != null) {
+            switch (precioRango) {
+                case "0-50" -> precioMax = 50.0;
+                case "50-100" -> { precioMin = 50.0; precioMax = 100.0; }
+                case "100-200" -> { precioMin = 100.0; precioMax = 200.0; }
+                case "200+" -> precioMin = 200.0;
+                default -> precioRango = null;
+            }
+        }
+        List<Producto> productos = ordenar(productoService.buscar(q, categoriaId, talla, precioMin, precioMax), orden);
 
         model.addAttribute("productos", productos);
-        model.addAttribute("categorias", categoriaService.obtenerTodas());
+        model.addAttribute("categorias", categoriaService.obtenerPrincipales());
         model.addAttribute("categoriaSeleccionada", categoriaId);
+        model.addAttribute("tallas", Talla.values());
+        model.addAttribute("tallaSeleccionada", talla);
+        model.addAttribute("precioRango", precioRango);
         model.addAttribute("q", q);
         model.addAttribute("orden", orden);
-        if ((q == null || q.isBlank()) && categoriaId == null) {
+        if ((q == null || q.isBlank()) && categoriaId == null && talla == null && precioRango == null) {
             model.addAttribute("masVendidos", pedidoService.obtenerMasVendidos(4));
         }
         model.addAttribute("titulo", "Tienda");

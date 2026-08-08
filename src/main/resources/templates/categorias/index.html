@@ -7,7 +7,7 @@
         <i class="tags icon"></i>
         <div class="content">
             Gestión de Categorías
-            <div class="sub header">Agrupa tus productos por familias o tipos para organizar mejor el inventario.</div>
+            <div class="sub header">Organiza tu catálogo en categorías principales y subcategorías (p. ej. Hombre → Buzos, Casacas, Zapatillas).</div>
         </div>
     </h1>
 
@@ -19,10 +19,10 @@
 
     <div class="ui negative message" th:if="${param.error}">
         <div class="header">No se puede eliminar</div>
-        <p>Esta categoría tiene productos asociados y no puede eliminarse mientras existan.</p>
+        <p>Esta categoría tiene productos o subcategorías asociadas y no puede eliminarse mientras existan.</p>
     </div>
 
-    <div th:if="${categorias.isEmpty()}" class="ui icon warning message">
+    <div th:if="${categoriasPrincipales.isEmpty()}" class="ui icon warning message">
         <i class="info circle icon"></i>
         <div class="content">
             <div class="header">Base de datos vacía</div>
@@ -30,44 +30,57 @@
         </div>
     </div>
 
-    <div class="ui icon input list-search" th:unless="${categorias.isEmpty()}">
-        <i class="search icon"></i>
-        <input type="text" placeholder="Buscar por nombre o descripción..." aria-label="Buscar categorías"
-               oninput="filtrarTabla(this, 'tablaCategorias')">
-    </div>
-    <div id="tablaCategoriasSinResultados" class="ui icon info message" style="display:none;">
-        <i class="search icon"></i>
-        <div class="content">No se encontraron categorías con ese criterio de búsqueda.</div>
-    </div>
-
-    <table id="tablaCategorias" class="ui celled striped table" th:unless="${categorias.isEmpty()}">
+    <table class="ui celled striped table" th:unless="${categoriasPrincipales.isEmpty()}">
         <thead>
         <tr>
             <th class="one wide">ID</th>
             <th class="five wide">Nombre</th>
-            <th class="seven wide">Descripción</th>
-            <th class="three wide center aligned">Acciones</th>
+            <th class="six wide">Descripción</th>
+            <th class="four wide center aligned">Acciones</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="categoria : ${categorias}">
-            <td th:text="${categoria.id}"></td>
-            <td th:text="${categoria.nombre}" style="font-weight: bold;"></td>
-            <td th:text="${categoria.descripcion}"></td>
-            <td class="center aligned">
-                <div class="ui small buttons">
-                    <a th:href="@{/categorias/{id}/editar(id=${categoria.id})}" class="ui yellow button" title="Editar">
-                        <i class="edit icon"></i>
-                    </a>
-                    <form th:action="@{/categorias/{id}/eliminar(id=${categoria.id})}" method="post"
-                          style="display:contents" th:onsubmit="return confirm('¿Está seguro de eliminar esta categoría?')">
-                        <button type="submit" class="ui red button" title="Eliminar">
-                            <i class="trash icon"></i>
-                        </button>
-                    </form>
-                </div>
-            </td>
-        </tr>
+        <th:block th:each="categoria : ${categoriasPrincipales}">
+            <tr>
+                <td th:text="${categoria.id}"></td>
+                <td th:text="${categoria.nombre}" style="font-weight: bold;"></td>
+                <td th:text="${categoria.descripcion}"></td>
+                <td class="center aligned">
+                    <div class="ui small buttons">
+                        <a th:href="@{/categorias/{id}/editar(id=${categoria.id})}" class="ui yellow button" title="Editar">
+                            <i class="edit icon"></i>
+                        </a>
+                        <form th:action="@{/categorias/{id}/eliminar(id=${categoria.id})}" method="post"
+                              style="display:contents" th:onsubmit="return confirm('¿Está seguro de eliminar esta categoría?')">
+                            <button type="submit" class="ui red button" title="Eliminar">
+                                <i class="trash icon"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            <tr th:each="sub : ${categoria.subcategorias}" class="categoria-sub-row">
+                <td th:text="${sub.id}" style="color: var(--color-text-muted);"></td>
+                <td style="padding-left: 34px; color: var(--color-text-muted);">
+                    <i class="level up alternate icon" style="transform: rotate(90deg);"></i>
+                    <span th:text="${sub.nombre}"></span>
+                </td>
+                <td th:text="${sub.descripcion}" style="color: var(--color-text-muted);"></td>
+                <td class="center aligned">
+                    <div class="ui small buttons">
+                        <a th:href="@{/categorias/{id}/editar(id=${sub.id})}" class="ui yellow button" title="Editar">
+                            <i class="edit icon"></i>
+                        </a>
+                        <form th:action="@{/categorias/{id}/eliminar(id=${sub.id})}" method="post"
+                              style="display:contents" th:onsubmit="return confirm('¿Está seguro de eliminar esta subcategoría?')">
+                            <button type="submit" class="ui red button" title="Eliminar">
+                                <i class="trash icon"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        </th:block>
         </tbody>
     </table>
 </div>

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,11 +24,11 @@ public class CategoriaController {
 
     @GetMapping
     public String listar(Model model) {
-        List<Categoria> lista = categoriaService.obtenerTodas();
+        List<Categoria> lista = categoriaService.obtenerPrincipales();
         if (lista == null) {
             lista = new ArrayList<>();
         }
-        model.addAttribute("categorias", lista);
+        model.addAttribute("categoriasPrincipales", lista);
         model.addAttribute("titulo", "Categorías");
         return "categorias/index";
     }
@@ -35,13 +36,14 @@ public class CategoriaController {
     @GetMapping("/nuevo")
     public String mostrarFormularioCrear(Model model) {
         model.addAttribute("categoria", new Categoria());
+        model.addAttribute("categoriasPrincipales", categoriaService.obtenerPrincipales());
         model.addAttribute("titulo", "Nueva Categoría");
         return "categorias/form";
     }
 
     @PostMapping
-    public String guardar(Categoria categoria) {
-        categoriaService.guardar(categoria);
+    public String guardar(Categoria categoria, @RequestParam(required = false) Long categoriaPadreId) {
+        categoriaService.guardar(categoria, categoriaPadreId);
         return "redirect:/categorias";
     }
 
@@ -50,6 +52,10 @@ public class CategoriaController {
         Categoria categoria = categoriaService.obtenerPorId(id);
         if (categoria != null) {
             model.addAttribute("categoria", categoria);
+            List<Categoria> principales = categoriaService.obtenerPrincipales().stream()
+                    .filter(c -> !c.getId().equals(id))
+                    .toList();
+            model.addAttribute("categoriasPrincipales", principales);
             model.addAttribute("titulo", "Editar Categoría");
             return "categorias/form";
         }
@@ -57,9 +63,10 @@ public class CategoriaController {
     }
 
     @PostMapping("/{id}")
-    public String actualizar(@PathVariable("id") Long id, Categoria categoria) {
+    public String actualizar(@PathVariable("id") Long id, Categoria categoria,
+                              @RequestParam(required = false) Long categoriaPadreId) {
         categoria.setId(id);
-        categoriaService.guardar(categoria);
+        categoriaService.guardar(categoria, categoriaPadreId);
         return "redirect:/categorias";
     }
 

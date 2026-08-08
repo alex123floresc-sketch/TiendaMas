@@ -17,6 +17,11 @@ public class CategoriaService {
         return categoriaRepository.findAll();
     }
 
+    /** Solo las categorías de primer nivel (sin padre), p. ej. Hombre, Mujer, Niños. */
+    public List<Categoria> obtenerPrincipales() {
+        return categoriaRepository.findByCategoriaPadreIsNullOrderByNombreAsc();
+    }
+
     public Categoria obtenerPorId(Long id) {
         return categoriaRepository.findById(id).orElse(null);
     }
@@ -25,8 +30,17 @@ public class CategoriaService {
         return categoriaRepository.save(categoria);
     }
 
+    /** Guarda la categoría asignándole (o quitándole) una categoría padre. */
+    public Categoria guardar(Categoria categoria, Long categoriaPadreId) {
+        if (categoriaPadreId == null) {
+            categoria.setCategoriaPadre(null);
+        } else {
+            categoria.setCategoriaPadre(obtenerPorId(categoriaPadreId));
+        }
+        return categoriaRepository.save(categoria);
+    }
+
     public void eliminar(Long id) {
         categoriaRepository.deleteById(id);
     }
 }
-

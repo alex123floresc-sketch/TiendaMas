@@ -87,7 +87,8 @@
                 <label for="categoriaId">Categoría</label>
                 <select id="categoriaId" th:field="*{categoriaId}" class="ui search fluid dropdown" required>
                     <option value="">-- Seleccione una Categoría --</option>
-                    <option th:each="cat : ${categorias}" th:value="${cat.id}" th:text="${cat.nombre}"></option>
+                    <option th:each="cat : ${categorias}" th:value="${cat.id}"
+                            th:text="${cat.categoriaPadre != null ? '— ' + cat.nombre + ' (' + cat.categoriaPadre.nombre + ')' : cat.nombre}"></option>
                 </select>
             </div>
 

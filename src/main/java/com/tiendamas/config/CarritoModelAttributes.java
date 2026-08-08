@@ -27,6 +27,6 @@ public class CarritoModelAttributes {
 
     @ModelAttribute("categoriasMenu")
     public List<Categoria> categoriasMenu() {
-        return categoriaService.obtenerTodas();
+        return categoriaService.obtenerPrincipales();
     }
 }
