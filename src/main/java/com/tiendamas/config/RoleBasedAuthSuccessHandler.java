@@ -31,7 +31,7 @@ public class RoleBasedAuthSuccessHandler implements AuthenticationSuccessHandler
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         String destino;
         if (tieneRol(authorities, "ROLE_ADMIN")) {
-            destino = "/personas";
+            destino = "/dashboard";
         } else if (tieneRol(authorities, "ROLE_VENDEDOR")) {
             destino = "/pos";
         } else if (tieneRol(authorities, "ROLE_CLIENTE")) {

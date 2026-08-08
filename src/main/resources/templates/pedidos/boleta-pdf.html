@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Boleta</title>
+    <style>
+        @page { size: A4; margin: 28px 34px; }
+        body { font-family: Helvetica, Arial, sans-serif; color: #1a2233; font-size: 11px; }
+        table { width: 100%; border-collapse: collapse; }
+        .marca { font-size: 20px; font-weight: bold; color: #101B2D; }
+        .marca-sub { font-size: 10px; color: #5B6B82; margin-top: 2px; }
+        .caja-comprobante { border: 1.5px solid #101B2D; border-radius: 4px; padding: 10px 16px; text-align: center; }
+        .caja-comprobante .tipo { font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        .caja-comprobante .numero { font-size: 15px; font-weight: bold; color: #2563EB; margin-top: 4px; }
+        .separador { border-top: 1px dashed #9CA3AF; margin: 14px 0; }
+        .fila-datos td { padding: 2px 0; vertical-align: top; }
+        .fila-datos .etiqueta { color: #5B6B82; width: 110px; }
+        .tabla-items { margin-top: 14px; }
+        .tabla-items th { background: #101B2D; color: #ffffff; padding: 7px 8px; font-size: 10px; text-transform: uppercase; text-align: left; }
+        .tabla-items th.num, .tabla-items td.num { text-align: right; }
+        .tabla-items td { padding: 7px 8px; border-bottom: 1px solid #EEF1F6; }
+        .item-detalle { color: #5B6B82; font-size: 9.5px; }
+        .totales { margin-top: 10px; }
+        .totales td { padding: 3px 8px; }
+        .totales .total-final td { border-top: 1.5px solid #101B2D; font-size: 13px; font-weight: bold; color: #101B2D; padding-top: 8px; }
+        .pie { margin-top: 26px; text-align: center; color: #5B6B82; font-size: 9.5px; }
+        .pie .gracias { font-size: 12px; font-weight: bold; color: #101B2D; margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+<table>
+    <tr>
+        <td style="width: 60%;">
+            <div class="marca">TiendaMas</div>
+            <div class="marca-sub">Ropa y accesorios para toda la familia</div>
+            <div class="marca-sub">Av. Puno S/N, Puno, Perú</div>
+            <div class="marca-sub">+51 900 948 480 · contacto@tiendamas.com</div>
+        </td>
+        <td style="width: 40%;">
+            <div class="caja-comprobante">
+                <div class="tipo" th:text="${pedido.tipoComprobante != null ? pedido.tipoComprobante.etiqueta : 'Comprobante de venta'}">Boleta de venta electrónica</div>
+                <div class="numero" th:text="${pedido.numeroCompleto}">B001-000123</div>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<div class="separador"></div>
+
+<table class="fila-datos">
+    <tr>
+        <td class="etiqueta">Cliente</td>
+        <td th:text="${pedido.persona.nombre} + ' ' + ${pedido.persona.apellido}">Nombre Apellido</td>
+        <td class="etiqueta">Fecha</td>
+        <td th:text="${pedido.fechaTexto}">01/01/2026 00:00</td>
+    </tr>
+    <tr th:if="${pedido.persona.razonSocial != null and !pedido.persona.razonSocial.isEmpty()}">
+        <td class="etiqueta">Razón social</td>
+        <td th:text="${pedido.persona.razonSocial}">Razón social</td>
+        <td class="etiqueta">Método de pago</td>
+        <td th:text="${pedido.metodoPago != null ? pedido.metodoPago.etiqueta : '—'}">Efectivo</td>
+    </tr>
+    <tr>
+        <td class="etiqueta">Documento</td>
+        <td th:text="${pedido.persona.tipoDocumento} + ' ' + ${pedido.persona.numeroDocumento}">DNI 12345678</td>
+        <td class="etiqueta" th:unless="${pedido.persona.razonSocial != null and !pedido.persona.razonSocial.isEmpty()}">Método de pago</td>
+        <td th:unless="${pedido.persona.razonSocial != null and !pedido.persona.razonSocial.isEmpty()}" th:text="${pedido.metodoPago != null ? pedido.metodoPago.etiqueta : '—'}">Efectivo</td>
+        <td class="etiqueta" th:if="${pedido.persona.razonSocial != null and !pedido.persona.razonSocial.isEmpty()}">Entrega</td>
+        <td th:if="${pedido.persona.razonSocial != null and !pedido.persona.razonSocial.isEmpty()}" th:text="${pedido.tipoEntrega != null ? pedido.tipoEntrega.etiqueta : '—'}">Retiro en tienda</td>
+    </tr>
+    <tr>
+        <td class="etiqueta">Email</td>
+        <td th:text="${pedido.persona.email}">correo@ejemplo.com</td>
+        <td class="etiqueta" th:unless="${pedido.persona.razonSocial != null and !pedido.persona.razonSocial.isEmpty()}">Entrega</td>
+        <td th:unless="${pedido.persona.razonSocial != null and !pedido.persona.razonSocial.isEmpty()}" th:text="${pedido.tipoEntrega != null ? pedido.tipoEntrega.etiqueta : '—'}">Retiro en tienda</td>
+    </tr>
+    <tr th:if="${pedido.direccionEntrega != null and !pedido.direccionEntrega.isEmpty()}">
+        <td class="etiqueta">Dirección</td>
+        <td colspan="3" th:text="${pedido.direccionEntrega}">Dirección de entrega</td>
+    </tr>
+</table>
+
+<table class="tabla-items">
+    <thead>
+    <tr>
+        <th style="width: 50%;">Descripción</th>
+        <th class="num" style="width: 15%;">P. Unit.</th>
+        <th class="num" style="width: 10%;">Cant.</th>
+        <th class="num" style="width: 25%;">Importe</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="d : ${pedido.detalles}">
+        <td>
+            <div th:text="${d.producto.nombre}">Producto</div>
+            <div class="item-detalle" th:if="${d.talla != null or d.color != null}"
+                 th:text="(${d.talla} ?: '') + (${d.color != null and !d.color.isEmpty()} ? ' · ' + ${d.color} : '')">Talla · Color</div>
+        </td>
+        <td class="num" th:text="'S/ ' + ${#numbers.formatDecimal(d.precioUnitario, 1, 2)}">S/ 0.00</td>
+        <td class="num" th:text="${d.cantidad}">1</td>
+        <td class="num" th:text="'S/ ' + ${#numbers.formatDecimal(d.subtotal, 1, 2)}">S/ 0.00</td>
+    </tr>
+    </tbody>
+</table>
+
+<table class="totales">
+    <tr class="total-final">
+        <td style="text-align: right; width: 75%;">TOTAL A PAGAR</td>
+        <td style="text-align: right; width: 25%;" th:text="'S/ ' + ${#numbers.formatDecimal(pedido.total, 1, 2)}">S/ 0.00</td>
+    </tr>
+</table>
+
+<div class="separador"></div>
+
+<div class="pie">
+    <div class="gracias">¡Gracias por tu compra!</div>
+    <div>Este documento es una representación impresa de tu comprobante de venta.</div>
+    <div th:text="'Estado del pedido: ' + (${pedido.estado != null ? pedido.estado.etiqueta : '—'})">Estado del pedido</div>
+</div>
+
+</body>
+</html>

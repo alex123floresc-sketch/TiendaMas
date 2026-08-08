@@ -1,6 +1,8 @@
 package com.tiendamas.config;
 
+import com.tiendamas.service.UsuarioService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -9,6 +11,20 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 @ControllerAdvice
 public class GlobalModelAttributes {
+
+    @Autowired
+    private UsuarioService usuarioService;
+
+    @ModelAttribute("nombreUsuario")
+    public String nombreUsuario(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()
+                || authentication instanceof AnonymousAuthenticationToken) {
+            return null;
+        }
+        return usuarioService.buscarPorUsername(authentication.getName())
+                .map(u -> u.getNombre() != null && !u.getNombre().isBlank() ? u.getNombre() : u.getUsername())
+                .orElse(authentication.getName());
+    }
 
     @ModelAttribute("currentUri")
     public String currentUri(HttpServletRequest request) {

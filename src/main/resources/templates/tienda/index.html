@@ -1,15 +1,22 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/tienda}">
 <body>
-<div th:fragment="content">
+<div th:fragment="content" th:with="productosConImagen=${productos.?[imagenUrl != null]}">
 
     <div class="tienda-hero">
-        <div class="tienda-hero-text">
-            <h1>Moda para toda la familia</h1>
-            <p>Ropa y accesorios para hombre, mujer y niños, con envío a domicilio o recojo en tienda.</p>
-            <a href="#catalogo" class="ui white button tienda-hero-cta">
-                <i class="arrow down icon"></i> Ver catálogo
-            </a>
+        <div class="tienda-hero-inner">
+            <div class="tienda-hero-text">
+                <h1>Moda para toda la familia</h1>
+                <p>Ropa y accesorios para hombre, mujer y niños, con envío a domicilio o recojo en tienda.</p>
+                <a href="#catalogo" class="ui white button tienda-hero-cta">
+                    <i class="arrow down icon"></i> Ver catálogo
+                </a>
+            </div>
+            <div class="tienda-hero-collage" th:if="${!#lists.isEmpty(productosConImagen)}">
+                <img th:each="p, it : ${productosConImagen}" th:if="${it.index < 4}"
+                     th:src="@{${p.imagenUrl}}" th:alt="${p.nombre}"
+                     th:class="'tienda-hero-foto tienda-hero-foto-' + (${it.index}+1)">
+            </div>
         </div>
     </div>
 

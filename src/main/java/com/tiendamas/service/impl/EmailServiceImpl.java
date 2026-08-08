@@ -4,6 +4,8 @@ import com.tiendamas.entity.DetallePedido;
 import com.tiendamas.entity.Pedido;
 import com.tiendamas.entity.Persona;
 import com.tiendamas.service.EmailService;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -68,6 +71,35 @@ public class EmailServiceImpl implements EmailService {
             mailSender.send(mensaje);
         } catch (MailException e) {
             log.warn("No se pudo enviar el correo de confirmación del pedido {}: {}", pedido.getId(), e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean enviarComprobantePorCorreo(Pedido pedido, byte[] pdfBoleta) {
+        if (pedido == null || pedido.getPersona() == null) {
+            return false;
+        }
+        String destinatario = pedido.getPersona().getEmail();
+        if (destinatario == null || destinatario.isBlank()) {
+            return false;
+        }
+
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
+            helper.setFrom(remitente);
+            helper.setTo(destinatario);
+            helper.setSubject("TiendaMas - Tu comprobante " + pedido.getNumeroCompleto());
+            helper.setText("Hola " + pedido.getPersona().getNombre() + ",\n\n"
+                    + "Adjuntamos el comprobante de tu pedido " + pedido.getNumeroCompleto() + ".\n\n"
+                    + "Gracias por tu compra.\nTiendaMas");
+            helper.addAttachment("Boleta-" + pedido.getNumeroCompleto() + ".pdf",
+                    new org.springframework.core.io.ByteArrayResource(pdfBoleta));
+            mailSender.send(mimeMessage);
+            return true;
+        } catch (MailException | MessagingException e) {
+            log.warn("No se pudo enviar el comprobante por correo del pedido {}: {}", pedido.getId(), e.getMessage());
+            return false;
         }
     }
 

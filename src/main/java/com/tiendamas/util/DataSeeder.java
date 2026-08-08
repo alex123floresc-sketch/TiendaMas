@@ -19,14 +19,19 @@ import com.tiendamas.repository.ProductoRepository;
 import com.tiendamas.repository.SueldoRepository;
 import com.tiendamas.repository.UsuarioRepository;
 import com.tiendamas.service.UsuarioService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +39,12 @@ import java.util.Optional;
 @Profile("!prod")
 @ConditionalOnProperty(name = "app.seed.demo", havingValue = "true")
 public class DataSeeder implements CommandLineRunner {
+
+    private static final Logger log = LoggerFactory.getLogger(DataSeeder.class);
+    private static final SecureRandom RANDOM = new SecureRandom();
+
+    @Autowired
+    private Environment environment;
 
     @Autowired
     private PersonaRepository personaRepository;
@@ -193,7 +204,14 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void sembrarUsuariosDemo() {
-        usuarioService.crearUsuario("admin", "admin123", RolUsuario.ADMIN, "Administrador", "Sistema", null);
+        String adminUsername = environment.getProperty("ADMIN_USERNAME", "admin");
+        String adminPassword = environment.getProperty("ADMIN_PASSWORD");
+        if (adminPassword == null || adminPassword.isBlank()) {
+            adminPassword = generarPasswordAleatoria();
+            log.warn("ADMIN_PASSWORD no esta definida. Se genero una contrasena aleatoria para el usuario '{}': {}"
+                    + " -- cambiala apenas ingreses.", adminUsername, adminPassword);
+        }
+        usuarioService.crearUsuario(adminUsername, adminPassword, RolUsuario.ADMIN, "Administrador", "Sistema", null);
         usuarioService.crearUsuario("vendedor1", "vendedor123", RolUsuario.VENDEDOR, "Carlos", "Mendoza", null);
         usuarioService.crearUsuario("vendedor2", "vendedor123", RolUsuario.VENDEDOR, "Rosa", "Quispe", null);
 
@@ -266,6 +284,12 @@ public class DataSeeder implements CommandLineRunner {
             sueldo.setEstado(EstadoSueldo.PENDIENTE);
             sueldoRepository.save(sueldo);
         });
+    }
+
+    private String generarPasswordAleatoria() {
+        byte[] bytes = new byte[15];
+        RANDOM.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
     private Optional<Persona> personaConDocumento(TipoDocumento tipo) {

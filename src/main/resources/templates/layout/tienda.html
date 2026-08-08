@@ -29,25 +29,40 @@
     </div>
 
     <form th:action="@{/tienda}" method="get" class="tienda-search">
-      <input type="text" name="q" placeholder="Buscar productos..." th:value="${q}" aria-label="Buscar productos">
+      <input type="text" name="q" placeholder="Buscar productos, marcas y más..." th:value="${q}" aria-label="Buscar productos">
       <button type="submit" aria-label="Buscar"><i class="search icon"></i></button>
     </form>
 
-    <a th:href="@{/tienda/carrito}" class="item tienda-cart-link">
+    <a th:href="@{/tienda/carrito}" class="item tienda-cart-link" title="Ver carrito">
       <i class="shopping cart icon"></i> Carrito
       <span class="tienda-cart-badge" th:if="${carritoCount != null and carritoCount > 0}" th:text="${carritoCount}"></span>
     </a>
-    <a th:href="@{/login}" class="item" th:unless="${usuarioAutenticado}">Ingresar</a>
-    <a th:href="@{/registro}" class="item" th:unless="${usuarioAutenticado}">Crear cuenta</a>
+
+    <a th:href="@{/login}" class="item tienda-nav-login" th:unless="${usuarioAutenticado}">
+      <i class="sign in alternate icon"></i> Iniciar sesión
+    </a>
+    <a th:href="@{/registro}" class="item ui primary button tienda-nav-registro" th:unless="${usuarioAutenticado}">
+      Crear cuenta
+    </a>
 
     <div class="ui dropdown item tienda-cuenta-dropdown" th:if="${esCliente}">
-      <i class="user icon"></i> <span th:text="${usuarioAutenticado}"></span> <i class="dropdown icon"></i>
+      <span class="tienda-avatar" th:text="${#strings.toUpperCase(#strings.substring(nombreUsuario,0,1))}"></span>
+      <span class="tienda-saludo">Hola, <strong th:text="${nombreUsuario}"></strong></span>
+      <i class="dropdown icon"></i>
       <div class="menu">
+        <div class="tienda-cuenta-menu-header">
+          <span class="tienda-avatar tienda-avatar-lg" th:text="${#strings.toUpperCase(#strings.substring(nombreUsuario,0,1))}"></span>
+          <div>
+            <div class="tienda-cuenta-menu-hola">Bienvenido/a</div>
+            <div class="tienda-cuenta-menu-nombre" th:text="${nombreUsuario}"></div>
+          </div>
+        </div>
+        <div class="divider"></div>
         <a th:href="@{/tienda/perfil}" class="item"><i class="id card icon"></i> Mi perfil</a>
         <a th:href="@{/tienda/pedidos}" class="item"><i class="list icon"></i> Mis pedidos</a>
         <div class="divider"></div>
         <form th:action="@{/logout}" method="post" class="item logout-link-form">
-          <button type="submit" class="logout-link-button"><i class="sign out alternate icon"></i> Salir</button>
+          <button type="submit" class="logout-link-button"><i class="sign out alternate icon"></i> Cerrar sesión</button>
         </form>
       </div>
     </div>
@@ -64,6 +79,7 @@
     <div class="tienda-footer-col tienda-footer-brand">
       <a th:href="@{/tienda}" class="tienda-footer-brand-link"><i class="shop icon"></i> TiendaMas</a>
       <p>Ropa y accesorios para hombre, mujer y niños: prendas de calidad, atención cercana y entrega rápida, ya sea en línea o en el mostrador.</p>
+      <div class="tienda-footer-label">Aceptamos</div>
       <div class="tienda-footer-pagos">
         <i class="cc visa icon" title="Visa"></i>
         <i class="cc mastercard icon" title="Mastercard"></i>
@@ -84,12 +100,22 @@
     </div>
 
     <div class="tienda-footer-col">
+      <h4>Nosotros</h4>
+      <ul>
+        <li><a href="#">Quiénes somos</a></li>
+        <li><a href="#">Trabaja con nosotros</a></li>
+        <li><a href="#">Libro de reclamaciones</a></li>
+      </ul>
+    </div>
+
+    <div class="tienda-footer-col">
       <h4>Ayuda</h4>
       <ul>
         <li><a href="#">Preguntas frecuentes</a></li>
         <li><a href="#">Envíos y entregas</a></li>
         <li><a href="#">Cambios y devoluciones</a></li>
         <li><a href="#">Términos y condiciones</a></li>
+        <li><a href="#">Política de privacidad</a></li>
       </ul>
     </div>
 
@@ -101,6 +127,7 @@
         <li><i class="envelope icon"></i> <a href="mailto:contacto@tiendamas.com">contacto@tiendamas.com</a></li>
         <li><i class="clock outline icon"></i> Lun. a Vie. 9:00–19:00 hs.</li>
       </ul>
+      <div class="tienda-footer-label">Síguenos</div>
       <div class="tienda-footer-social">
         <span class="tienda-social-icon" title="Facebook"><i class="facebook f icon"></i></span>
         <span class="tienda-social-icon" title="Instagram"><i class="instagram icon"></i></span>

@@ -7,8 +7,6 @@ import com.tiendamas.repository.PedidoRepository;
 import com.tiendamas.repository.PersonaRepository;
 import com.tiendamas.repository.ProductoRepository;
 import com.tiendamas.repository.VarianteProductoRepository;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,14 +34,22 @@ public class HomeController {
         this.categoriaRepository = categoriaRepository;
     }
 
+    /**
+     * La raíz del sitio siempre es la tienda pública, sin excepciones de rol.
+     * El acceso a paneles internos (dashboard, POS, etc.) se hace por su propia
+     * URL protegida, nunca a través de "/".
+     */
     @GetMapping("/")
-    public String index(Model model, Authentication authentication) {
-        if (tieneRol(authentication, "ROLE_VENDEDOR")) {
-            return "redirect:/pos";
-        }
-        if (tieneRol(authentication, "ROLE_CLIENTE")) {
-            return "redirect:/tienda";
-        }
+    public String index() {
+        return "redirect:/tienda";
+    }
+
+    /**
+     * Dashboard administrativo. La protección real ocurre en SecurityConfig
+     * (hasRole ADMIN) — este método nunca debe confiar solo en la vista.
+     */
+    @GetMapping("/dashboard")
+    public String dashboard(Model model) {
         model.addAttribute("titulo", "Inicio");
 
         List<Producto> productos = productoRepository.findAll();
@@ -68,15 +74,5 @@ public class HomeController {
     @GetMapping("/login")
     public String login() {
         return "login";
-    }
-
-    private boolean tieneRol(Authentication authentication, String rol) {
-        if (authentication == null) return false;
-        for (GrantedAuthority authority : authentication.getAuthorities()) {
-            if (authority.getAuthority().equals(rol)) {
-                return true;
-            }
-        }
-        return false;
     }
 }
