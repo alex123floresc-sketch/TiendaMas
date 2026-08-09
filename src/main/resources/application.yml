@@ -3,7 +3,9 @@ server:
 
 app:
   mail:
-    remitente: ${MAIL_FROM:no-reply@tiendamas.com}
+    # Gmail exige que el "From" coincida con la cuenta autenticada (MAIL_USERNAME);
+    # si no se define MAIL_FROM, usamos MAIL_USERNAME para evitar que Gmail rechace el envío.
+    remitente: ${MAIL_FROM:${MAIL_USERNAME:no-reply@tiendamas.com}}
 
 spring:
   servlet:

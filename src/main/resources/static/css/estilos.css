@@ -1566,6 +1566,127 @@ body {
     font-size: 0.9em;
 }
 
+/* --- Tienda: carruseles horizontales (más vendidos, por categoría) --- */
+.tienda-catalogo-titulo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--color-navy);
+    font-size: 1.3em;
+    margin: 8px 0 16px 0;
+    padding-top: 24px;
+    border-top: 1px solid var(--color-beige-dark);
+}
+.tienda-catalogo-titulo .icon {
+    color: var(--color-blue);
+}
+.tienda-carrusel-seccion {
+    margin-bottom: 36px;
+}
+.tienda-carrusel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+.tienda-carrusel-header .ui.header {
+    margin: 0;
+}
+.tienda-carrusel-flechas {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.tienda-carrusel-flecha {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--color-beige-dark);
+    background: var(--color-white);
+    color: var(--color-navy);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+.tienda-carrusel-flecha:hover {
+    background: var(--color-blue);
+    color: var(--color-white);
+    border-color: var(--color-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(20, 49, 93, 0.18);
+}
+.tienda-carrusel-flecha .icon {
+    margin: 0 !important;
+}
+.tienda-carrusel-vertodo {
+    margin-left: 6px;
+    color: var(--color-blue);
+    font-weight: 700;
+    font-size: 0.88em;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: gap 0.15s ease, color 0.15s ease;
+    white-space: nowrap;
+}
+.tienda-carrusel-vertodo:hover {
+    gap: 8px;
+    color: var(--color-navy);
+}
+.tienda-carrusel {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scroll-behavior: smooth;
+    padding: 2px 2px 14px 2px;
+    -webkit-overflow-scrolling: touch;
+}
+.tienda-carrusel::-webkit-scrollbar {
+    height: 8px;
+}
+.tienda-carrusel::-webkit-scrollbar-track {
+    background: var(--color-beige);
+    border-radius: 10px;
+}
+.tienda-carrusel::-webkit-scrollbar-thumb {
+    background: var(--color-beige-dark);
+    border-radius: 10px;
+}
+.tienda-carrusel::-webkit-scrollbar-thumb:hover {
+    background: var(--color-blue-light);
+}
+.tienda-carrusel-card {
+    flex: 0 0 auto;
+    width: 210px;
+    scroll-snap-align: start;
+    background: var(--color-white);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(20, 49, 93, 0.10);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+.tienda-carrusel-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 30px rgba(20, 49, 93, 0.18);
+}
+.tienda-carrusel-card .tienda-card-img {
+    height: 160px;
+}
+.tienda-carrusel-card .tienda-card-img img {
+    transition: transform 0.4s ease;
+}
+.tienda-carrusel-card:hover .tienda-card-img img {
+    transform: scale(1.08);
+}
+
 /* --- Tienda: estado vacío reutilizable (catálogo, carrito, pedidos) --- */
 .tienda-empty {
     text-align: center;
@@ -2214,6 +2335,33 @@ body {
     margin-top: 16px;
 }
 
+/* --- Páginas de error (404, 500, 403...) --- */
+.tienda-error-card {
+    text-align: center;
+    padding: 20px 10px !important;
+}
+.tienda-error-icon {
+    font-size: 3em !important;
+    color: var(--color-blue-light);
+    margin-bottom: 4px;
+}
+.tienda-error-codigo {
+    font-size: 2.4em;
+    font-weight: 800;
+    color: var(--color-navy);
+    letter-spacing: 0.02em;
+}
+.tienda-error-card p {
+    color: var(--color-text-muted);
+    margin: 10px 0 20px 0;
+}
+.tienda-error-acciones {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
 /* --- 6. RESPONSIVIDAD (móvil + escritorio) --- */
 
 /* Formularios: los campos en fila pasan a columna en pantallas angostas
@@ -2365,6 +2513,15 @@ body {
         align-items: stretch;
     }
     .tienda-hero-collage {
+        display: none;
+    }
+    .tienda-carrusel-card {
+        width: 165px;
+    }
+    .tienda-carrusel-card .tienda-card-img {
+        height: 120px;
+    }
+    .tienda-carrusel-vertodo span {
         display: none;
     }
     .tienda-detalle-layout,

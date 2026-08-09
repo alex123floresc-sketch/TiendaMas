@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página no encontrada · TiendaMas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body class="login-page">
+
+<div class="login-box">
+    <div class="ui raised segment tienda-error-card">
+        <i class="compass outline icon tienda-error-icon"></i>
+        <div class="tienda-error-codigo">404</div>
+        <h2 class="ui header">Esta página no existe</h2>
+        <p>El enlace que seguiste puede estar roto, viejo, o la página se movió de lugar.</p>
+        <div class="tienda-error-acciones">
+            <a th:href="@{/tienda}" class="ui primary button"><i class="shop icon"></i> Ir a la tienda</a>
+            <a th:href="@{/}" class="ui button">Ir al inicio</a>
+        </div>
+    </div>
+
+    <p class="login-footer">&copy; 2026 TiendaMas · Moda para toda la familia</p>
+</div>
+
+</body>
+</html>

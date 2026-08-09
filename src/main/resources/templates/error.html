@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Error ' + ${status != null ? status : ''} + ' · TiendaMas'">Error · TiendaMas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body class="login-page">
+
+<div class="login-box">
+    <div class="ui raised segment tienda-error-card">
+        <i class="exclamation triangle icon tienda-error-icon"></i>
+        <div class="tienda-error-codigo" th:text="${status != null ? status : '·'}">Error</div>
+        <h2 class="ui header" th:text="${status != null and status == 403} ? 'No tenés acceso a esta página' : 'Ocurrió un problema'"></h2>
+        <p th:if="${status != null and status == 403}">Tu cuenta no tiene permiso para ver esta sección.</p>
+        <p th:unless="${status != null and status == 403}">Algo no salió como esperábamos. Probá de nuevo en unos minutos o volvé a un lugar seguro.</p>
+        <div class="tienda-error-acciones">
+            <a th:href="@{/tienda}" class="ui primary button"><i class="shop icon"></i> Ir a la tienda</a>
+            <a th:href="@{/}" class="ui button">Ir al inicio</a>
+        </div>
+    </div>
+
+    <p class="login-footer">&copy; 2026 TiendaMas · Moda para toda la familia</p>
+</div>
+
+</body>
+</html>

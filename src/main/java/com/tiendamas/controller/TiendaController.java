@@ -3,6 +3,7 @@ package com.tiendamas.controller;
 import com.tiendamas.dto.CambioPasswordForm;
 import com.tiendamas.dto.ItemVenta;
 import com.tiendamas.entity.CanalVenta;
+import com.tiendamas.entity.Categoria;
 import com.tiendamas.entity.MetodoPago;
 import com.tiendamas.entity.Pedido;
 import com.tiendamas.entity.Persona;
@@ -24,7 +25,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
@@ -77,7 +80,16 @@ public class TiendaController {
         model.addAttribute("q", q);
         model.addAttribute("orden", orden);
         if ((q == null || q.isBlank()) && categoriaId == null && talla == null && precioRango == null) {
-            model.addAttribute("masVendidos", pedidoService.obtenerMasVendidos(4));
+            model.addAttribute("masVendidos", pedidoService.obtenerMasVendidos(10));
+
+            Map<Categoria, List<Producto>> carruseles = new LinkedHashMap<>();
+            for (Categoria cat : categoriaService.obtenerPrincipales()) {
+                List<Producto> destacados = productoService.buscar(null, cat.getId(), null, null, null);
+                if (!destacados.isEmpty()) {
+                    carruseles.put(cat, destacados.stream().limit(10).toList());
+                }
+            }
+            model.addAttribute("carruseles", carruseles);
         }
         model.addAttribute("titulo", "Tienda");
         return "tienda/index";

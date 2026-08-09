@@ -27,6 +27,7 @@
         <div class="tienda-beneficio"><i class="store icon"></i> Retiro gratis en tienda</div>
     </div>
 
+    <!-- Filtros arriba de todo, para que se puedan usar sin tener que bajar por la página -->
     <div class="tienda-filtros" id="catalogo">
         <a th:href="@{/tienda(q=${q}, talla=${tallaSeleccionada}, precioRango=${precioRango}, orden=${orden})}"
            class="ui label" th:classappend="${categoriaSeleccionada == null} ? 'blue'">Todas</a>
@@ -67,6 +68,43 @@
         </a>
     </div>
 
+    <!-- Carrusel: los más vendidos (se desplaza a los costados con flechas o arrastrando) -->
+    <div class="tienda-carrusel-seccion" th:if="${masVendidos != null and !masVendidos.isEmpty()}">
+        <div class="tienda-carrusel-header">
+            <h3 class="ui header"><i class="star icon"></i>Los más vendidos</h3>
+            <div class="tienda-carrusel-flechas">
+                <button type="button" class="tienda-carrusel-flecha" onclick="desplazarCarrusel('carrusel-masvendidos', -1)" aria-label="Anterior"><i class="chevron left icon"></i></button>
+                <button type="button" class="tienda-carrusel-flecha" onclick="desplazarCarrusel('carrusel-masvendidos', 1)" aria-label="Siguiente"><i class="chevron right icon"></i></button>
+            </div>
+        </div>
+        <div class="tienda-carrusel" id="carrusel-masvendidos">
+            <div class="tienda-carrusel-card" th:each="p : ${masVendidos}">
+                <th:block th:replace="~{tienda/fragments :: tarjetaProductoContenido(${p})}"></th:block>
+            </div>
+        </div>
+    </div>
+
+    <!-- Un carrusel por cada categoría principal -->
+    <div class="tienda-carrusel-seccion" th:each="entry : ${carruseles}">
+        <div class="tienda-carrusel-header">
+            <h3 class="ui header"><i class="tag icon"></i><span th:text="${entry.key.nombre}"></span></h3>
+            <div class="tienda-carrusel-flechas">
+                <button type="button" class="tienda-carrusel-flecha"
+                        th:onclick="'desplazarCarrusel(\'carrusel-cat-' + ${entry.key.id} + '\', -1)'" aria-label="Anterior"><i class="chevron left icon"></i></button>
+                <button type="button" class="tienda-carrusel-flecha"
+                        th:onclick="'desplazarCarrusel(\'carrusel-cat-' + ${entry.key.id} + '\', 1)'" aria-label="Siguiente"><i class="chevron right icon"></i></button>
+                <a th:href="@{/tienda(categoriaId=${entry.key.id})}" class="tienda-carrusel-vertodo"><span>Ver todo</span> <i class="arrow right icon"></i></a>
+            </div>
+        </div>
+        <div class="tienda-carrusel" th:id="'carrusel-cat-' + ${entry.key.id}">
+            <div class="tienda-carrusel-card" th:each="p : ${entry.value}">
+                <th:block th:replace="~{tienda/fragments :: tarjetaProductoContenido(${p})}"></th:block>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="tienda-catalogo-titulo"><i class="th icon"></i> Catálogo completo</h2>
+
     <div class="ui message" th:if="${q != null and !q.isBlank()}">
         Resultados de búsqueda para "<strong th:text="${q}"></strong>" (<span th:text="${productos.size()}"></span>)
         — <a th:href="@{/tienda}">quitar filtro</a>
@@ -100,53 +138,7 @@
 
     <div class="tienda-grid">
         <div class="tienda-card" th:each="p : ${productos}">
-            <a th:href="@{/tienda/productos/{id}(id=${p.id})}" class="tienda-card-link">
-                <div class="tienda-card-img">
-                    <img th:if="${p.imagenUrl != null}" th:src="@{${p.imagenUrl}}" alt="Imagen del producto">
-                    <i th:unless="${p.imagenUrl != null}" class="box icon huge"></i>
-                </div>
-                <div class="tienda-card-body">
-                    <div class="tienda-card-cat" th:text="${p.categoria != null ? p.categoria.nombre : ''}"></div>
-                    <div class="tienda-card-nombre" th:text="${p.nombre}"></div>
-                    <div class="hint" style="margin:0 0 4px 0;" th:if="${p.marca != null and !p.marca.isEmpty()}" th:text="${p.marca}"></div>
-                    <div class="tienda-card-tallas" th:unless="${#lists.isEmpty(p.tallasDisponibles)}">
-                        <span class="tienda-card-talla-badge" th:each="t : ${p.tallasDisponibles}" th:text="${t}"></span>
-                    </div>
-                    <div class="tienda-card-precio">
-                        S/ <span th:text="${p.precio}"></span>
-                    </div>
-                </div>
-            </a>
-            <a th:href="@{/tienda/productos/{id}(id=${p.id})}" class="ui fluid primary button" th:classappend="${p.stock == null or p.stock <= 0} ? 'disabled'">
-                <i class="tag icon"></i>
-                <span th:text="${p.stock != null and p.stock > 0} ? 'Ver tallas y colores' : 'Sin stock'"></span>
-            </a>
-        </div>
-    </div>
-
-    <div th:if="${masVendidos != null and !masVendidos.isEmpty()}" style="margin-top: 40px;">
-        <h3 class="ui header"><i class="star icon"></i>Los más vendidos</h3>
-        <div class="tienda-grid">
-            <div class="tienda-card" th:each="p : ${masVendidos}">
-                <a th:href="@{/tienda/productos/{id}(id=${p.id})}" class="tienda-card-link">
-                    <div class="tienda-card-img">
-                        <img th:if="${p.imagenUrl != null}" th:src="@{${p.imagenUrl}}" alt="Imagen del producto">
-                        <i th:unless="${p.imagenUrl != null}" class="box icon huge"></i>
-                    </div>
-                    <div class="tienda-card-body">
-                        <div class="tienda-card-cat" th:text="${p.categoria != null ? p.categoria.nombre : ''}"></div>
-                        <div class="tienda-card-nombre" th:text="${p.nombre}"></div>
-                        <div class="tienda-card-tallas" th:unless="${#lists.isEmpty(p.tallasDisponibles)}">
-                            <span class="tienda-card-talla-badge" th:each="t : ${p.tallasDisponibles}" th:text="${t}"></span>
-                        </div>
-                        <div class="tienda-card-precio">S/ <span th:text="${p.precio}"></span></div>
-                    </div>
-                </a>
-                <a th:href="@{/tienda/productos/{id}(id=${p.id})}" class="ui fluid primary button" th:classappend="${p.stock == null or p.stock <= 0} ? 'disabled'">
-                    <i class="tag icon"></i>
-                    <span th:text="${p.stock != null and p.stock > 0} ? 'Ver tallas y colores' : 'Sin stock'"></span>
-                </a>
-            </div>
+            <th:block th:replace="~{tienda/fragments :: tarjetaProductoContenido(${p})}"></th:block>
         </div>
     </div>
 </div>
