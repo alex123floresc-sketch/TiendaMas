@@ -2,6 +2,7 @@ package com.tiendamas.controller;
 
 import com.tiendamas.dto.CambioPasswordForm;
 import com.tiendamas.dto.ItemVenta;
+import com.tiendamas.dto.SugerenciaProducto;
 import com.tiendamas.entity.CanalVenta;
 import com.tiendamas.entity.Categoria;
 import com.tiendamas.entity.MetodoPago;
@@ -133,6 +134,20 @@ public class TiendaController {
             return productos;
         }
         return productos.stream().sorted(comparador).collect(Collectors.toList());
+    }
+
+    @GetMapping("/buscar-sugerencias")
+    @ResponseBody
+    public List<SugerenciaProducto> buscarSugerencias(@RequestParam(required = false) String q) {
+        if (q == null || q.isBlank() || q.trim().length() < 2) {
+            return List.of();
+        }
+        return productoService.buscar(q, null, null, null, null).stream()
+                .limit(6)
+                .map(p -> new SugerenciaProducto(p.getId(), p.getNombre(), p.getImagenUrl(), p.getPrecio(),
+                        p.getCategoria() != null ? p.getCategoria().getNombre() : null,
+                        "/tienda/productos/" + p.getId()))
+                .toList();
     }
 
     @PostMapping("/newsletter")

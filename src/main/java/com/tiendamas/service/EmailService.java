@@ -7,8 +7,11 @@ public interface EmailService {
     /** Notifica al cliente dueño del pedido que su estado cambió. No lanza excepción si falla el envío. */
     void enviarCambioEstadoPedido(Pedido pedido);
 
-    /** Confirma al cliente que su pedido fue registrado. No lanza excepción si falla el envío. */
-    void enviarConfirmacionPedido(Pedido pedido);
+    /**
+     * Confirma al cliente que su pedido fue registrado y adjunta su comprobante en PDF
+     * (si se pudo generar). No lanza excepción si falla el envío.
+     */
+    void enviarConfirmacionPedido(Pedido pedido, byte[] pdfComprobante);
 
     /**
      * Envía la boleta/factura en PDF al correo del dueño del pedido.

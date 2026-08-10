@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailAuthenticationException;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -46,6 +47,8 @@ public class EmailServiceImpl implements EmailService {
             mensaje.setSubject("TiendaMas - Actualización de tu pedido " + pedido.getNumeroCompleto());
             mensaje.setText(construirCuerpo(pedido));
             mailSender.send(mensaje);
+        } catch (MailAuthenticationException e) {
+            logFalloAutenticacion("cambio de estado", pedido.getId(), e);
         } catch (MailException e) {
             log.warn("No se pudo enviar el correo de cambio de estado del pedido {}: {}", pedido.getId(), e.getMessage());
         }
@@ -53,7 +56,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     @Async
-    public void enviarConfirmacionPedido(Pedido pedido) {
+    public void enviarConfirmacionPedido(Pedido pedido, byte[] pdfComprobante) {
         if (pedido == null || pedido.getPersona() == null) {
             return;
         }
@@ -63,13 +66,20 @@ public class EmailServiceImpl implements EmailService {
         }
 
         try {
-            SimpleMailMessage mensaje = new SimpleMailMessage();
-            mensaje.setFrom(remitente);
-            mensaje.setTo(destinatario);
-            mensaje.setSubject("TiendaMas - Confirmación de tu pedido " + pedido.getNumeroCompleto());
-            mensaje.setText(construirCuerpoConfirmacion(pedido));
-            mailSender.send(mensaje);
-        } catch (MailException e) {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, pdfComprobante != null);
+            helper.setFrom(remitente);
+            helper.setTo(destinatario);
+            helper.setSubject("TiendaMas - Confirmación de tu pedido " + pedido.getNumeroCompleto());
+            helper.setText(construirCuerpoConfirmacion(pedido, pdfComprobante != null));
+            if (pdfComprobante != null) {
+                helper.addAttachment("Boleta-" + pedido.getNumeroCompleto() + ".pdf",
+                        new org.springframework.core.io.ByteArrayResource(pdfComprobante));
+            }
+            mailSender.send(mimeMessage);
+        } catch (MailAuthenticationException e) {
+            logFalloAutenticacion("confirmación de pedido", pedido.getId(), e);
+        } catch (MailException | MessagingException e) {
             log.warn("No se pudo enviar el correo de confirmación del pedido {}: {}", pedido.getId(), e.getMessage());
         }
     }
@@ -97,10 +107,21 @@ public class EmailServiceImpl implements EmailService {
                     new org.springframework.core.io.ByteArrayResource(pdfBoleta));
             mailSender.send(mimeMessage);
             return true;
+        } catch (MailAuthenticationException e) {
+            logFalloAutenticacion("comprobante", pedido.getId(), e);
+            return false;
         } catch (MailException | MessagingException e) {
             log.warn("No se pudo enviar el comprobante por correo del pedido {}: {}", pedido.getId(), e.getMessage());
             return false;
         }
+    }
+
+    private void logFalloAutenticacion(String contexto, Long pedidoId, MailAuthenticationException e) {
+        log.error("No se pudo enviar el correo de {} del pedido {}: fallo la autenticacion SMTP. "
+                        + "Revisa las variables de entorno MAIL_USERNAME/MAIL_PASSWORD: Gmail exige una "
+                        + "'contrasena de aplicacion' de 16 caracteres (no la contrasena normal de la cuenta), "
+                        + "generada en https://myaccount.google.com/apppasswords con la verificacion en dos pasos activada. "
+                        + "Detalle: {}", contexto, pedidoId, e.getMessage());
     }
 
     private String construirCuerpo(Pedido pedido) {
@@ -112,7 +133,7 @@ public class EmailServiceImpl implements EmailService {
                 + "Gracias por tu compra.\nTiendaMas";
     }
 
-    private String construirCuerpoConfirmacion(Pedido pedido) {
+    private String construirCuerpoConfirmacion(Pedido pedido, boolean conComprobanteAdjunto) {
         Persona persona = pedido.getPersona();
         StringBuilder texto = new StringBuilder();
         texto.append("Hola ").append(persona.getNombre()).append(",\n\n")
@@ -132,8 +153,11 @@ public class EmailServiceImpl implements EmailService {
         }
 
         texto.append("\nTotal: S/ ").append(pedido.getTotal()).append("\n")
-                .append("Estado: ").append(pedido.getEstado() != null ? pedido.getEstado().getEtiqueta() : "").append("\n\n")
-                .append("Podés seguir tu pedido ingresando a la tienda, en la sección \"Mis pedidos\".\n\n")
+                .append("Estado: ").append(pedido.getEstado() != null ? pedido.getEstado().getEtiqueta() : "").append("\n\n");
+        if (conComprobanteAdjunto) {
+            texto.append("Te adjuntamos tu comprobante de pago en PDF.\n\n");
+        }
+        texto.append("Podés seguir tu pedido ingresando a la tienda, en la sección \"Mis pedidos\".\n\n")
                 .append("Gracias por tu compra.\nTiendaMas");
         return texto.toString();
     }

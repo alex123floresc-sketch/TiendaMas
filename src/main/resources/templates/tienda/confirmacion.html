@@ -52,6 +52,11 @@
             </tfoot>
         </table>
 
+        <div th:if="${pedido.persona != null and pedido.persona.email != null and !pedido.persona.email.isEmpty()}" class="ui positive message">
+            <i class="mail icon"></i> Te enviamos la confirmación y tu comprobante en PDF a
+            <strong th:text="${pedido.persona.email}"></strong>. Si no lo ves en unos minutos, revisá spam/promociones.
+        </div>
+
         <div th:if="${pedido.tipoEntrega != null and pedido.tipoEntrega.name() == 'DOMICILIO'}" class="ui info message">
             <i class="truck icon"></i> Te avisaremos por correo cuando tu pedido salga en camino.
         </div>

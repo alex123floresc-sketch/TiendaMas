@@ -46,10 +46,13 @@
       </div>
     </div>
 
-    <form th:action="@{/tienda}" method="get" class="tienda-search">
-      <input type="text" name="q" placeholder="Buscar productos, marcas y más..." th:value="${q}" aria-label="Buscar productos">
-      <button type="submit" aria-label="Buscar"><i class="search icon"></i></button>
-    </form>
+    <div class="tienda-search-wrap">
+      <form th:action="@{/tienda}" method="get" class="tienda-search" autocomplete="off">
+        <input type="text" name="q" id="tiendaBuscadorInput" placeholder="Buscar productos, marcas y más..." th:value="${q}" aria-label="Buscar productos">
+        <button type="submit" aria-label="Buscar"><i class="search icon"></i></button>
+      </form>
+      <div class="tienda-search-sugerencias" id="tiendaBuscadorSugerencias"></div>
+    </div>
 
     <a th:href="@{/tienda/favoritos}" class="item tienda-cart-link" title="Ver favoritos" id="tiendaFavoritosLink">
       <i class="heart icon"></i> Favoritos
@@ -219,6 +222,93 @@
             });
         }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
         elementos.forEach(function (el) { observador.observe(el); });
+    })();
+
+    /* --- Buscador: sugerencias en vivo mientras se escribe --- */
+    (function () {
+        var input = document.getElementById('tiendaBuscadorInput');
+        var caja = document.getElementById('tiendaBuscadorSugerencias');
+        if (!input || !caja) return;
+
+        var temporizador = null;
+        var controlador = null;
+
+        function ocultar() {
+            caja.classList.remove('visible');
+            caja.innerHTML = '';
+        }
+
+        function formatearPrecio(valor) {
+            var n = parseFloat(valor || 0);
+            return 'S/ ' + n.toFixed(2);
+        }
+
+        function pintar(sugerencias, consulta) {
+            caja.innerHTML = '';
+            if (!sugerencias.length) {
+                var vacio = document.createElement('div');
+                vacio.className = 'tienda-search-sugerencia-vacio';
+                vacio.textContent = 'Sin resultados para "' + consulta + '"';
+                caja.appendChild(vacio);
+                caja.classList.add('visible');
+                return;
+            }
+            sugerencias.forEach(function (p) {
+                var item = document.createElement('a');
+                item.className = 'tienda-search-sugerencia';
+                item.href = p.url;
+                if (p.imagenUrl) {
+                    var img = document.createElement('img');
+                    img.src = p.imagenUrl;
+                    img.alt = '';
+                    img.loading = 'lazy';
+                    item.appendChild(img);
+                } else {
+                    var icono = document.createElement('i');
+                    icono.className = 'box icon';
+                    item.appendChild(icono);
+                }
+                var info = document.createElement('div');
+                info.className = 'tienda-search-sugerencia-info';
+                var nombre = document.createElement('span');
+                nombre.className = 'tienda-search-sugerencia-nombre';
+                nombre.textContent = p.nombre;
+                var meta = document.createElement('span');
+                meta.className = 'tienda-search-sugerencia-precio';
+                meta.textContent = formatearPrecio(p.precio) + (p.categoria ? ' · ' + p.categoria : '');
+                info.appendChild(nombre);
+                info.appendChild(meta);
+                item.appendChild(info);
+                caja.appendChild(item);
+            });
+            caja.classList.add('visible');
+        }
+
+        input.addEventListener('input', function () {
+            var consulta = input.value.trim();
+            clearTimeout(temporizador);
+            if (consulta.length < 2) {
+                ocultar();
+                return;
+            }
+            temporizador = setTimeout(function () {
+                if (controlador) controlador.abort();
+                controlador = ('AbortController' in window) ? new AbortController() : null;
+                fetch('/tienda/buscar-sugerencias?q=' + encodeURIComponent(consulta), {
+                    signal: controlador ? controlador.signal : undefined
+                })
+                    .then(function (res) { return res.ok ? res.json() : []; })
+                    .then(function (data) { pintar(data, consulta); })
+                    .catch(function (err) { if (err.name !== 'AbortError') ocultar(); });
+            }, 250);
+        });
+
+        document.addEventListener('click', function (ev) {
+            if (!ev.target.closest('.tienda-search-wrap')) ocultar();
+        });
+        input.addEventListener('keydown', function (ev) {
+            if (ev.key === 'Escape') ocultar();
+        });
     })();
 
     /* --- Favoritos: lista de deseos guardada en el navegador (localStorage) --- */

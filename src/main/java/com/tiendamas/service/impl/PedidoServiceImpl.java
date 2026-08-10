@@ -20,6 +20,8 @@ import com.tiendamas.service.PedidoService;
 import com.tiendamas.service.PersonaService;
 import com.tiendamas.service.ProductoService;
 import com.tiendamas.service.SerieCorrelativoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +35,8 @@ import java.util.Map;
 
 @Service
 public class PedidoServiceImpl implements PedidoService {
+
+    private static final Logger log = LoggerFactory.getLogger(PedidoServiceImpl.class);
 
     @Autowired
     private PedidoRepository pedidoRepository;
@@ -51,6 +55,9 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private ComprobantePdfService comprobantePdfService;
 
     @Override
     public List<Pedido> obtenerTodos() {
@@ -149,7 +156,15 @@ public class PedidoServiceImpl implements PedidoService {
 
         pedido.setTotal(total);
         Pedido guardado = pedidoRepository.save(pedido);
-        emailService.enviarConfirmacionPedido(guardado);
+
+        byte[] pdfComprobante = null;
+        try {
+            pdfComprobante = comprobantePdfService.generarPdf(guardado);
+        } catch (Exception e) {
+            log.warn("No se pudo generar el PDF del comprobante para el pedido {}, se enviara el correo sin adjunto: {}",
+                    guardado.getId(), e.getMessage());
+        }
+        emailService.enviarConfirmacionPedido(guardado, pdfComprobante);
         return guardado;
     }
 
