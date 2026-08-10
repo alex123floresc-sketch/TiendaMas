@@ -437,6 +437,96 @@ body {
     height: 220px;
 }
 
+/* --- Reportes: filtro de fechas + exportar PDF --- */
+.reporte-filtro-form {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 14px;
+    background: var(--color-white);
+    border: 1px solid var(--color-beige-dark);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+}
+.reporte-filtro-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.reporte-filtro-campo label {
+    font-size: 0.78em;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.reporte-filtro-campo input[type="date"] {
+    border: 1px solid var(--color-beige-dark);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 0.9em;
+    color: var(--color-text);
+}
+.reporte-btn-pdf {
+    margin-left: auto !important;
+}
+
+/* --- Reportes: navegación rápida entre secciones --- */
+.reporte-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 26px;
+}
+.reporte-nav a {
+    background: var(--color-white);
+    border: 1px solid var(--color-beige-dark);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 0.82em;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+.reporte-nav a:hover {
+    border-color: var(--color-blue);
+    color: var(--color-blue);
+    transform: translateY(-2px);
+}
+
+/* --- Reportes: títulos de sección consistentes --- */
+.reporte-seccion-titulo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--color-navy);
+    font-size: 1.25em;
+    margin: 30px 0 14px 0;
+    padding-top: 18px;
+    border-top: 1px solid var(--color-beige-dark);
+    scroll-margin-top: 20px;
+}
+.reporte-seccion-titulo:first-of-type {
+    border-top: none;
+    padding-top: 0;
+    margin-top: 10px;
+}
+.reporte-seccion-titulo .icon {
+    color: var(--color-blue);
+}
+
+/* --- Reportes: grilla de estadísticas del resumen (más de 5, Semantic no lo cubre) --- */
+.ui.statistics.reporte-stats-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+}
+.ui.statistics.reporte-stats-grid .statistic {
+    margin: 0 !important;
+}
+
 /* Segmentos / tarjetas */
 .ui.segment {
     border-top: 3px solid var(--color-beige-dark);

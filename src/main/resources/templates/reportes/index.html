@@ -12,14 +12,58 @@
         </div>
     </h1>
 
-    <div class="ui four stackable statistics" style="margin-bottom: 30px;">
+    <!-- Filtro de fechas + exportar PDF -->
+    <form th:action="@{/reportes}" method="get" class="reporte-filtro-form">
+        <div class="reporte-filtro-campo">
+            <label for="desde">Desde</label>
+            <input type="date" id="desde" name="desde" th:value="${desde}">
+        </div>
+        <div class="reporte-filtro-campo">
+            <label for="hasta">Hasta</label>
+            <input type="date" id="hasta" name="hasta" th:value="${hasta}">
+        </div>
+        <button type="submit" class="ui primary button"><i class="filter icon"></i> Filtrar</button>
+        <a th:if="${desde != null or hasta != null}" th:href="@{/reportes}" class="ui button">Ver todo el histórico</a>
+        <a th:href="@{/reportes/pdf(desde=${desde}, hasta=${hasta})}" class="ui teal button reporte-btn-pdf" target="_blank">
+            <i class="file pdf icon"></i> Exportar PDF
+        </a>
+    </form>
+    <div class="ui info message" th:if="${desde != null or hasta != null}">
+        <i class="info circle icon"></i>
+        Los totales y tablas de abajo corresponden al rango elegido. Las tendencias (financiero, ventas por semana/mes) y las recomendaciones de reabastecimiento siempre muestran el período fijo indicado en cada gráfico, sin importar este filtro.
+    </div>
+
+    <!-- Navegación rápida -->
+    <div class="reporte-nav">
+        <a href="#resumen">Resumen</a>
+        <a href="#estado-entrega">Estado y entrega</a>
+        <a href="#financiero">Financiero</a>
+        <a href="#tendencia-canal">Tendencia por canal</a>
+        <a href="#productos">Productos más vendidos</a>
+        <a href="#categorias">Por categoría</a>
+        <a href="#canal-pago">Canal y método de pago</a>
+        <a href="#vendedores">Por vendedor</a>
+        <a href="#clientes">Mejores clientes</a>
+        <a href="#reabastecimiento">Reabastecimiento</a>
+    </div>
+
+    <h2 class="reporte-seccion-titulo" id="resumen"><i class="tachometer alternate icon"></i> Resumen del período</h2>
+    <div class="ui stackable statistics reporte-stats-grid" style="margin-bottom: 30px;">
         <div class="statistic">
-            <div class="value" th:text="'$' + ${#numbers.formatDecimal(totalVentas, 1, 2)}"></div>
+            <div class="value" th:text="'S/ ' + ${#numbers.formatDecimal(totalVentas, 1, 2)}"></div>
             <div class="label">Ventas totales</div>
         </div>
         <div class="statistic">
             <div class="value" th:text="${totalPedidos}"></div>
             <div class="label">Pedidos</div>
+        </div>
+        <div class="statistic">
+            <div class="value" th:text="'S/ ' + ${#numbers.formatDecimal(ticketPromedio, 1, 2)}"></div>
+            <div class="label">Ticket promedio</div>
+        </div>
+        <div class="statistic">
+            <div class="value" th:text="${totalUnidadesVendidas}"></div>
+            <div class="label">Unidades vendidas</div>
         </div>
         <div class="statistic">
             <div class="value" th:text="${totalClientes}"></div>
@@ -31,7 +75,36 @@
         </div>
     </div>
 
-    <h3 class="ui header"><i class="chart line icon"></i>Resumen financiero (últimos 6 meses)</h3>
+    <h2 class="reporte-seccion-titulo" id="estado-entrega"><i class="tasks icon"></i> Pedidos por estado y por entrega</h2>
+    <div class="ui two column stackable grid" style="margin-bottom: 10px;">
+        <div class="column">
+            <div th:if="${#maps.isEmpty(pedidosPorEstado)}" class="ui info message"><p>Aún no hay pedidos en este período.</p></div>
+            <table class="ui celled striped table" th:unless="${#maps.isEmpty(pedidosPorEstado)}">
+                <thead><tr><th>Estado</th><th class="right aligned">Pedidos</th></tr></thead>
+                <tbody>
+                <tr th:each="entry : ${pedidosPorEstado}">
+                    <td th:text="${entry.key}" style="font-weight: bold;"></td>
+                    <td class="right aligned" th:text="${entry.value}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="column">
+            <div th:if="${#maps.isEmpty(pedidosPorEntrega)}" class="ui info message"><p>Aún no hay pedidos en este período.</p></div>
+            <table class="ui celled striped table" th:unless="${#maps.isEmpty(pedidosPorEntrega)}">
+                <thead><tr><th>Tipo de entrega</th><th class="right aligned">Pedidos</th></tr></thead>
+                <tbody>
+                <tr th:each="entry : ${pedidosPorEntrega}">
+                    <td th:text="${entry.key}" style="font-weight: bold;"></td>
+                    <td class="right aligned" th:text="${entry.value}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <h2 class="reporte-seccion-titulo" id="financiero"><i class="chart line icon"></i> Resumen financiero (últimos 6 meses)</h2>
+    <p class="hint" style="margin-bottom: 10px;">Independiente del filtro de fechas de arriba.</p>
     <div class="finanzas-grid">
         <div class="finanzas-mes" th:each="r : ${resumenMensual}">
             <div class="finanzas-mes-label" th:text="${r.mes}"></div>
@@ -64,7 +137,8 @@
         </div>
     </div>
 
-    <h3 class="ui header" style="margin-top: 30px;"><i class="chart bar icon"></i>Ventas por semana y por mes (por canal)</h3>
+    <h2 class="reporte-seccion-titulo" id="tendencia-canal" style="margin-top: 30px;"><i class="chart bar icon"></i>Ventas por semana y por mes (por canal)</h2>
+    <p class="hint" style="margin-bottom: 10px;">Independiente del filtro de fechas de arriba.</p>
     <div class="ui two column stackable grid">
         <div class="column">
             <div class="reporte-chart-card">
@@ -102,58 +176,51 @@
         </div>
     </div>
 
-    <div class="ui two column stackable grid" style="margin-top: 10px;">
-
-        <div class="column">
-            <h3 class="ui header"><i class="star icon"></i>Productos más vendidos</h3>
-            <div th:if="${#lists.isEmpty(masVendidos)}" class="ui info message">
-                <p>Aún no hay ventas registradas.</p>
-            </div>
-            <table class="ui celled striped table" th:unless="${#lists.isEmpty(masVendidos)}">
-                <thead>
-                <tr>
-                    <th>Producto</th>
-                    <th class="right aligned">Unidades vendidas</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="producto : ${masVendidos}">
-                    <td th:text="${producto.nombre}" style="font-weight: bold;"></td>
-                    <td th:text="${unidadesPorProducto.get(producto.nombre)}" class="right aligned"></td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="column">
-            <h3 class="ui header"><i class="tags icon"></i>Ventas por categoría</h3>
-            <div th:if="${#maps.isEmpty(ventasPorCategoria)}" class="ui info message">
-                <p>Aún no hay ventas registradas.</p>
-            </div>
-            <table class="ui celled striped table" th:unless="${#maps.isEmpty(ventasPorCategoria)}">
-                <thead>
-                <tr>
-                    <th>Categoría</th>
-                    <th class="right aligned">Total vendido</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="entry : ${ventasPorCategoria}">
-                    <td th:text="${entry.key}" style="font-weight: bold;"></td>
-                    <td th:text="'$' + ${#numbers.formatDecimal(entry.value, 1, 2)}" class="right aligned"></td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
+    <h2 class="reporte-seccion-titulo" id="productos" style="margin-top: 10px;"><i class="star icon"></i>Productos más vendidos</h2>
+    <div th:if="${#lists.isEmpty(masVendidos)}" class="ui info message">
+        <p>Aún no hay ventas registradas en este período.</p>
     </div>
+    <table class="ui celled striped table" th:unless="${#lists.isEmpty(masVendidos)}">
+        <thead>
+        <tr>
+            <th>Producto</th>
+            <th class="right aligned">Unidades vendidas</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="entry : ${masVendidos}">
+            <td th:text="${entry.key}" style="font-weight: bold;"></td>
+            <td th:text="${entry.value}" class="right aligned"></td>
+        </tr>
+        </tbody>
+    </table>
 
+    <h2 class="reporte-seccion-titulo" id="categorias" style="margin-top: 10px;"><i class="tags icon"></i>Ventas por categoría</h2>
+    <div th:if="${#maps.isEmpty(ventasPorCategoria)}" class="ui info message">
+        <p>Aún no hay ventas registradas en este período.</p>
+    </div>
+    <table class="ui celled striped table" th:unless="${#maps.isEmpty(ventasPorCategoria)}">
+        <thead>
+        <tr>
+            <th>Categoría</th>
+            <th class="right aligned">Total vendido</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="entry : ${ventasPorCategoria}">
+            <td th:text="${entry.key}" style="font-weight: bold;"></td>
+            <td th:text="'S/ ' + ${#numbers.formatDecimal(entry.value, 1, 2)}" class="right aligned"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h2 class="reporte-seccion-titulo" id="canal-pago" style="margin-top: 10px;"><i class="exchange icon"></i>Ventas por canal y método de pago</h2>
     <div class="ui two column stackable grid" style="margin-top: 10px;">
 
         <div class="column">
-            <h3 class="ui header"><i class="exchange icon"></i>Ventas por canal</h3>
+            <h3 class="ui header"><i class="exchange icon"></i>Por canal</h3>
             <div th:if="${#maps.isEmpty(ventasPorCanal)}" class="ui info message">
-                <p>Aún no hay ventas registradas.</p>
+                <p>Aún no hay ventas registradas en este período.</p>
             </div>
             <div th:unless="${#maps.isEmpty(ventasPorCanal)}">
                 <div class="reporte-chart-card" style="margin-bottom:15px;">
@@ -179,9 +246,9 @@
         </div>
 
         <div class="column">
-            <h3 class="ui header"><i class="credit card icon"></i>Ventas por método de pago</h3>
+            <h3 class="ui header"><i class="credit card icon"></i>Por método de pago</h3>
             <div th:if="${#maps.isEmpty(ventasPorMetodoPago)}" class="ui info message">
-                <p>Aún no hay ventas registradas.</p>
+                <p>Aún no hay ventas registradas en este período.</p>
             </div>
             <div th:unless="${#maps.isEmpty(ventasPorMetodoPago)}">
                 <div class="reporte-chart-card" style="margin-bottom:15px;">
@@ -208,10 +275,10 @@
 
     </div>
 
-    <h3 class="ui header" style="margin-top: 10px;"><i class="id badge icon"></i>Ventas por vendedor</h3>
+    <h2 class="reporte-seccion-titulo" id="vendedores" style="margin-top: 10px;"><i class="id badge icon"></i>Ventas por vendedor</h2>
     <p class="hint" style="margin-bottom: 10px;">Incluye tanto las ventas atendidas en tienda física como las realizadas por el cliente en la tienda en línea.</p>
     <div th:if="${#maps.isEmpty(ventasPorVendedor)}" class="ui info message">
-        <p>Aún no hay ventas registradas.</p>
+        <p>Aún no hay ventas registradas en este período.</p>
     </div>
     <div class="ui two column stackable grid" th:unless="${#maps.isEmpty(ventasPorVendedor)}">
         <div class="column">
@@ -239,9 +306,32 @@
         </div>
     </div>
 
-    <h3 class="ui header" style="margin-top: 30px;"><i class="warning sign icon"></i>Recomendaciones de reabastecimiento</h3>
+    <h2 class="reporte-seccion-titulo" id="clientes" style="margin-top: 30px;"><i class="user icon"></i>Mejores clientes</h2>
+    <div th:if="${#lists.isEmpty(topClientes)}" class="ui info message">
+        <p>Aún no hay ventas registradas en este período.</p>
+    </div>
+    <table class="ui celled striped table" th:unless="${#lists.isEmpty(topClientes)}">
+        <thead>
+        <tr>
+            <th>Cliente</th>
+            <th>Documento</th>
+            <th class="right aligned">Pedidos</th>
+            <th class="right aligned">Total comprado</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="c : ${topClientes}">
+            <td th:text="${c.persona.nombre} + ' ' + ${c.persona.apellido}" style="font-weight: bold;"></td>
+            <td th:text="${c.persona.tipoDocumento} + ' ' + ${c.persona.numeroDocumento}"></td>
+            <td class="right aligned" th:text="${c.pedidos}"></td>
+            <td class="right aligned" th:text="'S/ ' + ${#numbers.formatDecimal(c.total, 1, 2)}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h2 class="reporte-seccion-titulo" id="reabastecimiento" style="margin-top: 30px;"><i class="warning sign icon"></i>Recomendaciones de reabastecimiento</h2>
     <p class="hint" style="margin-bottom: 10px;">
-        Calculado según ventas de los últimos 30 días: no es solo "stock bajo", sino cuántos días de inventario quedan a ese ritmo de venta.
+        Calculado según ventas de los últimos 30 días (independiente del filtro de fechas): no es solo "stock bajo", sino cuántos días de inventario quedan a ese ritmo de venta.
     </p>
     <div th:if="${#lists.isEmpty(recomendacionesReabastecimiento)}" class="ui positive message">
         <p>Todos los productos tienen existencias suficientes para su ritmo de venta actual.</p>

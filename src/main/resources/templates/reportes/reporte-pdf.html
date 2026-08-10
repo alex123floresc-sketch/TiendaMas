@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Reporte TiendaMas</title>
+    <style>
+        @page { size: A4; margin: 26px 32px; }
+        body { font-family: Helvetica, Arial, sans-serif; color: #1a2233; font-size: 10.5px; }
+        table { width: 100%; border-collapse: collapse; }
+        .marca { font-size: 19px; font-weight: bold; color: #101B2D; }
+        .marca-sub { font-size: 9.5px; color: #5B6B82; margin-top: 2px; }
+        .caja-periodo { border: 1.5px solid #101B2D; border-radius: 4px; padding: 8px 14px; text-align: center; }
+        .caja-periodo .tipo { font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        .caja-periodo .valor { font-size: 12px; font-weight: bold; color: #2563EB; margin-top: 4px; }
+        .separador { border-top: 1px dashed #9CA3AF; margin: 12px 0; }
+        h2 { font-size: 12.5px; color: #101B2D; margin: 18px 0 6px 0; border-top: 1px solid #EEF1F6; padding-top: 10px; }
+        h2:first-of-type { border-top: none; padding-top: 0; }
+        .kpis { margin-top: 6px; }
+        .kpis td { width: 16.6%; padding: 8px 4px; text-align: center; border: 1px solid #EEF1F6; }
+        .kpis .valor { font-size: 13px; font-weight: bold; color: #101B2D; display: block; }
+        .kpis .etiqueta { font-size: 8.5px; color: #5B6B82; text-transform: uppercase; }
+        .tabla-datos th { background: #101B2D; color: #ffffff; padding: 6px 8px; font-size: 9px; text-transform: uppercase; text-align: left; }
+        .tabla-datos th.num, .tabla-datos td.num { text-align: right; }
+        .tabla-datos td { padding: 5px 8px; border-bottom: 1px solid #EEF1F6; }
+        .tabla-datos tr:nth-child(even) td { background: #F8FAFC; }
+        .vacio { color: #5B6B82; font-style: italic; padding: 6px 0; }
+        .pie { margin-top: 22px; text-align: center; color: #5B6B82; font-size: 9px; }
+    </style>
+</head>
+<body>
+
+<table>
+    <tr>
+        <td style="width: 60%;">
+            <div class="marca">TiendaMas</div>
+            <div class="marca-sub">Reporte gerencial de ventas</div>
+            <div class="marca-sub" th:text="'Generado el ' + ${generadoEl}">Generado el 01/01/2026 00:00</div>
+        </td>
+        <td style="width: 40%;">
+            <div class="caja-periodo">
+                <div class="tipo">Período</div>
+                <div class="valor"
+                     th:text="${(desde != null or hasta != null) ? ((desde != null ? desde : 'inicio') + ' — ' + (hasta != null ? hasta : 'hoy')) : 'Histórico completo'}">Histórico completo</div>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<div class="separador"></div>
+
+<h2>Resumen</h2>
+<table class="kpis">
+    <tr>
+        <td><span class="valor" th:text="'S/ ' + ${#numbers.formatDecimal(totalVentas, 1, 2)}">S/ 0.00</span><span class="etiqueta">Ventas totales</span></td>
+        <td><span class="valor" th:text="${totalPedidos}">0</span><span class="etiqueta">Pedidos</span></td>
+        <td><span class="valor" th:text="'S/ ' + ${#numbers.formatDecimal(ticketPromedio, 1, 2)}">S/ 0.00</span><span class="etiqueta">Ticket promedio</span></td>
+        <td><span class="valor" th:text="${totalUnidadesVendidas}">0</span><span class="etiqueta">Unidades vendidas</span></td>
+        <td><span class="valor" th:text="${totalClientes}">0</span><span class="etiqueta">Clientes</span></td>
+        <td><span class="valor" th:text="${totalProductos}">0</span><span class="etiqueta">Productos</span></td>
+    </tr>
+</table>
+
+<h2>Pedidos por estado</h2>
+<p class="vacio" th:if="${#maps.isEmpty(pedidosPorEstado)}">Sin pedidos en este período.</p>
+<table class="tabla-datos" th:unless="${#maps.isEmpty(pedidosPorEstado)}">
+    <thead><tr><th>Estado</th><th class="num">Pedidos</th></tr></thead>
+    <tbody>
+    <tr th:each="entry : ${pedidosPorEstado}">
+        <td th:text="${entry.key}"></td>
+        <td class="num" th:text="${entry.value}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<h2>Pedidos por tipo de entrega</h2>
+<p class="vacio" th:if="${#maps.isEmpty(pedidosPorEntrega)}">Sin pedidos en este período.</p>
+<table class="tabla-datos" th:unless="${#maps.isEmpty(pedidosPorEntrega)}">
+    <thead><tr><th>Entrega</th><th class="num">Pedidos</th></tr></thead>
+    <tbody>
+    <tr th:each="entry : ${pedidosPorEntrega}">
+        <td th:text="${entry.key}"></td>
+        <td class="num" th:text="${entry.value}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<h2>Productos más vendidos</h2>
+<p class="vacio" th:if="${#lists.isEmpty(masVendidos)}">Sin ventas en este período.</p>
+<table class="tabla-datos" th:unless="${#lists.isEmpty(masVendidos)}">
+    <thead><tr><th>Producto</th><th class="num">Unidades</th></tr></thead>
+    <tbody>
+    <tr th:each="entry : ${masVendidos}">
+        <td th:text="${entry.key}"></td>
+        <td class="num" th:text="${entry.value}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<h2>Ventas por categoría</h2>
+<p class="vacio" th:if="${#maps.isEmpty(ventasPorCategoria)}">Sin ventas en este período.</p>
+<table class="tabla-datos" th:unless="${#maps.isEmpty(ventasPorCategoria)}">
+    <thead><tr><th>Categoría</th><th class="num">Total vendido</th></tr></thead>
+    <tbody>
+    <tr th:each="entry : ${ventasPorCategoria}">
+        <td th:text="${entry.key}"></td>
+        <td class="num" th:text="'S/ ' + ${#numbers.formatDecimal(entry.value, 1, 2)}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<h2>Ventas por canal</h2>
+<p class="vacio" th:if="${#maps.isEmpty(ventasPorCanal)}">Sin ventas en este período.</p>
+<table class="tabla-datos" th:unless="${#maps.isEmpty(ventasPorCanal)}">
+    <thead><tr><th>Canal</th><th class="num">Total vendido</th></tr></thead>
+    <tbody>
+    <tr th:each="entry : ${ventasPorCanal}">
+        <td th:text="${entry.key}"></td>
+        <td class="num" th:text="'S/ ' + ${#numbers.formatDecimal(entry.value, 1, 2)}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<h2>Ventas por método de pago</h2>
+<p class="vacio" th:if="${#maps.isEmpty(ventasPorMetodoPago)}">Sin ventas en este período.</p>
+<table class="tabla-datos" th:unless="${#maps.isEmpty(ventasPorMetodoPago)}">
+    <thead><tr><th>Método de pago</th><th class="num">Total vendido</th></tr></thead>
+    <tbody>
+    <tr th:each="entry : ${ventasPorMetodoPago}">
+        <td th:text="${entry.key}"></td>
+        <td class="num" th:text="'S/ ' + ${#numbers.formatDecimal(entry.value, 1, 2)}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<h2>Ventas por vendedor</h2>
+<p class="vacio" th:if="${#maps.isEmpty(ventasPorVendedor)}">Sin ventas en este período.</p>
+<table class="tabla-datos" th:unless="${#maps.isEmpty(ventasPorVendedor)}">
+    <thead><tr><th>Vendedor</th><th class="num">Total vendido</th></tr></thead>
+    <tbody>
+    <tr th:each="entry : ${ventasPorVendedor}">
+        <td th:text="${entry.key}"></td>
+        <td class="num" th:text="'S/ ' + ${#numbers.formatDecimal(entry.value, 1, 2)}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<h2>Mejores clientes</h2>
+<p class="vacio" th:if="${#lists.isEmpty(topClientes)}">Sin ventas en este período.</p>
+<table class="tabla-datos" th:unless="${#lists.isEmpty(topClientes)}">
+    <thead><tr><th>Cliente</th><th>Documento</th><th class="num">Pedidos</th><th class="num">Total comprado</th></tr></thead>
+    <tbody>
+    <tr th:each="c : ${topClientes}">
+        <td th:text="${c.persona.nombre} + ' ' + ${c.persona.apellido}"></td>
+        <td th:text="${c.persona.tipoDocumento} + ' ' + ${c.persona.numeroDocumento}"></td>
+        <td class="num" th:text="${c.pedidos}"></td>
+        <td class="num" th:text="'S/ ' + ${#numbers.formatDecimal(c.total, 1, 2)}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<h2>Recomendaciones de reabastecimiento (últimos 30 días)</h2>
+<p class="vacio" th:if="${#lists.isEmpty(recomendacionesReabastecimiento)}">Todas las existencias alcanzan para el ritmo de venta actual.</p>
+<table class="tabla-datos" th:unless="${#lists.isEmpty(recomendacionesReabastecimiento)}">
+    <thead>
+    <tr>
+        <th>Producto</th>
+        <th>Talla / color</th>
+        <th class="num">Stock</th>
+        <th class="num">Vendidos (30d)</th>
+        <th class="num">Días restantes</th>
+        <th>Urgencia</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="r : ${recomendacionesReabastecimiento}">
+        <td th:text="${r.producto.nombre}"></td>
+        <td th:text="${r.variante.etiqueta}"></td>
+        <td class="num" th:text="${r.variante.stock}"></td>
+        <td class="num" th:text="${r.unidadesVendidas30d}"></td>
+        <td class="num" th:text="${r.diasRestantes != null} ? ${#numbers.formatDecimal(r.diasRestantes, 1, 1)} : '—'"></td>
+        <td th:text="${r.nivel}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<div class="pie">
+    Reporte generado automáticamente por TiendaMas · Uso interno
+</div>
+
+</body>
+</html>

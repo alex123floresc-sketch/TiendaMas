@@ -1,5 +1,6 @@
 package com.tiendamas.controller;
 
+import com.tiendamas.dto.ClienteResumen;
 import com.tiendamas.dto.RecomendacionReabastecimiento;
 import com.tiendamas.dto.ResumenMensual;
 import com.tiendamas.dto.ResumenVentasPeriodo;
@@ -7,6 +8,7 @@ import com.tiendamas.entity.CanalVenta;
 import com.tiendamas.entity.DetallePedido;
 import com.tiendamas.entity.Gasto;
 import com.tiendamas.entity.Pedido;
+import com.tiendamas.entity.Persona;
 import com.tiendamas.entity.Producto;
 import com.tiendamas.entity.Sueldo;
 import com.tiendamas.entity.Usuario;
@@ -17,21 +19,30 @@ import com.tiendamas.service.PersonaService;
 import com.tiendamas.service.ProductoService;
 import com.tiendamas.service.SueldoService;
 import com.tiendamas.service.UsuarioService;
+import com.tiendamas.service.impl.ReportePdfService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Controller
 @RequestMapping("/reportes")
@@ -55,8 +66,12 @@ public class ReporteController {
     @Autowired
     private UsuarioService usuarioService;
 
+    @Autowired
+    private ReportePdfService reportePdfService;
+
     private static final int STOCK_BAJO_UMBRAL = 5;
-    private static final int TOP_PRODUCTOS_LIMITE = 5;
+    private static final int TOP_PRODUCTOS_LIMITE = 8;
+    private static final int TOP_CLIENTES_LIMITE = 8;
     private static final int MESES_RESUMEN = 6;
     private static final int SEMANAS_RESUMEN = 8;
     private static final int VENTANA_REABASTECIMIENTO_DIAS = 30;
@@ -67,16 +82,56 @@ public class ReporteController {
     };
 
     @GetMapping
-    public String reportes(Model model) {
-        List<Pedido> pedidos = pedidoService.obtenerTodos();
+    public String reportes(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+                            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
+                            Model model) {
+        model.addAllAttributes(calcularReporte(desde, hasta));
+        model.addAttribute("titulo", "Reportes");
+        model.addAttribute("desde", desde);
+        model.addAttribute("hasta", hasta);
+        return "reportes/index";
+    }
+
+    @GetMapping("/pdf")
+    public ResponseEntity<byte[]> exportarPdf(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+                                               @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta) {
+        Map<String, Object> datos = calcularReporte(desde, hasta);
+        datos.put("desde", desde);
+        datos.put("hasta", hasta);
+        datos.put("generadoEl", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+
+        byte[] pdf = reportePdfService.generarPdf(datos);
+        String nombreArchivo = "Reporte-TiendaMas-" + LocalDate.now() + ".pdf";
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        ContentDisposition.attachment().filename(nombreArchivo).build().toString())
+                .body(pdf);
+    }
+
+    /**
+     * Calcula todos los datos del reporte. Las secciones "totales" (ventas, top productos, por
+     * categoría/canal/método/vendedor/cliente, estado y entrega) respetan el rango desde/hasta si
+     * se indica. Las tendencias (resumen mensual financiero, semanal y mensual por canal) y las
+     * recomendaciones de reabastecimiento son siempre sobre el histórico/últimos 30 días, sin
+     * importar el filtro, porque muestran una evolución en el tiempo.
+     */
+    private Map<String, Object> calcularReporte(LocalDate desde, LocalDate hasta) {
+        List<Pedido> todosPedidos = pedidoService.obtenerTodos();
         List<Producto> productos = productoService.obtenerTodos();
+        List<Pedido> pedidos = filtrarPorFecha(todosPedidos, desde, hasta);
 
         double totalVentas = 0.0;
+        int totalUnidades = 0;
         Map<String, Integer> unidadesPorProducto = new LinkedHashMap<>();
         Map<String, Double> ventasPorCategoria = new LinkedHashMap<>();
         Map<String, Double> ventasPorCanal = new LinkedHashMap<>();
         Map<String, Double> ventasPorMetodoPago = new LinkedHashMap<>();
         Map<String, Double> ventasPorVendedor = new LinkedHashMap<>();
+        Map<String, Integer> pedidosPorEstado = new LinkedHashMap<>();
+        Map<String, Integer> pedidosPorEntrega = new LinkedHashMap<>();
+        Map<Persona, Double> gastoPorCliente = new LinkedHashMap<>();
+        Map<Persona, Integer> pedidosPorCliente = new LinkedHashMap<>();
 
         Map<String, Usuario> usuariosPorUsername = usuarioService.obtenerTodos().stream()
                 .collect(Collectors.toMap(Usuario::getUsername, u -> u, (a, b) -> a));
@@ -91,6 +146,12 @@ public class ReporteController {
             String metodoPagoNombre = pedido.getMetodoPago() != null ? pedido.getMetodoPago().getEtiqueta() : "Sin especificar";
             ventasPorMetodoPago.merge(metodoPagoNombre, totalPedido, Double::sum);
 
+            String estadoNombre = pedido.getEstado() != null ? pedido.getEstado().getEtiqueta() : "Sin estado";
+            pedidosPorEstado.merge(estadoNombre, 1, Integer::sum);
+
+            String entregaNombre = pedido.getTipoEntrega() != null ? pedido.getTipoEntrega().getEtiqueta() : "Sin especificar";
+            pedidosPorEntrega.merge(entregaNombre, 1, Integer::sum);
+
             String vendedorUsername = pedido.getVendedorUsername();
             String vendedorNombre;
             if (vendedorUsername == null || vendedorUsername.isBlank()) {
@@ -101,12 +162,18 @@ public class ReporteController {
             }
             ventasPorVendedor.merge(vendedorNombre, totalPedido, Double::sum);
 
+            if (pedido.getPersona() != null) {
+                gastoPorCliente.merge(pedido.getPersona(), totalPedido, Double::sum);
+                pedidosPorCliente.merge(pedido.getPersona(), 1, Integer::sum);
+            }
+
             for (DetallePedido detalle : pedido.getDetalles()) {
                 Producto producto = detalle.getProducto();
                 if (producto == null) continue;
 
                 int cantidad = detalle.getCantidad() != null ? detalle.getCantidad() : 0;
                 unidadesPorProducto.merge(producto.getNombre(), cantidad, Integer::sum);
+                totalUnidades += cantidad;
 
                 String categoriaNombre = producto.getCategoria() != null
                         ? producto.getCategoria().getNombre() : "Sin categoría";
@@ -115,7 +182,18 @@ public class ReporteController {
             }
         }
 
-        List<Producto> masVendidos = pedidoService.obtenerMasVendidos(TOP_PRODUCTOS_LIMITE);
+        double ticketPromedio = pedidos.isEmpty() ? 0.0 : totalVentas / pedidos.size();
+
+        List<Map.Entry<String, Integer>> masVendidos = unidadesPorProducto.entrySet().stream()
+                .sorted((a, b) -> b.getValue() - a.getValue())
+                .limit(TOP_PRODUCTOS_LIMITE)
+                .toList();
+
+        List<ClienteResumen> topClientes = gastoPorCliente.entrySet().stream()
+                .sorted((a, b) -> Double.compare(b.getValue(), a.getValue()))
+                .limit(TOP_CLIENTES_LIMITE)
+                .map(e -> new ClienteResumen(e.getKey(), e.getValue(), pedidosPorCliente.getOrDefault(e.getKey(), 0)))
+                .toList();
 
         Map<Long, Integer> unidadesUltimos30Dias = pedidoService.obtenerUnidadesVendidasDesde(
                 LocalDateTime.now().minusDays(VENTANA_REABASTECIMIENTO_DIAS));
@@ -125,35 +203,50 @@ public class ReporteController {
         List<RecomendacionReabastecimiento> recomendacionesReabastecimiento =
                 calcularReabastecimiento(variantes, unidadesUltimos30Dias);
 
-        List<ResumenMensual> resumenMensual = calcularResumenMensual(pedidos, gastoService.obtenerTodos(), sueldoService.obtenerTodos());
+        List<ResumenMensual> resumenMensual = calcularResumenMensual(todosPedidos, gastoService.obtenerTodos(), sueldoService.obtenerTodos());
         double maxResumenMensual = resumenMensual.stream()
-                .flatMap(r -> java.util.stream.Stream.of(r.getVentas(), r.getGastos(), r.getSueldos()))
+                .flatMap(r -> Stream.of(r.getVentas(), r.getGastos(), r.getSueldos()))
                 .max(Double::compare)
                 .orElse(1.0);
         if (maxResumenMensual <= 0) {
             maxResumenMensual = 1.0;
         }
 
-        List<ResumenVentasPeriodo> resumenSemanal = calcularResumenSemanal(pedidos);
-        List<ResumenVentasPeriodo> resumenMensualVentas = calcularResumenMensualVentas(pedidos);
+        List<ResumenVentasPeriodo> resumenSemanal = calcularResumenSemanal(todosPedidos);
+        List<ResumenVentasPeriodo> resumenMensualVentas = calcularResumenMensualVentas(todosPedidos);
 
-        model.addAttribute("titulo", "Reportes");
-        model.addAttribute("totalVentas", totalVentas);
-        model.addAttribute("totalPedidos", pedidos.size());
-        model.addAttribute("totalClientes", personaService.obtenerTodas().size());
-        model.addAttribute("totalProductos", productos.size());
-        model.addAttribute("masVendidos", masVendidos);
-        model.addAttribute("unidadesPorProducto", unidadesPorProducto);
-        model.addAttribute("ventasPorCategoria", ventasPorCategoria);
-        model.addAttribute("ventasPorCanal", ventasPorCanal);
-        model.addAttribute("ventasPorMetodoPago", ventasPorMetodoPago);
-        model.addAttribute("ventasPorVendedor", ventasPorVendedor);
-        model.addAttribute("recomendacionesReabastecimiento", recomendacionesReabastecimiento);
-        model.addAttribute("resumenMensual", resumenMensual);
-        model.addAttribute("maxResumenMensual", maxResumenMensual);
-        model.addAttribute("resumenSemanal", resumenSemanal);
-        model.addAttribute("resumenMensualVentas", resumenMensualVentas);
-        return "reportes/index";
+        Map<String, Object> datos = new LinkedHashMap<>();
+        datos.put("totalVentas", totalVentas);
+        datos.put("totalPedidos", pedidos.size());
+        datos.put("totalClientes", personaService.obtenerTodas().size());
+        datos.put("totalProductos", productos.size());
+        datos.put("totalUnidadesVendidas", totalUnidades);
+        datos.put("ticketPromedio", ticketPromedio);
+        datos.put("masVendidos", masVendidos);
+        datos.put("ventasPorCategoria", ventasPorCategoria);
+        datos.put("ventasPorCanal", ventasPorCanal);
+        datos.put("ventasPorMetodoPago", ventasPorMetodoPago);
+        datos.put("ventasPorVendedor", ventasPorVendedor);
+        datos.put("pedidosPorEstado", pedidosPorEstado);
+        datos.put("pedidosPorEntrega", pedidosPorEntrega);
+        datos.put("topClientes", topClientes);
+        datos.put("recomendacionesReabastecimiento", recomendacionesReabastecimiento);
+        datos.put("resumenMensual", resumenMensual);
+        datos.put("maxResumenMensual", maxResumenMensual);
+        datos.put("resumenSemanal", resumenSemanal);
+        datos.put("resumenMensualVentas", resumenMensualVentas);
+        return datos;
+    }
+
+    private List<Pedido> filtrarPorFecha(List<Pedido> pedidos, LocalDate desde, LocalDate hasta) {
+        if (desde == null && hasta == null) {
+            return pedidos;
+        }
+        return pedidos.stream()
+                .filter(p -> p.getFecha() != null)
+                .filter(p -> desde == null || !p.getFecha().toLocalDate().isBefore(desde))
+                .filter(p -> hasta == null || !p.getFecha().toLocalDate().isAfter(hasta))
+                .toList();
     }
 
     private List<RecomendacionReabastecimiento> calcularReabastecimiento(List<VarianteProducto> variantes, Map<Long, Integer> unidadesUltimos30Dias) {
