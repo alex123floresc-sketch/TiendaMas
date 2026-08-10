@@ -32,6 +32,10 @@
                 </div>
                 <input type="file" name="imagen" accept="image/*">
                 <small class="hint" th:if="${producto != null and producto.imagenUrl != null}">Selecciona un archivo solo si quieres reemplazar la imagen actual.</small>
+                <div class="ui checkbox" style="margin-top:8px;" th:if="${producto != null and producto.imagenUrl != null}">
+                    <input type="checkbox" name="quitarImagen" value="true" id="quitarImagen">
+                    <label for="quitarImagen">Quitar la imagen principal actual (sin reemplazarla)</label>
+                </div>
             </div>
 
             <div class="field">

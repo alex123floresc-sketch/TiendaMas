@@ -96,6 +96,7 @@ public class ProductoController {
     public String actualizar(@PathVariable Long id,
                              @Valid @ModelAttribute("productoForm") ProductoForm form,
                              @RequestParam(value = "imagen", required = false) MultipartFile imagen,
+                             @RequestParam(value = "quitarImagen", required = false) boolean quitarImagen,
                              @RequestParam(value = "imagenesAdicionales", required = false) List<MultipartFile> imagenesAdicionales) {
         Categoria categoria = categoriaService.obtenerPorId(form.getCategoriaId());
         Producto existente = productoService.obtenerPorId(id);
@@ -103,6 +104,9 @@ public class ProductoController {
         if (imagen != null && !imagen.isEmpty()) {
             imagenStorage.eliminar(existente.getImagenUrl());
             imagenUrl = imagenStorage.guardar(imagen);
+        } else if (quitarImagen) {
+            imagenStorage.eliminar(existente.getImagenUrl());
+            imagenUrl = null;
         } else {
             imagenUrl = existente.getImagenUrl();
         }

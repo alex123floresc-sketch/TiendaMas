@@ -3,7 +3,9 @@ package com.tiendamas.service.impl;
 import com.tiendamas.dto.DetalleForm;
 import com.tiendamas.dto.ItemVenta;
 import com.tiendamas.dto.PedidoForm;
+import com.tiendamas.dto.ResultadoCupon;
 import com.tiendamas.entity.CanalVenta;
+import com.tiendamas.entity.Cupon;
 import com.tiendamas.entity.DetallePedido;
 import com.tiendamas.entity.EstadoPedido;
 import com.tiendamas.entity.MetodoPago;
@@ -59,6 +61,12 @@ public class PedidoServiceImpl implements PedidoService {
     @Autowired
     private ComprobantePdfService comprobantePdfService;
 
+    @Autowired
+    private EnvioService envioService;
+
+    @Autowired
+    private com.tiendamas.service.CuponService cuponService;
+
     @Override
     public List<Pedido> obtenerTodos() {
         return pedidoRepository.findAll();
@@ -96,6 +104,14 @@ public class PedidoServiceImpl implements PedidoService {
     public Pedido crearVenta(Long personaId, List<ItemVenta> items, CanalVenta canal,
                               MetodoPago metodoPago, String vendedorUsername,
                               TipoEntrega tipoEntrega, String direccionEntrega) {
+        return crearVenta(personaId, items, canal, metodoPago, vendedorUsername, tipoEntrega, direccionEntrega, null);
+    }
+
+    @Override
+    @Transactional
+    public Pedido crearVenta(Long personaId, List<ItemVenta> items, CanalVenta canal,
+                              MetodoPago metodoPago, String vendedorUsername,
+                              TipoEntrega tipoEntrega, String direccionEntrega, String codigoCupon) {
         Persona persona = personaService.obtenerPorId(personaId);
         if (persona == null) {
             throw new IllegalArgumentException("Cliente no encontrado");
@@ -154,8 +170,27 @@ public class PedidoServiceImpl implements PedidoService {
             throw new IllegalArgumentException("El carrito está vacío");
         }
 
-        pedido.setTotal(total);
+        Cupon cupon = null;
+        double descuento = 0.0;
+        if (codigoCupon != null && !codigoCupon.isBlank()) {
+            ResultadoCupon resultado = cuponService.validar(codigoCupon, total);
+            if (!resultado.isValido()) {
+                throw new IllegalArgumentException(resultado.getError());
+            }
+            cupon = resultado.getCupon();
+            descuento = cupon.calcularDescuento(total);
+        }
+
+        double costoEnvio = envioService.calcularCosto(total, pedido.getTipoEntrega());
+        pedido.setCostoEnvio(costoEnvio);
+        pedido.setCupon(cupon);
+        pedido.setDescuento(descuento);
+        pedido.setTotal(total - descuento + costoEnvio);
         Pedido guardado = pedidoRepository.save(pedido);
+
+        if (cupon != null) {
+            cuponService.registrarUso(cupon);
+        }
 
         byte[] pdfComprobante = null;
         try {
@@ -165,7 +200,7 @@ public class PedidoServiceImpl implements PedidoService {
                     guardado.getId(), e.getMessage());
         }
         emailService.enviarConfirmacionPedido(guardado, pdfComprobante);
-        return guardado;
+        return guardadobi
     }
 
     @Override

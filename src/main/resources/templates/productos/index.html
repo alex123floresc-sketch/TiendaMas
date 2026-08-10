@@ -74,8 +74,8 @@
             <td th:text="${producto.id}"></td>
             <td>
                 <div class="producto-thumb">
-                    <img th:if="${producto.imagenUrl != null}" th:src="@{${producto.imagenUrl}}" alt="Imagen del producto">
-                    <i th:unless="${producto.imagenUrl != null}" class="image icon"></i>
+                    <img th:if="${producto.imagenPrincipal != null}" th:src="@{${producto.imagenPrincipal}}" alt="Imagen del producto">
+                    <i th:unless="${producto.imagenPrincipal != null}" class="image icon"></i>
                 </div>
             </td>
             <td>
@@ -88,7 +88,7 @@
                       th:classappend="${v.stock != null and v.stock > 0} ? '' : 'grey'"
                       th:text="${v.talla != null ? v.talla.etiqueta : '?'} + (${v.color != null and !v.color.isEmpty()} ? ' · ' + ${v.color} : '') + ' (' + ${v.stock} + ')'"></span>
             </td>
-            <td th:text="'S/ ' + ${producto.precio}" style="font-weight: bold; color: #21ba45;"></td>
+            <td th:text="'S/ ' + ${#numbers.formatDecimal(producto.precio, 1, 2)}" style="font-weight: bold; color: #21ba45;"></td>
             <td th:text="${producto.stock}" class="center aligned"></td>
             <td>
                 <span class="ui teal tiny label" th:text="${producto.categoria.nombre}"></span>

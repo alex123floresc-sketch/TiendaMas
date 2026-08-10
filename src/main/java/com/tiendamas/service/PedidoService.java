@@ -30,6 +30,11 @@ public interface PedidoService {
                        MetodoPago metodoPago, String vendedorUsername,
                        TipoEntrega tipoEntrega, String direccionEntrega);
 
+    /** Igual que crearVenta, pero permite aplicar un código de cupón (null/blank = sin cupón). */
+    Pedido crearVenta(Long personaId, List<ItemVenta> items, CanalVenta canal,
+                       MetodoPago metodoPago, String vendedorUsername,
+                       TipoEntrega tipoEntrega, String direccionEntrega, String codigoCupon);
+
     void actualizarEstado(Long pedidoId, EstadoPedido nuevoEstado);
 
     void eliminar(Long id);

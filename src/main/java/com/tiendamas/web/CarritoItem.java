@@ -22,7 +22,7 @@ public class CarritoItem {
         this.talla = variante.getTalla() != null ? variante.getTalla().getEtiqueta() : null;
         this.color = variante.getColor();
         this.colorHex = variante.getColorHex();
-        this.imagenUrl = variante.getProducto().getImagenUrl();
+        this.imagenUrl = variante.getProducto().getImagenPrincipal();
         this.precioUnitario = variante.getProducto().getPrecio();
         this.stockDisponible = variante.getStock() != null ? variante.getStock() : 0;
         this.cantidad = cantidad;

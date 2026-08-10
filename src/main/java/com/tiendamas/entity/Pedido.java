@@ -24,6 +24,14 @@ public class Pedido {
 
     private Double total;
 
+    private Double costoEnvio = 0.0;
+
+    private Double descuento = 0.0;
+
+    @ManyToOne
+    @JoinColumn(name = "cupon_id")
+    private Cupon cupon;
+
     @Enumerated(EnumType.STRING)
     private TipoComprobante tipoComprobante;
 
@@ -75,6 +83,24 @@ public class Pedido {
 
     public Double getTotal() { return total; }
     public void setTotal(Double total) { this.total = total; }
+
+    public Double getCostoEnvio() { return costoEnvio; }
+    public void setCostoEnvio(Double costoEnvio) { this.costoEnvio = costoEnvio; }
+
+    public Double getDescuento() { return descuento; }
+    public void setDescuento(Double descuento) { this.descuento = descuento; }
+
+    public Cupon getCupon() { return cupon; }
+    public void setCupon(Cupon cupon) { this.cupon = cupon; }
+
+    /** Total de los productos solo (sin envío, sin descuento), para desglosar el comprobante. */
+    @Transient
+    public double getSubtotal() {
+        double totalPedido = total != null ? total : 0.0;
+        double envio = costoEnvio != null ? costoEnvio : 0.0;
+        double desc = descuento != null ? descuento : 0.0;
+        return totalPedido - envio + desc;
+    }
 
     public TipoComprobante getTipoComprobante() { return tipoComprobante; }
     public void setTipoComprobante(TipoComprobante tipoComprobante) { this.tipoComprobante = tipoComprobante; }

@@ -19,18 +19,15 @@
             <div class="tienda-detalle-media">
                 <div class="tienda-detalle-img">
                     <span class="tienda-badge-agotado" th:unless="${producto.tieneStock()}">Sin stock</span>
-                    <img id="tiendaDetalleImgPrincipal" th:if="${producto.imagenUrl != null}" th:src="@{${producto.imagenUrl}}" th:alt="${producto.nombre}">
-                    <img id="tiendaDetalleImgPrincipal" th:if="${producto.imagenUrl == null and not #lists.isEmpty(producto.imagenes)}"
-                         th:src="@{${producto.imagenes[0].url}}" th:alt="${producto.nombre}">
-                    <i th:if="${producto.imagenUrl == null and #lists.isEmpty(producto.imagenes)}" class="box icon massive"></i>
+                    <img id="tiendaDetalleImgPrincipal" th:if="${not #lists.isEmpty(producto.galeriaCompleta)}"
+                         th:src="@{${producto.galeriaCompleta[0]}}" th:alt="${producto.nombre}">
+                    <i th:if="${#lists.isEmpty(producto.galeriaCompleta)}" class="box icon massive"></i>
                 </div>
-                <div class="tienda-detalle-galeria" th:if="${not #lists.isEmpty(producto.imagenes)}">
-                    <img th:if="${producto.imagenUrl != null}" th:src="@{${producto.imagenUrl}}"
-                         class="tienda-detalle-galeria-thumb" th:alt="'Miniatura de ' + ${producto.nombre}" loading="lazy"
-                         onclick="document.getElementById('tiendaDetalleImgPrincipal').src=this.src">
-                    <img th:each="img : ${producto.imagenes}" th:src="@{${img.url}}"
-                         class="tienda-detalle-galeria-thumb" th:alt="'Miniatura de ' + ${producto.nombre}" loading="lazy"
-                         onclick="document.getElementById('tiendaDetalleImgPrincipal').src=this.src">
+                <div class="tienda-detalle-galeria" th:if="${producto.galeriaCompleta.size() > 1}">
+                    <img th:each="url, urlStat : ${producto.galeriaCompleta}" th:src="@{${url}}"
+                         class="tienda-detalle-galeria-thumb" th:classappend="${urlStat.first} ? 'activa'"
+                         th:alt="'Foto ' + ${urlStat.count} + ' de ' + ${producto.nombre}" loading="lazy"
+                         onclick="document.getElementById('tiendaDetalleImgPrincipal').src=this.src; document.querySelectorAll('.tienda-detalle-galeria-thumb').forEach(function(t){t.classList.remove('activa')}); this.classList.add('activa')">
                 </div>
             </div>
 
@@ -41,7 +38,7 @@
                 <div class="tienda-detalle-titulo-fila">
                     <h1 class="ui header" th:text="${producto.nombre}"></h1>
                     <button type="button" class="tienda-favorito-btn inline" aria-label="Agregar a favoritos" title="Agregar a favoritos"
-                            th:attr="data-id=${producto.id},data-nombre=${producto.nombre},data-precio=${producto.precio},data-imagen=${producto.imagenUrl},data-url=@{/tienda/productos/{id}(id=${producto.id})}">
+                            th:attr="data-id=${producto.id},data-nombre=${producto.nombre},data-precio=${producto.precio},data-imagen=${producto.imagenPrincipal},data-url=@{/tienda/productos/{id}(id=${producto.id})}">
                         <i class="heart icon"></i> <span>Guardar</span>
                     </button>
                 </div>

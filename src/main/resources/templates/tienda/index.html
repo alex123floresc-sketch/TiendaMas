@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/tienda}">
 <body>
-<div th:fragment="content" th:with="productosConImagen=${productos.?[imagenUrl != null]}">
+<div th:fragment="content" th:with="productosConImagen=${productos.?[imagenPrincipal != null]}">
 
     <div class="tienda-hero">
         <div class="tienda-hero-inner">
@@ -14,7 +14,7 @@
             </div>
             <div class="tienda-hero-collage" th:if="${!#lists.isEmpty(productosConImagen)}">
                 <img th:each="p, it : ${productosConImagen}" th:if="${it.index < 4}"
-                     th:src="@{${p.imagenUrl}}" th:alt="${p.nombre}"
+                     th:src="@{${p.imagenPrincipal}}" th:alt="${p.nombre}"
                      th:class="'tienda-hero-foto tienda-hero-foto-' + (${it.index}+1)">
             </div>
         </div>

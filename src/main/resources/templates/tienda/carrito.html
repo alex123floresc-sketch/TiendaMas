@@ -62,6 +62,14 @@
 
         <aside class="tienda-carrito-resumen">
             <h3 class="ui header">Resumen del pedido</h3>
+            <div class="tienda-envio-nudge" th:if="${envioMontoGratis != null}">
+                <i class="truck icon"></i>
+                <span th:if="${carrito.total >= envioMontoGratis}">¡Ya tienes envío a domicilio gratis!</span>
+                <span th:unless="${carrito.total >= envioMontoGratis}">
+                    Te faltan <strong>S/ <span th:text="${#numbers.formatDecimal(envioMontoGratis - carrito.total, 1, 2)}"></span></strong>
+                    para el envío a domicilio gratis.
+                </span>
+            </div>
             <div class="tienda-resumen-fila">
                 <span>Subtotal</span>
                 <span th:text="'S/ ' + ${#numbers.formatDecimal(carrito.total, 1, 2)}"></span>

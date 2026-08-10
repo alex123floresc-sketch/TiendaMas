@@ -50,6 +50,7 @@ public class PosController {
         model.addAttribute("titulo", "Punto de Venta");
         model.addAttribute("carrito", carrito);
         model.addAttribute("personas", personaService.obtenerTodas());
+        model.addAttribute("clienteGenerico", personaService.obtenerOClienteGenerico());
         return "pos/index";
     }
 

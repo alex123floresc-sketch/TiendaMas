@@ -6,6 +6,8 @@
   <title th:text="${titulo != null} ? ${titulo} + ' · TiendaMas' : 'TiendaMas'"></title>
   <meta name="description" th:content="${metaDescripcion != null} ? ${metaDescripcion} : 'TiendaMas: ropa y accesorios para hombre, mujer y niños, con envío a domicilio o recojo en tienda.'">
   <meta name="theme-color" content="#101B2D">
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="TiendaMas">
   <meta property="og:title" th:content="${titulo != null} ? ${titulo} + ' · TiendaMas' : 'TiendaMas'">

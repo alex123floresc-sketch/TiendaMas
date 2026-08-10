@@ -3,14 +3,14 @@
 <body>
 <th:block th:fragment="tarjetaProductoContenido(p)">
     <button type="button" class="tienda-favorito-btn" aria-label="Agregar a favoritos" title="Agregar a favoritos"
-            th:attr="data-id=${p.id},data-nombre=${p.nombre},data-precio=${p.precio},data-imagen=${p.imagenUrl},data-url=@{/tienda/productos/{id}(id=${p.id})}">
+            th:attr="data-id=${p.id},data-nombre=${p.nombre},data-precio=${p.precio},data-imagen=${p.imagenPrincipal},data-url=@{/tienda/productos/{id}(id=${p.id})}">
         <i class="heart icon"></i>
     </button>
     <span class="tienda-badge-agotado" th:unless="${p.stock != null and p.stock > 0}">Sin stock</span>
     <a th:href="@{/tienda/productos/{id}(id=${p.id})}" class="tienda-card-link">
         <div class="tienda-card-img">
-            <img th:if="${p.imagenUrl != null}" th:src="@{${p.imagenUrl}}" th:alt="${p.nombre}" loading="lazy">
-            <i th:unless="${p.imagenUrl != null}" class="box icon huge"></i>
+            <img th:if="${p.imagenPrincipal != null}" th:src="@{${p.imagenPrincipal}}" th:alt="${p.nombre}" loading="lazy">
+            <i th:unless="${p.imagenPrincipal != null}" class="box icon huge"></i>
         </div>
         <div class="tienda-card-body">
             <div class="tienda-card-cat" th:text="${p.categoria != null ? p.categoria.nombre : ''}"></div>

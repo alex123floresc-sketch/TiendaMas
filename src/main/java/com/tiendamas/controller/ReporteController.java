@@ -19,6 +19,7 @@ import com.tiendamas.service.PersonaService;
 import com.tiendamas.service.ProductoService;
 import com.tiendamas.service.SueldoService;
 import com.tiendamas.service.UsuarioService;
+import com.tiendamas.service.impl.ReporteChartService;
 import com.tiendamas.service.impl.ReportePdfService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -69,6 +70,9 @@ public class ReporteController {
     @Autowired
     private ReportePdfService reportePdfService;
 
+    @Autowired
+    private ReporteChartService reporteChartService;
+
     private static final int STOCK_BAJO_UMBRAL = 5;
     private static final int TOP_PRODUCTOS_LIMITE = 8;
     private static final int TOP_CLIENTES_LIMITE = 8;
@@ -93,12 +97,28 @@ public class ReporteController {
     }
 
     @GetMapping("/pdf")
+    @SuppressWarnings("unchecked")
     public ResponseEntity<byte[]> exportarPdf(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
                                                @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta) {
         Map<String, Object> datos = calcularReporte(desde, hasta);
         datos.put("desde", desde);
         datos.put("hasta", hasta);
         datos.put("generadoEl", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+
+        // Los gráficos de la pantalla se dibujan con Chart.js (JavaScript), que el generador de PDF
+        // no ejecuta; acá se renderizan de nuevo como imágenes estáticas para que salgan en el PDF.
+        datos.put("chartCanalBase64", reporteChartService.graficoTorta(
+                (Map<String, Double>) datos.get("ventasPorCanal"), "Ventas por canal"));
+        datos.put("chartMetodoPagoBase64", reporteChartService.graficoTorta(
+                (Map<String, Double>) datos.get("ventasPorMetodoPago"), "Ventas por método de pago"));
+        datos.put("chartVendedorBase64", reporteChartService.graficoTorta(
+                (Map<String, Double>) datos.get("ventasPorVendedor"), "Ventas por vendedor"));
+        datos.put("chartSemanalBase64", reporteChartService.graficoVentasPorCanal(
+                (List<ResumenVentasPeriodo>) datos.get("resumenSemanal"), "Ventas por semana (últimas 8 semanas)"));
+        datos.put("chartMensualVentasBase64", reporteChartService.graficoVentasPorCanal(
+                (List<ResumenVentasPeriodo>) datos.get("resumenMensualVentas"), "Ventas por mes (últimos 6 meses)"));
+        datos.put("chartFinancieroBase64", reporteChartService.graficoFinanciero(
+                (List<ResumenMensual>) datos.get("resumenMensual")));
 
         byte[] pdf = reportePdfService.generarPdf(datos);
         String nombreArchivo = "Reporte-TiendaMas-" + LocalDate.now() + ".pdf";

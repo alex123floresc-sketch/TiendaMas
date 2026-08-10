@@ -49,27 +49,33 @@
 
     <h2 class="reporte-seccion-titulo" id="resumen"><i class="tachometer alternate icon"></i> Resumen del período</h2>
     <div class="ui stackable statistics reporte-stats-grid" style="margin-bottom: 30px;">
-        <div class="statistic">
+        <div class="statistic reporte-stat-card ventas">
+            <i class="money bill alternate icon"></i>
             <div class="value" th:text="'S/ ' + ${#numbers.formatDecimal(totalVentas, 1, 2)}"></div>
             <div class="label">Ventas totales</div>
         </div>
-        <div class="statistic">
+        <div class="statistic reporte-stat-card pedidos">
+            <i class="receipt icon"></i>
             <div class="value" th:text="${totalPedidos}"></div>
             <div class="label">Pedidos</div>
         </div>
-        <div class="statistic">
+        <div class="statistic reporte-stat-card ticket">
+            <i class="ticket alternate icon"></i>
             <div class="value" th:text="'S/ ' + ${#numbers.formatDecimal(ticketPromedio, 1, 2)}"></div>
             <div class="label">Ticket promedio</div>
         </div>
-        <div class="statistic">
+        <div class="statistic reporte-stat-card unidades">
+            <i class="boxes icon"></i>
             <div class="value" th:text="${totalUnidadesVendidas}"></div>
             <div class="label">Unidades vendidas</div>
         </div>
-        <div class="statistic">
+        <div class="statistic reporte-stat-card clientes">
+            <i class="users icon"></i>
             <div class="value" th:text="${totalClientes}"></div>
             <div class="label">Clientes</div>
         </div>
-        <div class="statistic">
+        <div class="statistic reporte-stat-card productos">
+            <i class="tshirt icon"></i>
             <div class="value" th:text="${totalProductos}"></div>
             <div class="label">Productos</div>
         </div>

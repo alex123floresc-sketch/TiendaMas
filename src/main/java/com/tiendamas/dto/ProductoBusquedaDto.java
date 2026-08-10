@@ -22,7 +22,7 @@ public class ProductoBusquedaDto {
         this.marca = p.getMarca();
         this.precio = p.getPrecio();
         this.stock = p.getStock();
-        this.imagenUrl = p.getImagenUrl();
+        this.imagenUrl = p.getImagenPrincipal();
         this.categoriaId = p.getCategoria() != null ? p.getCategoria().getId() : null;
         this.categoriaNombre = p.getCategoria() != null ? p.getCategoria().getNombre() : null;
         this.variantes = p.getVariantes() == null ? List.of() : p.getVariantes().stream()

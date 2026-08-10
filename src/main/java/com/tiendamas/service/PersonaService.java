@@ -8,4 +8,7 @@ public interface PersonaService {
     Persona guardar(Persona persona);
     Persona obtenerPorId(Long id);
     void eliminar(Long id);
+
+    /** Cliente reutilizable para ventas de mostrador sin registrar al comprador (boleta a "Público General"). */
+    Persona obtenerOClienteGenerico();
 }

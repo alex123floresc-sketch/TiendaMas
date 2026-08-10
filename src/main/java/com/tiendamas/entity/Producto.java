@@ -78,6 +78,30 @@ public class Producto {
         this.imagenes.add(imagen);
     }
 
+    /** Todas las fotos del producto en orden de presentación: la principal primero, luego la galería. */
+    @Transient
+    public List<String> getGaleriaCompleta() {
+        List<String> urls = new ArrayList<>();
+        if (imagenUrl != null && !imagenUrl.isBlank()) {
+            urls.add(imagenUrl);
+        }
+        if (imagenes != null) {
+            for (ImagenProducto img : imagenes) {
+                if (img.getUrl() != null) {
+                    urls.add(img.getUrl());
+                }
+            }
+        }
+        return urls;
+    }
+
+    /** La foto a mostrar como miniatura/portada: la principal si existe, si no la primera de la galería. */
+    @Transient
+    public String getImagenPrincipal() {
+        List<String> galeria = getGaleriaCompleta();
+        return galeria.isEmpty() ? null : galeria.get(0);
+    }
+
     @Transient
     public Integer getStock() {
         if (variantes == null) return 0;

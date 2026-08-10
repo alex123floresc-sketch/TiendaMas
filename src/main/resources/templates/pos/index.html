@@ -81,7 +81,7 @@
                             </div>
                         </div>
                     </td>
-                    <td th:text="'S/ ' + ${item.precioUnitario}"></td>
+                    <td th:text="'S/ ' + ${#numbers.formatDecimal(item.precioUnitario, 1, 2)}"></td>
                     <td>
                         <input type="number" th:value="${item.cantidad}" min="1" th:max="${item.stockDisponible}"
                                class="ui input" style="width:80px;"
@@ -115,9 +115,14 @@
                         <label>Cliente</label>
                         <select name="personaId" class="ui search fluid dropdown" required>
                             <option value="">-- Selecciona un cliente --</option>
-                            <option th:each="p : ${personas}" th:value="${p.id}"
+                            <option th:if="${clienteGenerico != null}" th:value="${clienteGenerico.id}">
+                                🛒 Venta sin registrar (Público General)
+                            </option>
+                            <option th:each="p : ${personas}" th:if="${clienteGenerico == null or p.id != clienteGenerico.id}"
+                                    th:value="${p.id}"
                                     th:text="${p.nombre + ' ' + p.apellido}"></option>
                         </select>
+                        <small class="hint">¿El cliente no quiere dar sus datos? Elige "Venta sin registrar" y se emitirá la boleta a Público General.</small>
                     </div>
 
                     <div class="field required">
@@ -346,7 +351,7 @@
                 ? '<img class="pos-product-img" src="' + escapeHtml(p.imagenUrl) + '" alt="">'
                 : '<div class="pos-product-img-placeholder"><i class="image outline icon"></i></div>';
             card.innerHTML =
-                imagenHtml +
+                '<div class="pos-product-img-wrap">' + imagenHtml + '</div>' +
                 (p.categoriaNombre ? '<div class="pos-product-cat">' + escapeHtml(p.categoriaNombre) + '</div>' : '') +
                 '<div class="pos-product-nombre">' + escapeHtml(p.nombre) + '</div>' +
                 '<div class="pos-product-marca">' + escapeHtml(p.marca || '') + '</div>' +

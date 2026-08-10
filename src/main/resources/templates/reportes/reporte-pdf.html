@@ -25,6 +25,12 @@
         .tabla-datos tr:nth-child(even) td { background: #F8FAFC; }
         .vacio { color: #5B6B82; font-style: italic; padding: 6px 0; }
         .pie { margin-top: 22px; text-align: center; color: #5B6B82; font-size: 9px; }
+        .grafico { display: block; margin: 6px auto 4px; max-width: 100%; }
+        .grafico-chico { width: 320px; }
+        .grafico-mediano { width: 420px; }
+        .grafico-grande { width: 100%; }
+        .dos-columnas { width: 100%; }
+        .dos-columnas td { width: 50%; vertical-align: top; padding: 0 6px; }
     </style>
 </head>
 <body>
@@ -84,6 +90,36 @@
     </tbody>
 </table>
 
+<h2>Resumen financiero (últimos 6 meses)</h2>
+<p class="vacio" th:if="${chartFinancieroBase64 == null}">Sin movimientos registrados.</p>
+<img th:if="${chartFinancieroBase64 != null}" class="grafico grafico-grande" th:src="${chartFinancieroBase64}" alt="Gráfico de resumen financiero" />
+<table class="tabla-datos" th:if="${chartFinancieroBase64 != null}">
+    <thead><tr><th>Mes</th><th class="num">Ventas</th><th class="num">Gastos</th><th class="num">Sueldos</th><th class="num">Utilidad</th></tr></thead>
+    <tbody>
+    <tr th:each="r : ${resumenMensual}">
+        <td th:text="${r.mes}"></td>
+        <td class="num" th:text="'S/ ' + ${#numbers.formatDecimal(r.ventas, 1, 2)}"></td>
+        <td class="num" th:text="'S/ ' + ${#numbers.formatDecimal(r.gastos, 1, 2)}"></td>
+        <td class="num" th:text="'S/ ' + ${#numbers.formatDecimal(r.sueldos, 1, 2)}"></td>
+        <td class="num" th:text="'S/ ' + ${#numbers.formatDecimal(r.utilidad, 1, 2)}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<h2>Ventas por semana y por mes (por canal)</h2>
+<table class="dos-columnas">
+    <tr>
+        <td>
+            <p class="vacio" th:if="${chartSemanalBase64 == null}">Sin ventas registradas.</p>
+            <img th:if="${chartSemanalBase64 != null}" class="grafico grafico-mediano" th:src="${chartSemanalBase64}" alt="Gráfico de ventas por semana" />
+        </td>
+        <td>
+            <p class="vacio" th:if="${chartMensualVentasBase64 == null}">Sin ventas registradas.</p>
+            <img th:if="${chartMensualVentasBase64 != null}" class="grafico grafico-mediano" th:src="${chartMensualVentasBase64}" alt="Gráfico de ventas por mes" />
+        </td>
+    </tr>
+</table>
+
 <h2>Productos más vendidos</h2>
 <p class="vacio" th:if="${#lists.isEmpty(masVendidos)}">Sin ventas en este período.</p>
 <table class="tabla-datos" th:unless="${#lists.isEmpty(masVendidos)}">
@@ -110,6 +146,7 @@
 
 <h2>Ventas por canal</h2>
 <p class="vacio" th:if="${#maps.isEmpty(ventasPorCanal)}">Sin ventas en este período.</p>
+<img th:if="${chartCanalBase64 != null}" class="grafico grafico-chico" th:src="${chartCanalBase64}" alt="Gráfico de ventas por canal" />
 <table class="tabla-datos" th:unless="${#maps.isEmpty(ventasPorCanal)}">
     <thead><tr><th>Canal</th><th class="num">Total vendido</th></tr></thead>
     <tbody>
@@ -122,6 +159,7 @@
 
 <h2>Ventas por método de pago</h2>
 <p class="vacio" th:if="${#maps.isEmpty(ventasPorMetodoPago)}">Sin ventas en este período.</p>
+<img th:if="${chartMetodoPagoBase64 != null}" class="grafico grafico-chico" th:src="${chartMetodoPagoBase64}" alt="Gráfico de ventas por método de pago" />
 <table class="tabla-datos" th:unless="${#maps.isEmpty(ventasPorMetodoPago)}">
     <thead><tr><th>Método de pago</th><th class="num">Total vendido</th></tr></thead>
     <tbody>
@@ -134,6 +172,7 @@
 
 <h2>Ventas por vendedor</h2>
 <p class="vacio" th:if="${#maps.isEmpty(ventasPorVendedor)}">Sin ventas en este período.</p>
+<img th:if="${chartVendedorBase64 != null}" class="grafico grafico-chico" th:src="${chartVendedorBase64}" alt="Gráfico de ventas por vendedor" />
 <table class="tabla-datos" th:unless="${#maps.isEmpty(ventasPorVendedor)}">
     <thead><tr><th>Vendedor</th><th class="num">Total vendido</th></tr></thead>
     <tbody>

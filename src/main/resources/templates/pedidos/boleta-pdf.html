@@ -105,6 +105,14 @@
 </table>
 
 <table class="totales">
+    <tr th:if="${pedido.costoEnvio != null and pedido.costoEnvio > 0}">
+        <td style="text-align: right; width: 75%;">Subtotal</td>
+        <td style="text-align: right; width: 25%;" th:text="'S/ ' + ${#numbers.formatDecimal(pedido.subtotal, 1, 2)}"></td>
+    </tr>
+    <tr th:if="${pedido.costoEnvio != null and pedido.costoEnvio > 0}">
+        <td style="text-align: right; width: 75%;">Envío</td>
+        <td style="text-align: right; width: 25%;" th:text="'S/ ' + ${#numbers.formatDecimal(pedido.costoEnvio, 1, 2)}"></td>
+    </tr>
     <tr class="total-final">
         <td style="text-align: right; width: 75%;">TOTAL A PAGAR</td>
         <td style="text-align: right; width: 25%;" th:text="'S/ ' + ${#numbers.formatDecimal(pedido.total, 1, 2)}">S/ 0.00</td>

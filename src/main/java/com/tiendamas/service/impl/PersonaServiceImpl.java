@@ -1,6 +1,7 @@
 package com.tiendamas.service.impl;
 
 import com.tiendamas.entity.Persona;
+import com.tiendamas.entity.TipoDocumento;
 import com.tiendamas.repository.PersonaRepository;
 import com.tiendamas.service.PersonaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,8 @@ import java.util.List;
 
 @Service
 public class PersonaServiceImpl implements PersonaService {
+
+    private static final String DOCUMENTO_CLIENTE_GENERICO = "00000000";
 
     @Autowired
     private PersonaRepository personaRepository;
@@ -32,5 +35,15 @@ public class PersonaServiceImpl implements PersonaService {
     @Override
     public void eliminar(Long id) {
         personaRepository.deleteById(id);
+    }
+
+    @Override
+    public Persona obtenerOClienteGenerico() {
+        return personaRepository.findByNumeroDocumento(DOCUMENTO_CLIENTE_GENERICO)
+                .orElseGet(() -> {
+                    Persona generico = new Persona("Público", "General", null, null, null,
+                            TipoDocumento.DNI, DOCUMENTO_CLIENTE_GENERICO);
+                    return personaRepository.save(generico);
+                });
     }
 }

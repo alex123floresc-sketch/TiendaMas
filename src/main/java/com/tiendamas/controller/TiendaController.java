@@ -2,6 +2,7 @@ package com.tiendamas.controller;
 
 import com.tiendamas.dto.CambioPasswordForm;
 import com.tiendamas.dto.ItemVenta;
+import com.tiendamas.dto.ResultadoCupon;
 import com.tiendamas.dto.SugerenciaProducto;
 import com.tiendamas.entity.CanalVenta;
 import com.tiendamas.entity.Categoria;
@@ -16,10 +17,12 @@ import com.tiendamas.entity.Usuario;
 import com.tiendamas.entity.VarianteProducto;
 import com.tiendamas.repository.SuscriptorRepository;
 import com.tiendamas.service.CategoriaService;
+import com.tiendamas.service.CuponService;
 import com.tiendamas.service.PedidoService;
 import com.tiendamas.service.PersonaService;
 import com.tiendamas.service.ProductoService;
 import com.tiendamas.service.UsuarioService;
+import com.tiendamas.service.impl.EnvioService;
 import com.tiendamas.web.Carrito;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +68,12 @@ public class TiendaController {
 
     @Autowired
     private SuscriptorRepository suscriptorRepository;
+
+    @Autowired
+    private EnvioService envioService;
+
+    @Autowired
+    private CuponService cuponService;
 
     @GetMapping
     public String index(@RequestParam(required = false) String q,
@@ -117,9 +126,9 @@ public class TiendaController {
                 if (!destacados.isEmpty()) {
                     carruseles.put(cat, destacados.stream().limit(10).toList());
                     destacados.stream()
-                            .filter(p -> p.getImagenUrl() != null)
+                            .filter(p -> p.getImagenPrincipal() != null)
                             .findFirst()
-                            .ifPresent(p -> imagenPorCategoria.put(cat.getId(), p.getImagenUrl()));
+                            .ifPresent(p -> imagenPorCategoria.put(cat.getId(), p.getImagenPrincipal()));
                 }
             }
             model.addAttribute("carruseles", carruseles);
@@ -152,7 +161,7 @@ public class TiendaController {
         }
         return productoService.buscar(q, null, null, null, null).stream()
                 .limit(6)
-                .map(p -> new SugerenciaProducto(p.getId(), p.getNombre(), p.getImagenUrl(), p.getPrecio(),
+                .map(p -> new SugerenciaProducto(p.getId(), p.getNombre(), p.getImagenPrincipal(), p.getPrecio(),
                         p.getCategoria() != null ? p.getCategoria().getNombre() : null,
                         "/tienda/productos/" + p.getId()))
                 .toList();
@@ -193,14 +202,13 @@ public class TiendaController {
         if (producto == null) {
             return "redirect:/tienda";
         }
-        String imagen = producto.getImagenUrl() != null ? producto.getImagenUrl()
-                : (!producto.getImagenes().isEmpty() ? producto.getImagenes().get(0).getUrl() : null);
+        String imagen = producto.getImagenPrincipal();
         model.addAttribute("producto", producto);
         model.addAttribute("relacionados", productoService.obtenerRelacionados(producto));
         model.addAttribute("titulo", producto.getNombre());
         model.addAttribute("metaDescripcion", descripcionCorta(producto.getDescripcion(), producto.getNombre()));
         model.addAttribute("ogImage", imagen);
-        model.addAttribute("productoJsonLd", jsonLdProducto(producto, imagen, request));
+        model.addAttribute("productoJsonLd", jsonLdProducto(producto, request));
         return "tienda/detalle";
     }
 
@@ -209,7 +217,7 @@ public class TiendaController {
         return base.length() > 160 ? base.substring(0, 157) + "..." : base;
     }
 
-    private String jsonLdProducto(Producto producto, String imagen, HttpServletRequest request) {
+    private String jsonLdProducto(Producto producto, HttpServletRequest request) {
         String baseUrl = request.getRequestURL().substring(0, request.getRequestURL().length() - request.getRequestURI().length());
         Map<String, Object> jsonLd = new LinkedHashMap<>();
         jsonLd.put("@context", "https://schema.org/");
@@ -217,8 +225,9 @@ public class TiendaController {
         jsonLd.put("name", producto.getNombre());
         jsonLd.put("description", descripcionCorta(producto.getDescripcion(), producto.getNombre()));
         jsonLd.put("sku", String.valueOf(producto.getId()));
-        if (imagen != null) {
-            jsonLd.put("image", List.of(baseUrl + imagen));
+        List<String> imagenes = producto.getGaleriaCompleta().stream().map(url -> baseUrl + url).toList();
+        if (!imagenes.isEmpty()) {
+            jsonLd.put("image", imagenes);
         }
         if (producto.getMarca() != null && !producto.getMarca().isEmpty()) {
             jsonLd.put("brand", Map.of("@type", "Brand", "name", producto.getMarca()));
@@ -258,6 +267,7 @@ public class TiendaController {
 
         model.addAttribute("carrito", carrito);
         model.addAttribute("recomendados", recomendados);
+        model.addAttribute("envioMontoGratis", envioService.getMontoGratis());
         model.addAttribute("titulo", "Mi Carrito");
         return "tienda/carrito";
     }
@@ -292,6 +302,8 @@ public class TiendaController {
         }
         model.addAttribute("carrito", carrito);
         model.addAttribute("persona", persona);
+        model.addAttribute("costoEnvio", envioService.calcularCosto(carrito.getTotal(), TipoEntrega.DOMICILIO));
+        model.addAttribute("envioMontoGratis", envioService.getMontoGratis());
         model.addAttribute("titulo", "Finalizar Compra");
         return "tienda/checkout";
     }
@@ -300,6 +312,7 @@ public class TiendaController {
     public String checkout(@RequestParam MetodoPago metodoPago,
                             @RequestParam TipoEntrega tipoEntrega,
                             @RequestParam(required = false) String direccionEntrega,
+                            @RequestParam(required = false) String codigoCupon,
                             Principal principal, Model model) {
         if (carrito.isEmpty()) {
             return "redirect:/tienda/carrito";
@@ -320,12 +333,33 @@ public class TiendaController {
         Pedido pedido;
         try {
             pedido = pedidoService.crearVenta(persona.getId(), items, CanalVenta.ONLINE, metodoPago, null,
-                    tipoEntrega, direccion);
+                    tipoEntrega, direccion, codigoCupon);
         } catch (IllegalArgumentException e) {
-            return "redirect:/tienda/carrito?error=stockInsuficiente";
+            model.addAttribute("carrito", carrito);
+            model.addAttribute("persona", persona);
+            model.addAttribute("costoEnvio", envioService.calcularCosto(carrito.getTotal(), TipoEntrega.DOMICILIO));
+            model.addAttribute("envioMontoGratis", envioService.getMontoGratis());
+            model.addAttribute("titulo", "Finalizar Compra");
+            model.addAttribute("checkoutError", e.getMessage());
+            return "tienda/checkout";
         }
         carrito.vaciar();
         return "redirect:/tienda/confirmacion/" + pedido.getId();
+    }
+
+    @PostMapping("/cupon/validar")
+    @ResponseBody
+    public Map<String, Object> validarCupon(@RequestParam String codigo) {
+        ResultadoCupon resultado = cuponService.validar(codigo, carrito.getTotal());
+        Map<String, Object> respuesta = new LinkedHashMap<>();
+        respuesta.put("valido", resultado.isValido());
+        if (resultado.isValido()) {
+            respuesta.put("descuento", resultado.getCupon().calcularDescuento(carrito.getTotal()));
+            respuesta.put("mensaje", "Cupón aplicado");
+        } else {
+            respuesta.put("mensaje", resultado.getError());
+        }
+        return respuesta;
     }
 
     @GetMapping("/confirmacion/{id}")

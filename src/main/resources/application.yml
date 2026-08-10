@@ -10,6 +10,10 @@ app:
     # Crea cuentas y catálogo de demo al arrancar (solo aplica fuera del perfil "prod").
     # Poné SEED_DEMO=false si ya tenés tus propios datos y no querés que se generen de nuevo.
     demo: ${SEED_DEMO:true}
+  envio:
+    # Costo fijo del envío a domicilio (soles) y monto de compra a partir del cual es gratis.
+    costo: ${ENVIO_COSTO:12.00}
+    montoGratis: ${ENVIO_MONTO_GRATIS:150.00}
 
 spring:
   servlet:

@@ -36,7 +36,7 @@
             <td th:text="${pedido.persona.nombre + ' ' + pedido.persona.apellido}"></td>
             <td th:text="${pedido.fechaTexto}"></td>
             <td th:text="${pedido.metodoPago != null ? pedido.metodoPago.etiqueta : ''}"></td>
-            <td th:text="'S/ ' + ${pedido.total}" style="color:#21ba45; font-weight:bold;"></td>
+            <td th:text="'S/ ' + ${#numbers.formatDecimal(pedido.total, 1, 2)}" style="color:#21ba45; font-weight:bold;"></td>
             <td class="center aligned">
                 <a th:href="@{/pedidos/{id}(id=${pedido.id})}" class="ui info button"><i class="eye icon"></i></a>
             </td>

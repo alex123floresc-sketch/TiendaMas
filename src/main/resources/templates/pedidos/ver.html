@@ -81,6 +81,15 @@
             </tbody>
         </table>
 
+        <table class="comprobante-datos" th:if="${pedido.costoEnvio != null and pedido.costoEnvio > 0}" style="margin-bottom:6px;">
+            <tr>
+                <td class="etiqueta">Subtotal</td>
+                <td th:text="'S/ ' + ${#numbers.formatDecimal(pedido.subtotal, 1, 2)}"></td>
+                <td class="etiqueta">Envío</td>
+                <td th:text="'S/ ' + ${#numbers.formatDecimal(pedido.costoEnvio, 1, 2)}"></td>
+            </tr>
+        </table>
+
         <div class="comprobante-total-final">
             <span>TOTAL A PAGAR</span>
             <span th:text="'S/ ' + ${#numbers.formatDecimal(pedido.total, 1, 2)}"></span>

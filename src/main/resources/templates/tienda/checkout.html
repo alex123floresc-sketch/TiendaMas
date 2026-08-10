@@ -19,7 +19,13 @@
         <div class="tienda-checkout-paso"><span>3</span> Confirmación</div>
     </div>
 
+    <div class="ui negative message" th:if="${checkoutError != null}">
+        <p th:text="${checkoutError}"></p>
+    </div>
+
     <form th:action="@{/tienda/checkout}" method="post" class="ui form" id="formCheckout">
+        <input type="hidden" name="codigoCupon" id="codigoCuponAplicado" value="">
+
         <div class="tienda-checkout-layout">
             <div class="tienda-checkout-form">
 
@@ -39,13 +45,15 @@
                         <div class="tienda-entrega-opciones">
                             <label class="tienda-entrega-opcion">
                                 <input type="radio" name="tipoEntrega" value="RETIRO_TIENDA" checked
-                                       onchange="document.getElementById('bloqueDireccionEntrega').style.display='none'; document.getElementById('direccionEntrega').required=false;">
+                                       onchange="document.getElementById('bloqueDireccionEntrega').style.display='none'; document.getElementById('direccionEntrega').required=false; actualizarResumenEnvio(false);">
                                 <i class="store icon"></i> Retiro en tienda
+                                <small class="hint">Gratis</small>
                             </label>
                             <label class="tienda-entrega-opcion">
                                 <input type="radio" name="tipoEntrega" value="DOMICILIO"
-                                       onchange="document.getElementById('bloqueDireccionEntrega').style.display='block'; document.getElementById('direccionEntrega').required=true;">
+                                       onchange="document.getElementById('bloqueDireccionEntrega').style.display='block'; document.getElementById('direccionEntrega').required=true; actualizarResumenEnvio(true);">
                                 <i class="truck icon"></i> Envío a domicilio
+                                <small class="hint" th:text="${costoEnvio > 0} ? ('S/ ' + ${#numbers.formatDecimal(costoEnvio, 1, 2)}) : '¡Gratis!'"></small>
                             </label>
                         </div>
                     </div>
@@ -99,17 +107,86 @@
                         <span th:text="'S/ ' + ${#numbers.formatDecimal(item.subtotal, 1, 2)}"></span>
                     </div>
                 </div>
+                <div class="tienda-cupon-campo">
+                    <input type="text" id="inputCupon" placeholder="Código de cupón" autocomplete="off">
+                    <button type="button" class="ui small button" id="btnAplicarCupon">Aplicar</button>
+                </div>
+                <p class="hint" id="mensajeCupon"></p>
+
                 <div class="tienda-resumen-fila">
                     <span>Subtotal</span>
                     <span th:text="'S/ ' + ${#numbers.formatDecimal(carrito.total, 1, 2)}"></span>
                 </div>
+                <div class="tienda-resumen-fila" id="filaDescuento" style="display:none;">
+                    <span>Descuento</span>
+                    <span id="resumenDescuento">- S/ 0.00</span>
+                </div>
+                <div class="tienda-resumen-fila">
+                    <span>Envío</span>
+                    <span id="resumenEnvio">Gratis</span>
+                </div>
                 <div class="tienda-resumen-fila tienda-resumen-total">
                     <span>Total</span>
-                    <span th:text="'S/ ' + ${#numbers.formatDecimal(carrito.total, 1, 2)}"></span>
+                    <span id="resumenTotal" th:text="'S/ ' + ${#numbers.formatDecimal(carrito.total, 1, 2)}"></span>
                 </div>
+                <p class="hint" th:if="${costoEnvio > 0}">
+                    Envío gratis en compras desde S/ <span th:text="${#numbers.formatDecimal(envioMontoGratis, 1, 2)}"></span>.
+                </p>
             </aside>
         </div>
     </form>
+
+    <script th:inline="javascript">
+        const SUBTOTAL_CARRITO = /*[[${carrito.total}]]*/ 0;
+        const COSTO_ENVIO = /*[[${costoEnvio}]]*/ 0;
+        const CSRF_TOKEN = document.querySelector('meta[name="_csrf"]').content;
+        const CSRF_HEADER = document.querySelector('meta[name="_csrf_header"]').content;
+
+        let descuentoAplicado = 0;
+
+        function actualizarResumenEnvio(esDomicilio) {
+            const envio = esDomicilio ? COSTO_ENVIO : 0;
+            document.getElementById('resumenEnvio').textContent = envio > 0 ? ('S/ ' + envio.toFixed(2)) : 'Gratis';
+            document.getElementById('resumenTotal').textContent = 'S/ ' + (SUBTOTAL_CARRITO - descuentoAplicado + envio).toFixed(2);
+        }
+
+        document.getElementById('btnAplicarCupon').addEventListener('click', function () {
+            const codigo = document.getElementById('inputCupon').value.trim();
+            const mensaje = document.getElementById('mensajeCupon');
+            if (!codigo) {
+                mensaje.textContent = 'Ingresa un código de cupón';
+                mensaje.className = 'hint tienda-cupon-error';
+                return;
+            }
+            const headers = {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            };
+            headers[CSRF_HEADER] = CSRF_TOKEN;
+            fetch(/*[[@{/tienda/cupon/validar}]]*/ '/tienda/cupon/validar', {
+                method: 'POST',
+                headers: headers,
+                body: new URLSearchParams({ codigo: codigo }).toString()
+            }).then(function (res) { return res.json(); })
+              .then(function (data) {
+                  mensaje.textContent = data.mensaje;
+                  if (data.valido) {
+                      mensaje.className = 'hint tienda-cupon-ok';
+                      descuentoAplicado = data.descuento;
+                      document.getElementById('codigoCuponAplicado').value = codigo;
+                      document.getElementById('filaDescuento').style.display = 'flex';
+                      document.getElementById('resumenDescuento').textContent = '- S/ ' + descuentoAplicado.toFixed(2);
+                  } else {
+                      mensaje.className = 'hint tienda-cupon-error';
+                      descuentoAplicado = 0;
+                      document.getElementById('codigoCuponAplicado').value = '';
+                      document.getElementById('filaDescuento').style.display = 'none';
+                  }
+                  const domicilioSeleccionado = document.querySelector('input[name="tipoEntrega"]:checked').value === 'DOMICILIO';
+                  actualizarResumenEnvio(domicilioSeleccionado);
+              });
+        });
+    </script>
 </div>
 </body>
 </html>
