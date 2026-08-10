@@ -10,6 +10,7 @@ import com.tiendamas.entity.MetodoPago;
 import com.tiendamas.entity.Pedido;
 import com.tiendamas.entity.Persona;
 import com.tiendamas.entity.Producto;
+import com.tiendamas.entity.Resena;
 import com.tiendamas.entity.Suscriptor;
 import com.tiendamas.entity.Talla;
 import com.tiendamas.entity.TipoEntrega;
@@ -21,6 +22,7 @@ import com.tiendamas.service.CuponService;
 import com.tiendamas.service.PedidoService;
 import com.tiendamas.service.PersonaService;
 import com.tiendamas.service.ProductoService;
+import com.tiendamas.service.ResenaService;
 import com.tiendamas.service.UsuarioService;
 import com.tiendamas.service.impl.EnvioService;
 import com.tiendamas.web.Carrito;
@@ -74,6 +76,9 @@ public class TiendaController {
 
     @Autowired
     private CuponService cuponService;
+
+    @Autowired
+    private ResenaService resenaService;
 
     @GetMapping
     public String index(@RequestParam(required = false) String q,
@@ -197,7 +202,7 @@ public class TiendaController {
     }
 
     @GetMapping("/productos/{id}")
-    public String detalle(@PathVariable Long id, Model model, HttpServletRequest request) {
+    public String detalle(@PathVariable Long id, Model model, HttpServletRequest request, Principal principal) {
         Producto producto = productoService.obtenerPorId(id);
         if (producto == null) {
             return "redirect:/tienda";
@@ -209,7 +214,30 @@ public class TiendaController {
         model.addAttribute("metaDescripcion", descripcionCorta(producto.getDescripcion(), producto.getNombre()));
         model.addAttribute("ogImage", imagen);
         model.addAttribute("productoJsonLd", jsonLdProducto(producto, request));
+
+        List<Resena> resenas = resenaService.obtenerPorProducto(id);
+        model.addAttribute("resenas", resenas);
+        model.addAttribute("promedioResenas", resenaService.promedioPorProducto(id));
+        Persona persona = personaDelUsuario(principal);
+        model.addAttribute("puedeResenar", persona != null && resenaService.puedeResenar(id, persona.getId()));
+        model.addAttribute("yaReseno", persona != null && resenaService.yaReseno(id, persona.getId()));
         return "tienda/detalle";
+    }
+
+    @PostMapping("/productos/{id}/resenas")
+    public String crearResena(@PathVariable Long id, @RequestParam Integer calificacion,
+                               @RequestParam(required = false) String comentario,
+                               Principal principal, RedirectAttributes redirectAttributes) {
+        Persona persona = personaDelUsuario(principal);
+        if (persona == null) {
+            return "redirect:/login";
+        }
+        try {
+            resenaService.crear(id, persona.getId(), calificacion, comentario);
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("resenaError", e.getMessage());
+        }
+        return "redirect:/tienda/productos/" + id + "#resenas";
     }
 
     private String descripcionCorta(String descripcion, String nombre) {

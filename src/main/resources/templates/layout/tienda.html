@@ -20,11 +20,20 @@
   <link rel="stylesheet" th:href="@{/css/estilos.css}">
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.js"></script>
+  <script th:src="@{/js/main.js}"></script>
 </head>
 <body class="tienda-body">
 
 <nav class="tienda-navbar">
-  <a th:href="@{/tienda}" class="tienda-brand"><i class="shop icon"></i> TiendaMas</a>
+  <div class="capas-menu">
+    <a th:href="@{/tienda}" class="tienda-brand"><i class="shop icon"></i> TiendaMas</a>
+    <th:block th:if="${esAdmin or esVendedor or esCliente}">
+      <button type="button" class="capas-menu-toggle" aria-label="Cambiar de sección" aria-expanded="false" aria-haspopup="true">
+        <i class="chevron down icon"></i>
+      </button>
+      <div th:replace="~{layout/fragments :: capasMenuPanel}"></div>
+    </th:block>
+  </div>
 
   <button type="button" class="tienda-nav-toggle" aria-label="Abrir menú"
           onclick="document.querySelector('.tienda-nav-links').classList.toggle('open'); this.classList.toggle('open')">

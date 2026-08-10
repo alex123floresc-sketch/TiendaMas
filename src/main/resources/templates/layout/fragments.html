@@ -19,10 +19,16 @@
 
   <aside class="admin-sidebar">
 
-    <a href="/dashboard" class="admin-brand">
-      <span class="admin-brand-badge"><i class="shop icon"></i></span>
-      <span class="admin-brand-text">TiendaMas <small>Panel Administrador</small></span>
-    </a>
+    <div class="capas-menu">
+      <a href="/dashboard" class="admin-brand">
+        <span class="admin-brand-badge"><i class="shop icon"></i></span>
+        <span class="admin-brand-text">TiendaMas <small>Panel Administrador</small></span>
+      </a>
+      <button type="button" class="capas-menu-toggle" aria-label="Cambiar de sección" aria-expanded="false" aria-haspopup="true">
+        <i class="chevron down icon"></i>
+      </button>
+      <div th:replace="~{layout/fragments :: capasMenuPanel}"></div>
+    </div>
 
     <nav class="admin-sidebar-nav">
 
@@ -78,6 +84,49 @@
     </div>
 
   </aside>
+</div>
+
+<!-- Menú de "capas": salta entre las secciones de la aplicación (tienda pública, POS, panel
+     administrador, reportes, cuenta del cliente) sin importar en cuál estés parado ahora mismo. -->
+<div th:fragment="capasMenuPanel" class="capas-menu-panel">
+  <div class="capas-menu-titulo">Ir a otra sección</div>
+
+  <a href="/tienda" class="capas-menu-item" th:classappend="${currentUri != null and currentUri.startsWith('/tienda')} ? 'activo'">
+    <span class="capas-menu-item-icon"><i class="shop icon"></i></span>
+    <span class="capas-menu-item-texto"><strong>Tienda online</strong><small>Catálogo público y compras</small></span>
+  </a>
+
+  <a href="/pos" class="capas-menu-item" th:if="${esAdmin or esVendedor}"
+     th:classappend="${currentUri != null and currentUri.startsWith('/pos')} ? 'activo'">
+    <span class="capas-menu-item-icon"><i class="cash register icon"></i></span>
+    <span class="capas-menu-item-texto"><strong>Punto de venta</strong><small>Ventas rápidas en mostrador</small></span>
+  </a>
+
+  <a href="/dashboard" class="capas-menu-item" th:if="${esAdmin}"
+     th:classappend="${currentUri != null and (currentUri == '/dashboard' or currentUri.startsWith('/productos') or currentUri.startsWith('/categorias'))} ? 'activo'">
+    <span class="capas-menu-item-icon"><i class="tachometer alternate icon"></i></span>
+    <span class="capas-menu-item-texto"><strong>Panel administrador</strong><small>Catálogo, pedidos y personas</small></span>
+  </a>
+
+  <a href="/reportes" class="capas-menu-item" th:if="${esAdmin}"
+     th:classappend="${currentUri != null and currentUri.startsWith('/reportes')} ? 'activo'">
+    <span class="capas-menu-item-icon"><i class="chart bar icon"></i></span>
+    <span class="capas-menu-item-texto"><strong>Reportes</strong><small>Ventas, finanzas y estadísticas</small></span>
+  </a>
+
+  <div class="capas-menu-divider" th:if="${esCliente}"></div>
+
+  <a href="/tienda/perfil" class="capas-menu-item" th:if="${esCliente}"
+     th:classappend="${currentUri != null and currentUri.startsWith('/tienda/perfil')} ? 'activo'">
+    <span class="capas-menu-item-icon"><i class="id card icon"></i></span>
+    <span class="capas-menu-item-texto"><strong>Mi cuenta</strong><small>Perfil y datos personales</small></span>
+  </a>
+
+  <a href="/tienda/pedidos" class="capas-menu-item" th:if="${esCliente}"
+     th:classappend="${currentUri != null and currentUri.startsWith('/tienda/pedidos')} ? 'activo'">
+    <span class="capas-menu-item-icon"><i class="box icon"></i></span>
+    <span class="capas-menu-item-texto"><strong>Mis pedidos</strong><small>Historial de compras</small></span>
+  </a>
 </div>
 </body>
 </html>

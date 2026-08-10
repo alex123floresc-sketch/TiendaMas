@@ -28,7 +28,8 @@ public class SecurityConfig {
                         .requestMatchers("/", "/css/**", "/js/**", "/uploads/**", "/login", "/registro",
                                 "/robots.txt", "/sitemap.xml").permitAll()
 
-                        .requestMatchers("/tienda/checkout/**", "/tienda/pedidos/**", "/tienda/perfil/**").hasRole("CLIENTE")
+                        .requestMatchers("/tienda/checkout/**", "/tienda/pedidos/**", "/tienda/perfil/**",
+                                "/tienda/productos/*/resenas").hasRole("CLIENTE")
                         .requestMatchers("/tienda/**").permitAll()
 
                         .requestMatchers("/pos/**").hasAnyRole("VENDEDOR", "ADMIN")

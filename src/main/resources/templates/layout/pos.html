@@ -10,11 +10,18 @@
   <link rel="stylesheet" th:href="@{/css/estilos.css}">
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.js"></script>
+  <script th:src="@{/js/main.js}"></script>
 </head>
 <body class="pos-body">
 
 <div class="pos-topbar">
-  <a th:href="@{/pos}" class="pos-brand"><i class="cash register icon"></i> TiendaMas <span>POS</span></a>
+  <div class="capas-menu">
+    <a th:href="@{/pos}" class="pos-brand"><i class="cash register icon"></i> TiendaMas <span>POS</span></a>
+    <button type="button" class="capas-menu-toggle" aria-label="Cambiar de sección" aria-expanded="false" aria-haspopup="true">
+      <i class="chevron down icon"></i>
+    </button>
+    <div th:replace="~{layout/fragments :: capasMenuPanel}"></div>
+  </div>
   <button type="button" class="pos-nav-toggle" onclick="document.querySelector('.pos-topbar-actions').classList.toggle('open')">
     <i class="bars icon"></i>
   </button>

@@ -200,7 +200,7 @@ public class PedidoServiceImpl implements PedidoService {
                     guardado.getId(), e.getMessage());
         }
         emailService.enviarConfirmacionPedido(guardado, pdfComprobante);
-        return guardadobi
+        return guardado;
     }
 
     @Override
