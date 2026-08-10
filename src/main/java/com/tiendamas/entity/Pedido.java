@@ -54,6 +54,9 @@ public class Pedido {
     @Enumerated(EnumType.STRING)
     private EstadoPedido estado = EstadoPedido.PENDIENTE;
 
+    /** Id del cargo en Culqi cuando el pago fue con tarjeta (referencia para reconciliación). */
+    private String culquiChargeId;
+
     public Pedido() {
         this.fecha = LocalDateTime.now();
     }
@@ -128,6 +131,9 @@ public class Pedido {
 
     public EstadoPedido getEstado() { return estado; }
     public void setEstado(EstadoPedido estado) { this.estado = estado; }
+
+    public String getCulquiChargeId() { return culquiChargeId; }
+    public void setCulquiChargeId(String culquiChargeId) { this.culquiChargeId = culquiChargeId; }
 
     @Transient
     public String getNumeroCompleto() {

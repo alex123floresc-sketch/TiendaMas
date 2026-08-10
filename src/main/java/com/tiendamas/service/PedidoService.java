@@ -35,6 +35,11 @@ public interface PedidoService {
                        MetodoPago metodoPago, String vendedorUsername,
                        TipoEntrega tipoEntrega, String direccionEntrega, String codigoCupon);
 
+    /** Igual que crearVenta, pero además guarda el id del cargo de Culqi cuando el pago fue con tarjeta. */
+    Pedido crearVenta(Long personaId, List<ItemVenta> items, CanalVenta canal,
+                       MetodoPago metodoPago, String vendedorUsername,
+                       TipoEntrega tipoEntrega, String direccionEntrega, String codigoCupon, String culquiChargeId);
+
     void actualizarEstado(Long pedidoId, EstadoPedido nuevoEstado);
 
     void eliminar(Long id);

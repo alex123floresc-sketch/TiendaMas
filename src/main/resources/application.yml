@@ -14,6 +14,11 @@ app:
     # Costo fijo del envío a domicilio (soles) y monto de compra a partir del cual es gratis.
     costo: ${ENVIO_COSTO:12.00}
     montoGratis: ${ENVIO_MONTO_GRATIS:150.00}
+  culqui:
+    # Llaves de Culqi (https://culqi.com) para cobrar pagos con tarjeta en el checkout.
+    # Sin CULQUI_SECRET_KEY, el pago con tarjeta queda deshabilitado automáticamente.
+    public-key: ${CULQUI_PUBLIC_KEY:}
+    secret-key: ${CULQUI_SECRET_KEY:}
 
 spring:
   servlet:

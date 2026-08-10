@@ -25,6 +25,7 @@
 
     <form th:action="@{/tienda/checkout}" method="post" class="ui form" id="formCheckout">
         <input type="hidden" name="codigoCupon" id="codigoCuponAplicado" value="">
+        <input type="hidden" name="culquiToken" id="culquiTokenInput" value="">
 
         <div class="tienda-checkout-layout">
             <div class="tienda-checkout-form">
@@ -73,9 +74,10 @@
                                 <input type="radio" name="metodoPago" value="EFECTIVO" checked>
                                 <i class="money bill alternate icon"></i> Efectivo (contra entrega)
                             </label>
-                            <label class="tienda-entrega-opcion">
-                                <input type="radio" name="metodoPago" value="TARJETA">
+                            <label class="tienda-entrega-opcion" th:classappend="${!culquiConfigurado} ? 'deshabilitado'">
+                                <input type="radio" name="metodoPago" value="TARJETA" th:disabled="${!culquiConfigurado}">
                                 <i class="credit card icon"></i> Tarjeta de crédito/débito
+                                <small class="hint" th:unless="${culquiConfigurado}">No disponible por el momento</small>
                             </label>
                             <label class="tienda-entrega-opcion">
                                 <input type="radio" name="metodoPago" value="YAPE_PLIN">
@@ -88,6 +90,8 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="ui negative message" id="culquiError" style="display:none;"></div>
 
                 <button type="submit" class="ui positive big fluid button tienda-checkout-confirmar">
                     <i class="check circle icon"></i> Confirmar pedido
@@ -136,13 +140,57 @@
         </div>
     </form>
 
+    <script th:if="${culquiConfigurado}" src="https://checkout.culqi.com/js/v4"></script>
+
     <script th:inline="javascript">
         const SUBTOTAL_CARRITO = /*[[${carrito.total}]]*/ 0;
         const COSTO_ENVIO = /*[[${costoEnvio}]]*/ 0;
+        const CULQUI_CONFIGURADO = /*[[${culquiConfigurado}]]*/ false;
+        const CULQUI_PUBLIC_KEY = /*[[${culquiPublicKey}]]*/ '';
         const CSRF_TOKEN = document.querySelector('meta[name="_csrf"]').content;
         const CSRF_HEADER = document.querySelector('meta[name="_csrf_header"]').content;
 
         let descuentoAplicado = 0;
+
+        if (CULQUI_CONFIGURADO && window.Culqi) {
+            Culqi.publicKey = CULQUI_PUBLIC_KEY;
+        }
+
+        /* Callback global que invoca Culqui Checkout cuando el cliente termina de cargar su tarjeta. */
+        window.culqi = function () {
+            if (Culqi.token) {
+                document.getElementById('culquiTokenInput').value = Culqi.token.id;
+                document.getElementById('culquiError').style.display = 'none';
+                document.getElementById('formCheckout').submit();
+            } else if (Culqi.error) {
+                const error = document.getElementById('culquiError');
+                error.textContent = Culqi.error.user_message || 'No se pudo procesar el pago con tarjeta.';
+                error.style.display = 'block';
+            }
+        };
+
+        document.getElementById('formCheckout').addEventListener('submit', function (ev) {
+            const metodo = document.querySelector('input[name="metodoPago"]:checked').value;
+            if (metodo !== 'TARJETA' || document.getElementById('culquiTokenInput').value) {
+                return;
+            }
+            ev.preventDefault();
+            const error = document.getElementById('culquiError');
+            if (!CULQUI_CONFIGURADO) {
+                error.textContent = 'Los pagos con tarjeta no están disponibles en este momento.';
+                error.style.display = 'block';
+                return;
+            }
+            const domicilio = document.querySelector('input[name="tipoEntrega"]:checked').value === 'DOMICILIO';
+            const envio = domicilio ? COSTO_ENVIO : 0;
+            const totalCentavos = Math.round((SUBTOTAL_CARRITO - descuentoAplicado + envio) * 100);
+            Culqi.settings({
+                title: 'TiendaMas',
+                currency: 'PEN',
+                amount: totalCentavos
+            });
+            Culqi.open();
+        });
 
         function actualizarResumenEnvio(esDomicilio) {
             const envio = esDomicilio ? COSTO_ENVIO : 0;

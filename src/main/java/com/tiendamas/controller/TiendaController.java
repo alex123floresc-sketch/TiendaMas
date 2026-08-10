@@ -3,6 +3,7 @@ package com.tiendamas.controller;
 import com.tiendamas.dto.CambioPasswordForm;
 import com.tiendamas.dto.ItemVenta;
 import com.tiendamas.dto.ResultadoCupon;
+import com.tiendamas.dto.ResultadoPago;
 import com.tiendamas.dto.SugerenciaProducto;
 import com.tiendamas.entity.CanalVenta;
 import com.tiendamas.entity.Categoria;
@@ -31,6 +32,7 @@ import com.tiendamas.service.ResenaService;
 import com.tiendamas.service.SolicitudDevolucionService;
 import com.tiendamas.service.UsuarioService;
 import com.tiendamas.service.impl.EnvioService;
+import com.tiendamas.service.impl.PagoCulqiService;
 import com.tiendamas.web.Carrito;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,6 +93,9 @@ public class TiendaController {
 
     @Autowired
     private FidelidadService fidelidadService;
+
+    @Autowired
+    private PagoCulqiService pagoCulqiService;
 
     @GetMapping
     public String index(@RequestParam(required = false) String q,
@@ -352,6 +357,8 @@ public class TiendaController {
         model.addAttribute("persona", persona);
         model.addAttribute("costoEnvio", envioService.calcularCosto(carrito.getTotal(), TipoEntrega.DOMICILIO));
         model.addAttribute("envioMontoGratis", envioService.getMontoGratis());
+        model.addAttribute("culquiConfigurado", pagoCulqiService.estaConfigurado());
+        model.addAttribute("culquiPublicKey", pagoCulqiService.getPublicKey());
         model.addAttribute("titulo", "Finalizar Compra");
         return "tienda/checkout";
     }
@@ -361,6 +368,7 @@ public class TiendaController {
                             @RequestParam TipoEntrega tipoEntrega,
                             @RequestParam(required = false) String direccionEntrega,
                             @RequestParam(required = false) String codigoCupon,
+                            @RequestParam(required = false) String culquiToken,
                             Principal principal, Model model) {
         if (carrito.isEmpty()) {
             return "redirect:/tienda/carrito";
@@ -378,21 +386,49 @@ public class TiendaController {
                 .map(i -> new ItemVenta(i.getVarianteId(), i.getCantidad()))
                 .collect(Collectors.toList());
 
+        String culquiChargeId = null;
+        if (metodoPago == MetodoPago.TARJETA) {
+            double subtotal = carrito.getTotal();
+            double envio = envioService.calcularCosto(subtotal, tipoEntrega);
+            double descuento = 0.0;
+            if (codigoCupon != null && !codigoCupon.isBlank()) {
+                ResultadoCupon resultadoCupon = cuponService.validar(codigoCupon, subtotal, persona.getId());
+                if (!resultadoCupon.isValido()) {
+                    return mostrarErrorCheckout(model, persona, resultadoCupon.getError());
+                }
+                descuento = resultadoCupon.getCupon().calcularDescuento(subtotal);
+            }
+            double totalACobrar = subtotal - descuento + envio;
+
+            ResultadoPago pago = pagoCulqiService.cobrar(culquiToken, totalACobrar, persona.getEmail(),
+                    "Pedido TiendaMas");
+            if (!pago.isExitoso()) {
+                return mostrarErrorCheckout(model, persona, pago.getMensaje());
+            }
+            culquiChargeId = pago.getChargeId();
+        }
+
         Pedido pedido;
         try {
             pedido = pedidoService.crearVenta(persona.getId(), items, CanalVenta.ONLINE, metodoPago, null,
-                    tipoEntrega, direccion, codigoCupon);
+                    tipoEntrega, direccion, codigoCupon, culquiChargeId);
         } catch (IllegalArgumentException e) {
-            model.addAttribute("carrito", carrito);
-            model.addAttribute("persona", persona);
-            model.addAttribute("costoEnvio", envioService.calcularCosto(carrito.getTotal(), TipoEntrega.DOMICILIO));
-            model.addAttribute("envioMontoGratis", envioService.getMontoGratis());
-            model.addAttribute("titulo", "Finalizar Compra");
-            model.addAttribute("checkoutError", e.getMessage());
-            return "tienda/checkout";
+            return mostrarErrorCheckout(model, persona, e.getMessage());
         }
         carrito.vaciar();
         return "redirect:/tienda/confirmacion/" + pedido.getId();
+    }
+
+    private String mostrarErrorCheckout(Model model, Persona persona, String mensaje) {
+        model.addAttribute("carrito", carrito);
+        model.addAttribute("persona", persona);
+        model.addAttribute("costoEnvio", envioService.calcularCosto(carrito.getTotal(), TipoEntrega.DOMICILIO));
+        model.addAttribute("envioMontoGratis", envioService.getMontoGratis());
+        model.addAttribute("culquiConfigurado", pagoCulqiService.estaConfigurado());
+        model.addAttribute("culquiPublicKey", pagoCulqiService.getPublicKey());
+        model.addAttribute("titulo", "Finalizar Compra");
+        model.addAttribute("checkoutError", mensaje);
+        return "tienda/checkout";
     }
 
     @PostMapping("/cupon/validar")

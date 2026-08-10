@@ -115,6 +115,16 @@ public class PedidoServiceImpl implements PedidoService {
     public Pedido crearVenta(Long personaId, List<ItemVenta> items, CanalVenta canal,
                               MetodoPago metodoPago, String vendedorUsername,
                               TipoEntrega tipoEntrega, String direccionEntrega, String codigoCupon) {
+        return crearVenta(personaId, items, canal, metodoPago, vendedorUsername, tipoEntrega, direccionEntrega,
+                codigoCupon, null);
+    }
+
+    @Override
+    @Transactional
+    public Pedido crearVenta(Long personaId, List<ItemVenta> items, CanalVenta canal,
+                              MetodoPago metodoPago, String vendedorUsername,
+                              TipoEntrega tipoEntrega, String direccionEntrega, String codigoCupon,
+                              String culquiChargeId) {
         Persona persona = personaService.obtenerPorId(personaId);
         if (persona == null) {
             throw new IllegalArgumentException("Cliente no encontrado");
@@ -189,6 +199,7 @@ public class PedidoServiceImpl implements PedidoService {
         pedido.setCupon(cupon);
         pedido.setDescuento(descuento);
         pedido.setTotal(total - descuento + costoEnvio);
+        pedido.setCulquiChargeId(culquiChargeId);
         Pedido guardado = pedidoRepository.save(pedido);
 
         if (cupon != null) {
