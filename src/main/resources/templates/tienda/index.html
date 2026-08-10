@@ -59,9 +59,14 @@
         <input type="hidden" name="precioRango" th:value="${precioRango}">
         <input type="hidden" name="orden" th:value="${orden}">
 
-        <div class="tienda-filtro-grupo">
-            <span class="tienda-filtro-label"><i class="expand icon"></i> Talla <small>(elegí varias)</small></span>
-            <div class="tienda-filtro-chips">
+        <div class="tienda-filtro-dropdown" id="tallaDropdown">
+            <button type="button" class="tienda-filtro-dropdown-btn" id="tallaDropdownBtn"
+                    th:classappend="${!tallasSeleccionadas.isEmpty()} ? 'activo'">
+                <i class="expand icon"></i> Talla
+                <span class="tienda-filtro-badge" th:if="${!tallasSeleccionadas.isEmpty()}" th:text="${tallasSeleccionadas.size()}"></span>
+                <i class="chevron down icon tienda-filtro-dropdown-flecha"></i>
+            </button>
+            <div class="tienda-filtro-dropdown-panel" id="tallaDropdownPanel">
                 <label class="tienda-chip tienda-chip-checkbox" th:each="t : ${tallas}"
                        th:classappend="${tallasSeleccionadas.contains(t)} ? 'activo'">
                     <input type="checkbox" name="talla" th:value="${t}"

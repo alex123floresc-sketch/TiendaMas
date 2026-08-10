@@ -23,7 +23,11 @@ import java.util.Optional;
  *
  * Si se definen ADMIN_USERNAME/ADMIN_PASSWORD, se usan esas credenciales
  * (obligatorio en el perfil "prod", ver docker-compose.yml). Fuera de "prod",
- * si no se definen, se usa admin/admin123 como valor por defecto de desarrollo.
+ * si no se definen, se usa admin/admin123 como valor por defecto de desarrollo
+ * y se aplica SIEMPRE (aunque la cuenta ya exista con otra contraseña/rol),
+ * para garantizar que el acceso de administrador nunca quede roto en
+ * desarrollo. Si querés una contraseña propia que persista, definí
+ * ADMIN_PASSWORD.
  */
 @Component
 public class AdminPasswordSync implements CommandLineRunner {
@@ -58,11 +62,6 @@ public class AdminPasswordSync implements CommandLineRunner {
 
         Optional<Usuario> existente = usuarioRepository.findByUsername(username);
         if (existente.isPresent()) {
-            if (!passwordExplicita) {
-                // Valor por defecto de desarrollo: no pisamos una cuenta que ya existe
-                // (podría tener una contraseña que el usuario cambió a propósito).
-                return;
-            }
             Usuario usuario = existente.get();
             boolean coincide = passwordEncoder.matches(password, usuario.getPassword());
             if (!coincide || usuario.getRol() != RolUsuario.ADMIN || !usuario.isActivo()) {
@@ -70,7 +69,10 @@ public class AdminPasswordSync implements CommandLineRunner {
                 usuario.setRol(RolUsuario.ADMIN);
                 usuario.setActivo(true);
                 usuarioRepository.save(usuario);
-                log.info("Usuario ADMIN '{}' sincronizado con las variables ADMIN_USERNAME/ADMIN_PASSWORD.", username);
+                log.info(passwordExplicita
+                        ? "Usuario ADMIN '{}' sincronizado con las variables ADMIN_USERNAME/ADMIN_PASSWORD."
+                        : "Usuario ADMIN '{}' restaurado con la contraseña de desarrollo por defecto ('admin123') "
+                                + "porque no coincidia, no era ADMIN o estaba inactivo.", username);
             }
         } else {
             usuarioService.crearUsuario(username, password, RolUsuario.ADMIN, "Administrador", "Sistema", null);

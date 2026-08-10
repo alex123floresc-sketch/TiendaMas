@@ -226,6 +226,38 @@
         elementos.forEach(function (el) { observador.observe(el); });
     })();
 
+    /* --- Filtro de talla: menú desplegable (no muestra todas las opciones a la vez) --- */
+    (function () {
+        var contenedor = document.getElementById('tallaDropdown');
+        var boton = document.getElementById('tallaDropdownBtn');
+        var panel = document.getElementById('tallaDropdownPanel');
+        if (!contenedor || !boton || !panel) return;
+
+        function cerrar() {
+            panel.classList.remove('abierto');
+            boton.classList.remove('desplegado');
+            boton.setAttribute('aria-expanded', 'false');
+        }
+        function alternar() {
+            var abrir = !panel.classList.contains('abierto');
+            panel.classList.toggle('abierto', abrir);
+            boton.classList.toggle('desplegado', abrir);
+            boton.setAttribute('aria-expanded', abrir ? 'true' : 'false');
+        }
+
+        boton.setAttribute('aria-expanded', 'false');
+        boton.addEventListener('click', function (ev) {
+            ev.stopPropagation();
+            alternar();
+        });
+        document.addEventListener('click', function (ev) {
+            if (!ev.target.closest('#tallaDropdown')) cerrar();
+        });
+        document.addEventListener('keydown', function (ev) {
+            if (ev.key === 'Escape') cerrar();
+        });
+    })();
+
     /* --- Buscador: sugerencias en vivo mientras se escribe --- */
     (function () {
         var input = document.getElementById('tiendaBuscadorInput');
