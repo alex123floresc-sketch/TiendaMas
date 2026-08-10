@@ -36,6 +36,9 @@ public class Persona {
 
     private String preferencias;
 
+    /** Puntos del programa de fidelización, acumulados con cada compra y canjeables por cupones. */
+    private Integer puntosFidelidad = 0;
+
     public Persona() {
     }
     public Persona(String nombre, String apellido, String email, String telefono, String direccion) {
@@ -118,6 +121,9 @@ public class Persona {
 
     public String getPreferencias() { return preferencias; }
     public void setPreferencias(String preferencias) { this.preferencias = preferencias; }
+
+    public Integer getPuntosFidelidad() { return puntosFidelidad; }
+    public void setPuntosFidelidad(Integer puntosFidelidad) { this.puntosFidelidad = puntosFidelidad; }
 
     @Transient
     public TipoComprobante getTipoComprobanteSugerido() {

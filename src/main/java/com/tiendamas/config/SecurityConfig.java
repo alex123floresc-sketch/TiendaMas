@@ -29,7 +29,7 @@ public class SecurityConfig {
                                 "/robots.txt", "/sitemap.xml").permitAll()
 
                         .requestMatchers("/tienda/checkout/**", "/tienda/pedidos/**", "/tienda/perfil/**",
-                                "/tienda/productos/*/resenas").hasRole("CLIENTE")
+                                "/tienda/productos/*/resenas", "/tienda/fidelidad/**").hasRole("CLIENTE")
                         .requestMatchers("/tienda/**").permitAll()
 
                         .requestMatchers("/pos/**").hasAnyRole("VENDEDOR", "ADMIN")

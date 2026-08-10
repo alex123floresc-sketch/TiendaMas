@@ -2813,6 +2813,29 @@ body {
     font-size: 0.9em;
 }
 
+/* --- Programa de puntos / fidelización --- */
+.tienda-fidelidad-resumen {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 14px 0;
+}
+.tienda-fidelidad-puntos {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--color-navy);
+    background: var(--color-beige);
+    border-radius: 12px;
+    padding: 10px 18px;
+}
+.tienda-fidelidad-canje-fila {
+    display: flex;
+    gap: 10px;
+}
+.tienda-fidelidad-canje-fila input {
+    max-width: 140px;
+}
+
 /* --- Resumen financiero mensual (reportes) --- */
 .finanzas-grid {
     display: grid;

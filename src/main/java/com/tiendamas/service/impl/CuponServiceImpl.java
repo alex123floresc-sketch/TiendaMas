@@ -45,12 +45,21 @@ public class CuponServiceImpl implements CuponService {
 
     @Override
     public ResultadoCupon validar(String codigo, double subtotal) {
+        return validar(codigo, subtotal, null);
+    }
+
+    @Override
+    public ResultadoCupon validar(String codigo, double subtotal, Long personaId) {
         if (codigo == null || codigo.isBlank()) {
             return ResultadoCupon.invalido("Ingresa un código de cupón");
         }
         Cupon cupon = cuponRepository.findByCodigoIgnoreCase(codigo.trim()).orElse(null);
         if (cupon == null) {
             return ResultadoCupon.invalido("El cupón \"" + codigo.trim() + "\" no existe");
+        }
+        if (cupon.getPersonaAsignada() != null
+                && (personaId == null || !cupon.getPersonaAsignada().getId().equals(personaId))) {
+            return ResultadoCupon.invalido("Este cupón es personal y no está disponible para tu cuenta");
         }
         if (cupon.getMontoMinimo() != null && subtotal < cupon.getMontoMinimo()) {
             return ResultadoCupon.invalido(String.format(

@@ -26,6 +26,41 @@
         </p>
     </div>
 
+    <div class="ui segment tienda-fidelidad-card">
+        <h3 class="ui header"><i class="gift icon"></i> Mis puntos</h3>
+
+        <div class="ui positive message" th:if="${cuponCanjeado != null}">
+            <p>¡Listo! Tu cupón es <strong th:text="${cuponCanjeado.codigo}"></strong>, vale
+                S/ <span th:text="${#numbers.formatDecimal(cuponCanjeado.valor, 1, 2)}"></span> y podés usarlo en tu próxima compra
+                (vence el <span th:text="${#temporals.format(cuponCanjeado.fechaFin, 'dd/MM/yyyy')}"></span>).</p>
+        </div>
+        <div class="ui negative message" th:if="${fidelidadError != null}">
+            <p th:text="${fidelidadError}"></p>
+        </div>
+
+        <div class="tienda-fidelidad-resumen">
+            <div class="tienda-fidelidad-puntos" th:text="${puntosFidelidad}">0</div>
+            <div>
+                <div>puntos acumulados</div>
+                <div class="hint">Equivalen a S/ <span th:text="${#numbers.formatDecimal(valorPuntosEnSoles, 1, 2)}"></span> en descuentos</div>
+            </div>
+        </div>
+
+        <form th:if="${puntosFidelidad >= minimoParaCanjear}" th:action="@{/tienda/fidelidad/canjear}" method="post" class="ui form tienda-fidelidad-form">
+            <div class="field">
+                <label>Canjear puntos por un cupón de descuento</label>
+                <div class="tienda-fidelidad-canje-fila">
+                    <input type="number" name="puntos" th:min="${minimoParaCanjear}" th:max="${puntosFidelidad}" step="10" th:value="${minimoParaCanjear}">
+                    <button type="submit" class="ui button">Canjear</button>
+                </div>
+                <p class="hint">Mínimo <span th:text="${minimoParaCanjear}"></span> puntos · cada 10 puntos = S/ 1 de descuento</p>
+            </div>
+        </form>
+        <p class="hint" th:unless="${puntosFidelidad >= minimoParaCanjear}">
+            Te faltan <span th:text="${minimoParaCanjear - puntosFidelidad}"></span> puntos para poder canjear tu primer cupón.
+        </p>
+    </div>
+
     <div class="ui segment">
         <form th:action="@{/tienda/perfil}" th:object="${persona}" method="POST" class="ui form">
 

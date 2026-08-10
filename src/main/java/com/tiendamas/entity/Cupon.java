@@ -6,6 +6,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
@@ -39,6 +41,11 @@ public class Cupon {
 
     private Integer usosRealizados = 0;
 
+    /** Si no es null, el cupón es personal (por ejemplo, canjeado con puntos de fidelidad) y solo esa persona puede usarlo. */
+    @ManyToOne
+    @JoinColumn(name = "persona_asignada_id")
+    private Persona personaAsignada;
+
     public Cupon() {}
 
     public Long getId() { return id; }
@@ -70,6 +77,9 @@ public class Cupon {
 
     public Integer getUsosRealizados() { return usosRealizados; }
     public void setUsosRealizados(Integer usosRealizados) { this.usosRealizados = usosRealizados; }
+
+    public Persona getPersonaAsignada() { return personaAsignada; }
+    public void setPersonaAsignada(Persona personaAsignada) { this.personaAsignada = personaAsignada; }
 
     /** Verifica vigencia, actividad, tope de usos y monto mínimo (no valida el código en sí). */
     @Transient

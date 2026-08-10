@@ -67,6 +67,9 @@ public class PedidoServiceImpl implements PedidoService {
     @Autowired
     private com.tiendamas.service.CuponService cuponService;
 
+    @Autowired
+    private com.tiendamas.service.FidelidadService fidelidadService;
+
     @Override
     public List<Pedido> obtenerTodos() {
         return pedidoRepository.findAll();
@@ -173,7 +176,7 @@ public class PedidoServiceImpl implements PedidoService {
         Cupon cupon = null;
         double descuento = 0.0;
         if (codigoCupon != null && !codigoCupon.isBlank()) {
-            ResultadoCupon resultado = cuponService.validar(codigoCupon, total);
+            ResultadoCupon resultado = cuponService.validar(codigoCupon, total, persona.getId());
             if (!resultado.isValido()) {
                 throw new IllegalArgumentException(resultado.getError());
             }
@@ -191,6 +194,7 @@ public class PedidoServiceImpl implements PedidoService {
         if (cupon != null) {
             cuponService.registrarUso(cupon);
         }
+        fidelidadService.registrarCompra(persona, guardado.getSubtotal());
 
         byte[] pdfComprobante = null;
         try {

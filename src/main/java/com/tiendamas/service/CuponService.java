@@ -14,5 +14,8 @@ public interface CuponService {
     /** Valida código, vigencia, tope de usos y monto mínimo contra el subtotal indicado. */
     ResultadoCupon validar(String codigo, double subtotal);
 
+    /** Igual que validar, pero además comprueba que los cupones personales (de puntos de fidelidad) le pertenezcan a personaId. */
+    ResultadoCupon validar(String codigo, double subtotal, Long personaId);
+
     void registrarUso(Cupon cupon);
 }

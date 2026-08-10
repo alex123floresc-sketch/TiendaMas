@@ -6,6 +6,7 @@ import com.tiendamas.dto.ResultadoCupon;
 import com.tiendamas.dto.SugerenciaProducto;
 import com.tiendamas.entity.CanalVenta;
 import com.tiendamas.entity.Categoria;
+import com.tiendamas.entity.Cupon;
 import com.tiendamas.entity.DetallePedido;
 import com.tiendamas.entity.MetodoPago;
 import com.tiendamas.entity.Pedido;
@@ -22,6 +23,7 @@ import com.tiendamas.entity.VarianteProducto;
 import com.tiendamas.repository.SuscriptorRepository;
 import com.tiendamas.service.CategoriaService;
 import com.tiendamas.service.CuponService;
+import com.tiendamas.service.FidelidadService;
 import com.tiendamas.service.PedidoService;
 import com.tiendamas.service.PersonaService;
 import com.tiendamas.service.ProductoService;
@@ -86,6 +88,9 @@ public class TiendaController {
 
     @Autowired
     private SolicitudDevolucionService solicitudDevolucionService;
+
+    @Autowired
+    private FidelidadService fidelidadService;
 
     @GetMapping
     public String index(@RequestParam(required = false) String q,
@@ -392,8 +397,9 @@ public class TiendaController {
 
     @PostMapping("/cupon/validar")
     @ResponseBody
-    public Map<String, Object> validarCupon(@RequestParam String codigo) {
-        ResultadoCupon resultado = cuponService.validar(codigo, carrito.getTotal());
+    public Map<String, Object> validarCupon(@RequestParam String codigo, Principal principal) {
+        Persona persona = personaDelUsuario(principal);
+        ResultadoCupon resultado = cuponService.validar(codigo, carrito.getTotal(), persona != null ? persona.getId() : null);
         Map<String, Object> respuesta = new LinkedHashMap<>();
         respuesta.put("valido", resultado.isValido());
         if (resultado.isValido()) {
@@ -424,8 +430,27 @@ public class TiendaController {
         Persona persona = personaDelUsuario(principal);
         model.addAttribute("persona", persona != null ? persona : new Persona());
         model.addAttribute("cambioPasswordForm", new CambioPasswordForm());
+        int puntos = persona != null ? fidelidadService.obtenerPuntos(persona.getId()) : 0;
+        model.addAttribute("puntosFidelidad", puntos);
+        model.addAttribute("valorPuntosEnSoles", fidelidadService.valorEnSoles(puntos));
+        model.addAttribute("minimoParaCanjear", fidelidadService.getMinimoParaCanjear());
         model.addAttribute("titulo", "Mi Perfil");
         return "tienda/perfil";
+    }
+
+    @PostMapping("/fidelidad/canjear")
+    public String canjearPuntos(@RequestParam Integer puntos, Principal principal, RedirectAttributes redirectAttributes) {
+        Persona persona = personaDelUsuario(principal);
+        if (persona == null) {
+            return "redirect:/login";
+        }
+        try {
+            Cupon cupon = fidelidadService.canjear(persona.getId(), puntos);
+            redirectAttributes.addFlashAttribute("cuponCanjeado", cupon);
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("fidelidadError", e.getMessage());
+        }
+        return "redirect:/tienda/perfil";
     }
 
     @PostMapping("/perfil")
