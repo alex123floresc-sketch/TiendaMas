@@ -39,7 +39,7 @@
                     <div class="hint" th:if="${d.talla != null or d.color != null}"
                          th:text="(${d.talla} ?: '') + (${d.color != null and !d.color.isEmpty()} ? ' · ' + ${d.color} : '')"></div>
                 </td>
-                <td th:text="${d.cantidad} + ' x S/ ' + ${d.precioUnitario}"></td>
+                <td th:text="${d.cantidad} + ' x S/ ' + ${#numbers.formatDecimal(d.precioUnitario, 1, 2)}"></td>
                 <td class="right aligned" th:text="'S/ ' + ${#numbers.formatDecimal(d.subtotal, 1, 2)}"></td>
             </tr>
             </tbody>

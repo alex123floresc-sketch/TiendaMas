@@ -4,7 +4,7 @@
 <th:block th:fragment="tarjetaProductoContenido(p)">
     <a th:href="@{/tienda/productos/{id}(id=${p.id})}" class="tienda-card-link">
         <div class="tienda-card-img">
-            <img th:if="${p.imagenUrl != null}" th:src="@{${p.imagenUrl}}" alt="Imagen del producto">
+            <img th:if="${p.imagenUrl != null}" th:src="@{${p.imagenUrl}}" th:alt="${p.nombre}" loading="lazy">
             <i th:unless="${p.imagenUrl != null}" class="box icon huge"></i>
         </div>
         <div class="tienda-card-body">
@@ -14,7 +14,7 @@
             <div class="tienda-card-tallas" th:unless="${#lists.isEmpty(p.tallasDisponibles)}">
                 <span class="tienda-card-talla-badge" th:each="t : ${p.tallasDisponibles}" th:text="${t}"></span>
             </div>
-            <div class="tienda-card-precio">S/ <span th:text="${p.precio}"></span></div>
+            <div class="tienda-card-precio">S/ <span th:text="${#numbers.formatDecimal(p.precio, 1, 2)}"></span></div>
         </div>
     </a>
     <a th:href="@{/tienda/productos/{id}(id=${p.id})}" class="ui fluid primary button" th:classappend="${p.stock == null or p.stock <= 0} ? 'disabled'">

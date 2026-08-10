@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /tienda
+Disallow: /tienda/carrito
+Disallow: /tienda/checkout
+Disallow: /tienda/perfil
+Disallow: /tienda/pedidos
+Disallow: /pos
+Disallow: /dashboard
+Disallow: /login
+Disallow: /registro
+
+Sitemap: /sitemap.xml

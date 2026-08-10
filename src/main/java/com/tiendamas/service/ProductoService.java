@@ -34,6 +34,10 @@ public class ProductoService {
         return productoRepository.findAll();
     }
 
+    public List<Producto> obtenerRecientes() {
+        return productoRepository.findTop12ByOrderByIdDesc();
+    }
+
     public Producto obtenerPorId(Long id) {
         return productoRepository.findById(id).orElse(null);
     }

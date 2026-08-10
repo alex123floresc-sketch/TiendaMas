@@ -2610,6 +2610,53 @@ body {
     }
 }
 
+/* --- Tienda: página de información y ayuda (nosotros, FAQ, políticas) --- */
+.tienda-info-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+.tienda-info-nav a {
+    background: var(--color-white);
+    border: 1px solid var(--color-beige-dark);
+    border-radius: 999px;
+    padding: 7px 16px;
+    font-size: 0.85em;
+    font-weight: 600;
+    color: var(--color-text);
+    text-decoration: none;
+    transition: border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+.tienda-info-nav a:hover {
+    border-color: var(--color-blue);
+    color: var(--color-blue);
+    transform: translateY(-2px);
+}
+.tienda-info-seccion {
+    margin-bottom: 18px;
+    scroll-margin-top: 90px;
+}
+.tienda-info-seccion p {
+    color: var(--color-text-muted);
+    line-height: 1.6;
+}
+.tienda-info-seccion ul {
+    color: var(--color-text-muted);
+    line-height: 1.9;
+}
+.tienda-faq-item {
+    margin-bottom: 14px;
+}
+.tienda-faq-item:last-child {
+    margin-bottom: 0;
+}
+.tienda-faq-pregunta {
+    font-weight: 700;
+    color: var(--color-navy);
+    margin-bottom: 2px;
+}
+
 /* Celulares: objetivos táctiles más grandes y catálogo en una sola columna */
 @media (max-width: 480px) {
     .ui.button,

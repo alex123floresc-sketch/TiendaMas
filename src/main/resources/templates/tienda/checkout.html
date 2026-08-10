@@ -90,11 +90,11 @@
                 <h3 class="ui header">Resumen del pedido</h3>
                 <div class="tienda-checkout-resumen-items">
                     <div class="tienda-checkout-resumen-item" th:each="item : ${carrito.items}">
-                        <img th:if="${item.imagenUrl != null}" th:src="@{${item.imagenUrl}}" alt="">
+                        <img th:if="${item.imagenUrl != null}" th:src="@{${item.imagenUrl}}" th:alt="${item.nombre}" loading="lazy">
                         <i th:unless="${item.imagenUrl != null}" class="image icon"></i>
                         <div class="tienda-checkout-resumen-item-info">
                             <span th:text="${item.nombre}"></span>
-                            <span class="hint" th:text="${item.cantidad} + ' x S/ ' + ${item.precioUnitario}"></span>
+                            <span class="hint" th:text="${item.cantidad} + ' x S/ ' + ${#numbers.formatDecimal(item.precioUnitario, 1, 2)}"></span>
                         </div>
                         <span th:text="'S/ ' + ${#numbers.formatDecimal(item.subtotal, 1, 2)}"></span>
                     </div>

@@ -18,10 +18,13 @@ import com.tiendamas.service.PersonaService;
 import com.tiendamas.service.ProductoService;
 import com.tiendamas.service.UsuarioService;
 import com.tiendamas.web.Carrito;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 import java.security.Principal;
 import java.util.Comparator;
@@ -51,6 +54,9 @@ public class TiendaController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @GetMapping
     public String index(@RequestParam(required = false) String q,
@@ -92,6 +98,7 @@ public class TiendaController {
             model.addAttribute("carruseles", carruseles);
         }
         model.addAttribute("titulo", "Tienda");
+        model.addAttribute("metaDescripcion", "Ropa y accesorios para hombre, mujer y niños. Envío a domicilio o recojo en tienda, pago 100% seguro.");
         return "tienda/index";
     }
 
@@ -109,16 +116,62 @@ public class TiendaController {
         return productos.stream().sorted(comparador).collect(Collectors.toList());
     }
 
+    @GetMapping("/info")
+    public String info(@RequestParam(required = false) String seccion, Model model) {
+        model.addAttribute("seccion", seccion);
+        model.addAttribute("titulo", "Información y ayuda");
+        model.addAttribute("metaDescripcion", "Quiénes somos, envíos y entregas, cambios y devoluciones, términos y condiciones, y libro de reclamaciones de TiendaMas.");
+        return "tienda/info";
+    }
+
     @GetMapping("/productos/{id}")
-    public String detalle(@PathVariable Long id, Model model) {
+    public String detalle(@PathVariable Long id, Model model, HttpServletRequest request) {
         Producto producto = productoService.obtenerPorId(id);
         if (producto == null) {
             return "redirect:/tienda";
         }
+        String imagen = producto.getImagenUrl() != null ? producto.getImagenUrl()
+                : (!producto.getImagenes().isEmpty() ? producto.getImagenes().get(0).getUrl() : null);
         model.addAttribute("producto", producto);
         model.addAttribute("relacionados", productoService.obtenerRelacionados(producto));
         model.addAttribute("titulo", producto.getNombre());
+        model.addAttribute("metaDescripcion", descripcionCorta(producto.getDescripcion(), producto.getNombre()));
+        model.addAttribute("ogImage", imagen);
+        model.addAttribute("productoJsonLd", jsonLdProducto(producto, imagen, request));
         return "tienda/detalle";
+    }
+
+    private String descripcionCorta(String descripcion, String nombre) {
+        String base = descripcion != null && !descripcion.isBlank() ? descripcion : "Comprá " + nombre + " en TiendaMas.";
+        return base.length() > 160 ? base.substring(0, 157) + "..." : base;
+    }
+
+    private String jsonLdProducto(Producto producto, String imagen, HttpServletRequest request) {
+        String baseUrl = request.getRequestURL().substring(0, request.getRequestURL().length() - request.getRequestURI().length());
+        Map<String, Object> jsonLd = new LinkedHashMap<>();
+        jsonLd.put("@context", "https://schema.org/");
+        jsonLd.put("@type", "Product");
+        jsonLd.put("name", producto.getNombre());
+        jsonLd.put("description", descripcionCorta(producto.getDescripcion(), producto.getNombre()));
+        jsonLd.put("sku", String.valueOf(producto.getId()));
+        if (imagen != null) {
+            jsonLd.put("image", List.of(baseUrl + imagen));
+        }
+        if (producto.getMarca() != null && !producto.getMarca().isEmpty()) {
+            jsonLd.put("brand", Map.of("@type", "Brand", "name", producto.getMarca()));
+        }
+        Map<String, Object> offer = new LinkedHashMap<>();
+        offer.put("@type", "Offer");
+        offer.put("priceCurrency", "PEN");
+        offer.put("price", producto.getPrecio());
+        offer.put("availability", producto.tieneStock() ? "https://schema.org/InStock" : "https://schema.org/OutOfStock");
+        offer.put("url", baseUrl + "/tienda/productos/" + producto.getId());
+        jsonLd.put("offers", offer);
+        try {
+            return objectMapper.writeValueAsString(jsonLd);
+        } catch (JacksonException e) {
+            return null;
+        }
     }
 
     @PostMapping("/carrito/agregar")

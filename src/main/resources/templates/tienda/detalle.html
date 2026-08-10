@@ -3,6 +3,8 @@
 <body>
 <div th:fragment="content" style="max-width: 1050px; margin: 0 auto;">
 
+    <script type="application/ld+json" th:if="${productoJsonLd != null}" th:utext="${productoJsonLd}"></script>
+
     <nav class="tienda-breadcrumbs">
         <a th:href="@{/tienda}">Tienda</a>
         <i class="chevron right icon"></i>
@@ -17,17 +19,17 @@
             <div class="tienda-detalle-media">
                 <div class="tienda-detalle-img">
                     <span class="tienda-badge-agotado" th:unless="${producto.tieneStock()}">Sin stock</span>
-                    <img id="tiendaDetalleImgPrincipal" th:if="${producto.imagenUrl != null}" th:src="@{${producto.imagenUrl}}" alt="Imagen del producto">
+                    <img id="tiendaDetalleImgPrincipal" th:if="${producto.imagenUrl != null}" th:src="@{${producto.imagenUrl}}" th:alt="${producto.nombre}">
                     <img id="tiendaDetalleImgPrincipal" th:if="${producto.imagenUrl == null and not #lists.isEmpty(producto.imagenes)}"
-                         th:src="@{${producto.imagenes[0].url}}" alt="Imagen del producto">
+                         th:src="@{${producto.imagenes[0].url}}" th:alt="${producto.nombre}">
                     <i th:if="${producto.imagenUrl == null and #lists.isEmpty(producto.imagenes)}" class="box icon massive"></i>
                 </div>
                 <div class="tienda-detalle-galeria" th:if="${not #lists.isEmpty(producto.imagenes)}">
                     <img th:if="${producto.imagenUrl != null}" th:src="@{${producto.imagenUrl}}"
-                         class="tienda-detalle-galeria-thumb" alt="Miniatura"
+                         class="tienda-detalle-galeria-thumb" th:alt="'Miniatura de ' + ${producto.nombre}" loading="lazy"
                          onclick="document.getElementById('tiendaDetalleImgPrincipal').src=this.src">
                     <img th:each="img : ${producto.imagenes}" th:src="@{${img.url}}"
-                         class="tienda-detalle-galeria-thumb" alt="Miniatura"
+                         class="tienda-detalle-galeria-thumb" th:alt="'Miniatura de ' + ${producto.nombre}" loading="lazy"
                          onclick="document.getElementById('tiendaDetalleImgPrincipal').src=this.src">
                 </div>
             </div>
@@ -88,13 +90,13 @@
             <div class="tienda-card" th:each="p : ${relacionados}">
                 <a th:href="@{/tienda/productos/{id}(id=${p.id})}" class="tienda-card-link">
                     <div class="tienda-card-img">
-                    <img th:if="${p.imagenUrl != null}" th:src="@{${p.imagenUrl}}" alt="Imagen del producto">
+                    <img th:if="${p.imagenUrl != null}" th:src="@{${p.imagenUrl}}" th:alt="${p.nombre}" loading="lazy">
                     <i th:unless="${p.imagenUrl != null}" class="box icon huge"></i>
                 </div>
                     <div class="tienda-card-body">
                         <div class="tienda-card-cat" th:text="${p.categoria != null ? p.categoria.nombre : ''}"></div>
                         <div class="tienda-card-nombre" th:text="${p.nombre}"></div>
-                        <div class="tienda-card-precio" th:text="'S/ ' + ${p.precio}"></div>
+                        <div class="tienda-card-precio" th:text="'S/ ' + ${#numbers.formatDecimal(p.precio, 1, 2)}"></div>
                     </div>
                 </a>
                 <a th:href="@{/tienda/productos/{id}(id=${p.id})}" class="ui fluid primary button" th:classappend="${p.stock == null or p.stock <= 0} ? 'disabled'">

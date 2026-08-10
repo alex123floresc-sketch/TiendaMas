@@ -1,9 +1,19 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title th:text="${titulo != null} ? ${titulo} + ' · TiendaMas' : 'TiendaMas'"></title>
+  <meta name="description" th:content="${metaDescripcion != null} ? ${metaDescripcion} : 'TiendaMas: ropa y accesorios para hombre, mujer y niños, con envío a domicilio o recojo en tienda.'">
+  <meta name="theme-color" content="#101B2D">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="TiendaMas">
+  <meta property="og:title" th:content="${titulo != null} ? ${titulo} + ' · TiendaMas' : 'TiendaMas'">
+  <meta property="og:description" th:content="${metaDescripcion != null} ? ${metaDescripcion} : 'Ropa y accesorios para hombre, mujer y niños, con envío a domicilio o recojo en tienda.'">
+  <meta property="og:url" th:content="${baseUrl} + ${currentUri}">
+  <meta property="og:image" th:if="${ogImage != null}" th:content="${baseUrl} + ${ogImage}">
+  <link rel="canonical" th:href="${baseUrl} + ${currentUri}">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%23101B2D'/%3E%3Cpath d='M7 8h10l-.9 10.1a2 2 0 0 1-2 1.9H9.9a2 2 0 0 1-2-1.9L7 8z' fill='none' stroke='%2360A5FA' stroke-width='1.6' stroke-linejoin='round'/%3E%3Cpath d='M9 8V6.5a3 3 0 0 1 6 0V8' fill='none' stroke='%2360A5FA' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css">
   <link rel="stylesheet" th:href="@{/css/estilos.css}">
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -110,20 +120,20 @@
     <div class="tienda-footer-col">
       <h4>Nosotros</h4>
       <ul>
-        <li><a href="#">Quiénes somos</a></li>
-        <li><a href="#">Trabaja con nosotros</a></li>
-        <li><a href="#">Libro de reclamaciones</a></li>
+        <li><a th:href="@{/tienda/info(seccion='quienes-somos')}">Quiénes somos</a></li>
+        <li><a th:href="@{/tienda/info(seccion='trabaja-con-nosotros')}">Trabaja con nosotros</a></li>
+        <li><a th:href="@{/tienda/info(seccion='libro-de-reclamaciones')}">Libro de reclamaciones</a></li>
       </ul>
     </div>
 
     <div class="tienda-footer-col">
       <h4>Ayuda</h4>
       <ul>
-        <li><a href="#">Preguntas frecuentes</a></li>
-        <li><a href="#">Envíos y entregas</a></li>
-        <li><a href="#">Cambios y devoluciones</a></li>
-        <li><a href="#">Términos y condiciones</a></li>
-        <li><a href="#">Política de privacidad</a></li>
+        <li><a th:href="@{/tienda/info(seccion='preguntas-frecuentes')}">Preguntas frecuentes</a></li>
+        <li><a th:href="@{/tienda/info(seccion='envios-y-entregas')}">Envíos y entregas</a></li>
+        <li><a th:href="@{/tienda/info(seccion='cambios-y-devoluciones')}">Cambios y devoluciones</a></li>
+        <li><a th:href="@{/tienda/info(seccion='terminos-y-condiciones')}">Términos y condiciones</a></li>
+        <li><a th:href="@{/tienda/info(seccion='politica-de-privacidad')}">Política de privacidad</a></li>
       </ul>
     </div>
 

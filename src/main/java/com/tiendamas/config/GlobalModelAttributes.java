@@ -31,6 +31,13 @@ public class GlobalModelAttributes {
         return request.getRequestURI();
     }
 
+    @ModelAttribute("baseUrl")
+    public String baseUrl(HttpServletRequest request) {
+        StringBuffer url = request.getRequestURL();
+        String uri = request.getRequestURI();
+        return url.substring(0, url.length() - uri.length());
+    }
+
     @ModelAttribute("esAdmin")
     public boolean esAdmin(Authentication authentication) {
         return tieneRol(authentication, "ROLE_ADMIN");

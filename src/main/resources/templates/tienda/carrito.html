@@ -30,7 +30,7 @@
     <div class="tienda-carrito-layout" th:unless="${carrito.empty}">
         <div class="tienda-carrito-items">
             <div class="tienda-carrito-item" th:each="item : ${carrito.items}">
-                <img th:if="${item.imagenUrl != null}" th:src="@{${item.imagenUrl}}" class="carrito-item-thumb" alt="">
+                <img th:if="${item.imagenUrl != null}" th:src="@{${item.imagenUrl}}" class="carrito-item-thumb" th:alt="${item.nombre}" loading="lazy">
                 <i th:unless="${item.imagenUrl != null}" class="image icon huge carrito-item-thumb"></i>
 
                 <div class="tienda-carrito-item-info">
@@ -39,7 +39,7 @@
                         <span class="tienda-variante-swatch" th:if="${item.colorHex != null and !item.colorHex.isEmpty()}" th:style="'background:' + ${item.colorHex}"></span>
                         <span th:text="(${item.talla} ?: '') + (${item.color != null and !item.color.isEmpty()} ? ' · ' + ${item.color} : '')"></span>
                     </div>
-                    <div class="hint" th:text="'S/ ' + ${item.precioUnitario} + ' c/u'"></div>
+                    <div class="hint" th:text="'S/ ' + ${#numbers.formatDecimal(item.precioUnitario, 1, 2)} + ' c/u'"></div>
                     <form th:action="@{/tienda/carrito/quitar/{id}(id=${item.varianteId})}" method="post" class="tienda-carrito-quitar">
                         <button type="submit"><i class="trash icon"></i> Quitar</button>
                     </form>
@@ -85,13 +85,13 @@
             <div class="tienda-card" th:each="p : ${recomendados}">
                 <a th:href="@{/tienda/productos/{id}(id=${p.id})}" class="tienda-card-link">
                     <div class="tienda-card-img">
-                    <img th:if="${p.imagenUrl != null}" th:src="@{${p.imagenUrl}}" alt="Imagen del producto">
+                    <img th:if="${p.imagenUrl != null}" th:src="@{${p.imagenUrl}}" th:alt="${p.nombre}" loading="lazy">
                     <i th:unless="${p.imagenUrl != null}" class="box icon huge"></i>
                 </div>
                     <div class="tienda-card-body">
                         <div class="tienda-card-cat" th:text="${p.categoria != null ? p.categoria.nombre : ''}"></div>
                         <div class="tienda-card-nombre" th:text="${p.nombre}"></div>
-                        <div class="tienda-card-precio" th:text="'S/ ' + ${p.precio}"></div>
+                        <div class="tienda-card-precio" th:text="'S/ ' + ${#numbers.formatDecimal(p.precio, 1, 2)}"></div>
                     </div>
                 </a>
                 <a th:href="@{/tienda/productos/{id}(id=${p.id})}" class="ui fluid primary button" th:classappend="${p.stock == null or p.stock <= 0} ? 'disabled'">

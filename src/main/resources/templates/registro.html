@@ -1,9 +1,12 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crear cuenta · TiendaMas</title>
+    <meta name="description" content="Crea tu cuenta de cliente en TiendaMas para comprar en línea y ver tu historial de pedidos.">
+    <meta name="theme-color" content="#101B2D">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%23101B2D'/%3E%3Cpath d='M7 8h10l-.9 10.1a2 2 0 0 1-2 1.9H9.9a2 2 0 0 1-2-1.9L7 8z' fill='none' stroke='%2360A5FA' stroke-width='1.6' stroke-linejoin='round'/%3E%3Cpath d='M9 8V6.5a3 3 0 0 1 6 0V8' fill='none' stroke='%2360A5FA' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css">
     <link rel="stylesheet" th:href="@{/css/estilos.css}">
 </head>
@@ -28,12 +31,12 @@
 
             <div class="field required">
                 <label>Usuario</label>
-                <input type="text" th:field="*{username}" placeholder="Nombre de usuario" required>
+                <input type="text" th:field="*{username}" placeholder="Nombre de usuario" autocomplete="username" required>
             </div>
 
             <div class="field required">
                 <label>Contraseña</label>
-                <input type="password" th:field="*{password}" placeholder="Contraseña" required>
+                <input type="password" th:field="*{password}" placeholder="Contraseña" autocomplete="new-password" required>
             </div>
 
             <div class="two fields">
@@ -49,7 +52,7 @@
 
             <div class="field required">
                 <label>Email</label>
-                <input type="email" th:field="*{email}" placeholder="juan.perez@example.com" required>
+                <input type="email" th:field="*{email}" placeholder="juan.perez@example.com" autocomplete="email" required>
             </div>
 
             <div class="two fields">

@@ -13,6 +13,8 @@ import java.util.List;
 public interface ProductoRepository extends JpaRepository<Producto, Long> {
     List<Producto> findByCategoriaIdAndIdNot(Long categoriaId, Long id);
 
+    List<Producto> findTop12ByOrderByIdDesc();
+
     @Query("SELECT DISTINCT p FROM Producto p LEFT JOIN p.variantes v WHERE " +
            "(:categoriaId IS NULL OR p.categoria.id = :categoriaId " +
            "     OR (p.categoria.categoriaPadre IS NOT NULL AND p.categoria.categoriaPadre.id = :categoriaId)) AND " +
