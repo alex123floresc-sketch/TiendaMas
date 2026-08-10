@@ -1202,14 +1202,40 @@ body {
     font-size: 0.82em;
 }
 .tienda-hero {
+    position: relative;
     background: linear-gradient(135deg, var(--color-navy), var(--color-blue));
     color: var(--color-white);
     padding: 40px 30px;
     border-radius: 12px;
     margin-bottom: 25px;
     overflow: hidden;
+    isolation: isolate;
+}
+.tienda-hero::before,
+.tienda-hero::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    z-index: 0;
+    pointer-events: none;
+}
+.tienda-hero::before {
+    width: 420px;
+    height: 420px;
+    top: -180px;
+    right: -120px;
+    background: radial-gradient(circle, rgba(96, 165, 250, 0.35), transparent 70%);
+}
+.tienda-hero::after {
+    width: 320px;
+    height: 320px;
+    bottom: -160px;
+    left: -80px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.12), transparent 70%);
 }
 .tienda-hero-inner {
+    position: relative;
+    z-index: 1;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1360,6 +1386,7 @@ body {
     column-gap: 20px;
 }
 .tienda-card {
+    position: relative;
     background: var(--color-white);
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(20, 49, 93, 0.10);
@@ -1661,6 +1688,7 @@ body {
     background: var(--color-blue-light);
 }
 .tienda-carrusel-card {
+    position: relative;
     flex: 0 0 auto;
     width: 210px;
     scroll-snap-align: start;
@@ -2655,6 +2683,297 @@ body {
     font-weight: 700;
     color: var(--color-navy);
     margin-bottom: 2px;
+}
+
+/* --- Tienda: navbar con sombra/blur al hacer scroll --- */
+.tienda-navbar {
+    transition: box-shadow 0.25s ease, background-color 0.25s ease;
+}
+.tienda-navbar.con-scroll {
+    background-color: rgba(16, 27, 45, 0.92);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 6px 20px rgba(10, 18, 31, 0.28);
+}
+
+/* --- Tienda: botón flotante "volver arriba" --- */
+.tienda-volver-arriba {
+    position: fixed;
+    right: 22px;
+    bottom: 22px;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: none;
+    background: var(--color-navy);
+    color: var(--color-white);
+    box-shadow: 0 8px 20px rgba(10, 18, 31, 0.3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1em;
+    z-index: 150;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(12px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s, background-color 0.2s ease;
+}
+.tienda-volver-arriba.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+.tienda-volver-arriba:hover {
+    background: var(--color-blue);
+}
+.tienda-volver-arriba .icon {
+    margin: 0 !important;
+}
+
+/* --- Tienda: animación de aparición al hacer scroll --- */
+.reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+    .reveal {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}
+
+/* --- Tienda: botón de favoritos (corazón) sobre las tarjetas de producto --- */
+.tienda-favorito-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 3;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.92);
+    color: var(--color-text-muted);
+    box-shadow: 0 2px 8px rgba(20, 49, 93, 0.18);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+.tienda-favorito-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(20, 49, 93, 0.26);
+}
+.tienda-favorito-btn.activo {
+    color: #db2828;
+}
+.tienda-favorito-btn.activo .icon {
+    animation: tiendaLatido 0.35s ease;
+}
+.tienda-favorito-btn .icon {
+    margin: 0 !important;
+}
+.tienda-favorito-btn.inline {
+    position: static;
+    width: auto;
+    height: auto;
+    border-radius: 8px;
+    padding: 8px 16px;
+    gap: 6px;
+    font-weight: 700;
+    font-size: 0.85em;
+    box-shadow: none;
+    border: 1px solid var(--color-beige-dark);
+}
+.tienda-favorito-btn.inline:hover {
+    transform: none;
+    border-color: #db2828;
+}
+@keyframes tiendaLatido {
+    0% { transform: scale(1); }
+    45% { transform: scale(1.35); }
+    100% { transform: scale(1); }
+}
+
+/* --- Tienda: fila de título + botón de favoritos en el detalle de producto --- */
+.tienda-detalle-titulo-fila {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+.tienda-detalle-titulo-fila h1 {
+    margin: 0 !important;
+}
+
+/* --- Tienda: título de apartado reutilizable (categorías, por qué elegirnos) --- */
+.tienda-seccion-titulo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--color-navy);
+    font-size: 1.3em;
+    margin: 8px 0 16px 0;
+}
+.tienda-seccion-titulo .icon {
+    color: var(--color-blue);
+}
+
+/* --- Tienda: apartado de categorías destacadas (tarjetas visuales) --- */
+.tienda-seccion-categorias {
+    margin-bottom: 30px;
+}
+.tienda-categorias-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+}
+.tienda-categoria-tile {
+    position: relative;
+    height: 150px;
+    border-radius: 14px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--color-navy), var(--color-blue));
+    color: var(--color-blue-light);
+    font-size: 2.4em;
+    text-decoration: none;
+    box-shadow: 0 6px 16px rgba(20, 49, 93, 0.14);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.tienda-categoria-tile:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 30px rgba(20, 49, 93, 0.24);
+}
+.tienda-categoria-tile img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+.tienda-categoria-tile:hover img {
+    transform: scale(1.08);
+}
+.tienda-categoria-tile-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 14px 16px;
+    background: linear-gradient(0deg, rgba(10, 18, 31, 0.82) 0%, rgba(10, 18, 31, 0.05) 60%);
+    color: var(--color-white);
+    font-weight: 700;
+    font-size: 0.5em;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.tienda-categoria-tile-overlay .icon {
+    opacity: 0.85;
+    transition: transform 0.2s ease;
+}
+.tienda-categoria-tile:hover .tienda-categoria-tile-overlay .icon {
+    transform: translateX(4px);
+}
+
+/* --- Tienda: apartado "por qué elegirnos" con contadores animados --- */
+.tienda-stats-seccion {
+    margin: 36px 0;
+    padding: 32px 20px;
+    background: linear-gradient(180deg, var(--color-white), var(--color-beige));
+    border: 1px solid var(--color-beige-dark);
+    border-radius: 16px;
+}
+.tienda-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 20px;
+    text-align: center;
+}
+.tienda-stat-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+.tienda-stat-card .icon {
+    color: var(--color-blue);
+    font-size: 1.8em;
+    margin-bottom: 4px;
+}
+.tienda-stat-numero {
+    font-size: 2.1em;
+    font-weight: 800;
+    color: var(--color-navy);
+    font-variant-numeric: tabular-nums;
+}
+.tienda-stat-label {
+    color: var(--color-text-muted);
+    font-size: 0.88em;
+    font-weight: 600;
+}
+
+/* --- Tienda: apartado de suscripción al newsletter --- */
+.tienda-newsletter {
+    margin: 36px 0 10px;
+    padding: 34px 30px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--color-navy), var(--color-navy-dark));
+    color: var(--color-white);
+}
+.tienda-newsletter-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+.tienda-newsletter-texto h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 6px 0;
+    font-size: 1.25em;
+    color: var(--color-white);
+}
+.tienda-newsletter-texto p {
+    margin: 0;
+    color: #94A3B8;
+    max-width: 420px;
+}
+.tienda-newsletter-form {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.tienda-newsletter-form input[type="email"] {
+    border: none;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 0.95em;
+    min-width: 240px;
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--color-text);
+}
+.tienda-newsletter-form input[type="email"]:focus {
+    outline: 3px solid var(--color-blue-light);
+    outline-offset: 1px;
+}
+.tienda-newsletter .ui.message {
+    margin-top: 16px;
 }
 
 /* Celulares: objetivos táctiles más grandes y catálogo en una sola columna */

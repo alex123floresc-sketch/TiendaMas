@@ -6,6 +6,10 @@ app:
     # Gmail exige que el "From" coincida con la cuenta autenticada (MAIL_USERNAME);
     # si no se define MAIL_FROM, usamos MAIL_USERNAME para evitar que Gmail rechace el envío.
     remitente: ${MAIL_FROM:${MAIL_USERNAME:no-reply@tiendamas.com}}
+  seed:
+    # Crea cuentas y catálogo de demo al arrancar (solo aplica fuera del perfil "prod").
+    # Poné SEED_DEMO=false si ya tenés tus propios datos y no querés que se generen de nuevo.
+    demo: ${SEED_DEMO:true}
 
 spring:
   servlet:

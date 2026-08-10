@@ -38,7 +38,13 @@
                 <span class="ui teal label" th:text="${producto.categoria != null ? producto.categoria.nombre : 'Sin categoría'}"></span>
                 <span class="ui label" th:if="${producto.marca != null and !producto.marca.isEmpty()}" th:text="${producto.marca}"></span>
 
-                <h1 class="ui header" th:text="${producto.nombre}"></h1>
+                <div class="tienda-detalle-titulo-fila">
+                    <h1 class="ui header" th:text="${producto.nombre}"></h1>
+                    <button type="button" class="tienda-favorito-btn inline" aria-label="Agregar a favoritos" title="Agregar a favoritos"
+                            th:attr="data-id=${producto.id},data-nombre=${producto.nombre},data-precio=${producto.precio},data-imagen=${producto.imagenUrl},data-url=@{/tienda/productos/{id}(id=${producto.id})}">
+                        <i class="heart icon"></i> <span>Guardar</span>
+                    </button>
+                </div>
                 <p class="tienda-detalle-desc" th:text="${producto.descripcion}"></p>
 
                 <div class="tienda-detalle-precio">S/ <span th:text="${#numbers.formatDecimal(producto.precio, 1, 2)}"></span></div>
@@ -84,25 +90,11 @@
         </div>
     </div>
 
-    <div th:if="${relacionados != null and not #lists.isEmpty(relacionados)}" style="margin-top: 30px;">
+    <div th:if="${relacionados != null and not #lists.isEmpty(relacionados)}" class="reveal" style="margin-top: 30px;">
         <h3 class="ui header"><i class="thumbs up icon"></i> También te puede interesar</h3>
         <div class="tienda-grid">
             <div class="tienda-card" th:each="p : ${relacionados}">
-                <a th:href="@{/tienda/productos/{id}(id=${p.id})}" class="tienda-card-link">
-                    <div class="tienda-card-img">
-                    <img th:if="${p.imagenUrl != null}" th:src="@{${p.imagenUrl}}" th:alt="${p.nombre}" loading="lazy">
-                    <i th:unless="${p.imagenUrl != null}" class="box icon huge"></i>
-                </div>
-                    <div class="tienda-card-body">
-                        <div class="tienda-card-cat" th:text="${p.categoria != null ? p.categoria.nombre : ''}"></div>
-                        <div class="tienda-card-nombre" th:text="${p.nombre}"></div>
-                        <div class="tienda-card-precio" th:text="'S/ ' + ${#numbers.formatDecimal(p.precio, 1, 2)}"></div>
-                    </div>
-                </a>
-                <a th:href="@{/tienda/productos/{id}(id=${p.id})}" class="ui fluid primary button" th:classappend="${p.stock == null or p.stock <= 0} ? 'disabled'">
-                    <i class="tag icon"></i>
-                    <span th:text="${p.stock != null and p.stock > 0} ? 'Ver tallas y colores' : 'Sin stock'"></span>
-                </a>
+                <th:block th:replace="~{tienda/fragments :: tarjetaProductoContenido(${p})}"></th:block>
             </div>
         </div>
     </div>

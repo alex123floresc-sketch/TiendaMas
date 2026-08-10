@@ -2,6 +2,11 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 <th:block th:fragment="tarjetaProductoContenido(p)">
+    <button type="button" class="tienda-favorito-btn" aria-label="Agregar a favoritos" title="Agregar a favoritos"
+            th:attr="data-id=${p.id},data-nombre=${p.nombre},data-precio=${p.precio},data-imagen=${p.imagenUrl},data-url=@{/tienda/productos/{id}(id=${p.id})}">
+        <i class="heart icon"></i>
+    </button>
+    <span class="tienda-badge-agotado" th:unless="${p.stock != null and p.stock > 0}">Sin stock</span>
     <a th:href="@{/tienda/productos/{id}(id=${p.id})}" class="tienda-card-link">
         <div class="tienda-card-img">
             <img th:if="${p.imagenUrl != null}" th:src="@{${p.imagenUrl}}" th:alt="${p.nombre}" loading="lazy">

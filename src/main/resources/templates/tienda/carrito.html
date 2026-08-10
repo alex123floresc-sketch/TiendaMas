@@ -79,25 +79,11 @@
         </aside>
     </div>
 
-    <div th:if="${recomendados != null and not #lists.isEmpty(recomendados)}" style="margin-top: 30px;">
+    <div th:if="${recomendados != null and not #lists.isEmpty(recomendados)}" class="reveal" style="margin-top: 30px;">
         <h3 class="ui header"><i class="thumbs up icon"></i> También te puede interesar</h3>
         <div class="tienda-grid">
             <div class="tienda-card" th:each="p : ${recomendados}">
-                <a th:href="@{/tienda/productos/{id}(id=${p.id})}" class="tienda-card-link">
-                    <div class="tienda-card-img">
-                    <img th:if="${p.imagenUrl != null}" th:src="@{${p.imagenUrl}}" th:alt="${p.nombre}" loading="lazy">
-                    <i th:unless="${p.imagenUrl != null}" class="box icon huge"></i>
-                </div>
-                    <div class="tienda-card-body">
-                        <div class="tienda-card-cat" th:text="${p.categoria != null ? p.categoria.nombre : ''}"></div>
-                        <div class="tienda-card-nombre" th:text="${p.nombre}"></div>
-                        <div class="tienda-card-precio" th:text="'S/ ' + ${#numbers.formatDecimal(p.precio, 1, 2)}"></div>
-                    </div>
-                </a>
-                <a th:href="@{/tienda/productos/{id}(id=${p.id})}" class="ui fluid primary button" th:classappend="${p.stock == null or p.stock <= 0} ? 'disabled'">
-                    <i class="tag icon"></i>
-                    <span th:text="${p.stock != null and p.stock > 0} ? 'Ver tallas y colores' : 'Sin stock'"></span>
-                </a>
+                <th:block th:replace="~{tienda/fragments :: tarjetaProductoContenido(${p})}"></th:block>
             </div>
         </div>
     </div>

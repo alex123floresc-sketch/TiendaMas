@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/tienda}">
+<body>
+<div th:fragment="content">
+
+    <nav class="tienda-breadcrumbs">
+        <a th:href="@{/tienda}">Tienda</a>
+        <i class="chevron right icon"></i>
+        <span>Mis favoritos</span>
+    </nav>
+
+    <h1 class="ui dividing header"><i class="heart icon"></i> Mis Favoritos</h1>
+
+    <div class="tienda-empty" id="tiendaFavoritosVacio" style="display:none;">
+        <i class="heart outline icon"></i>
+        <h3>Todavía no guardaste ningún producto</h3>
+        <p>Tocá el corazón de un producto para guardarlo acá y encontrarlo más rápido después.</p>
+        <a th:href="@{/tienda}" class="ui primary button">Ir al catálogo</a>
+    </div>
+
+    <div class="tienda-grid" id="tiendaFavoritosGrid"></div>
+
+    <script th:inline="none">
+        document.addEventListener('DOMContentLoaded', function () {
+            var grid = document.getElementById('tiendaFavoritosGrid');
+            var vacio = document.getElementById('tiendaFavoritosVacio');
+
+            function crear(tag, clase, texto) {
+                var el = document.createElement(tag);
+                if (clase) el.className = clase;
+                if (texto !== undefined) el.textContent = texto;
+                return el;
+            }
+
+            function pintar() {
+                var favoritos = TiendaFavoritos.obtener();
+                grid.innerHTML = '';
+                vacio.style.display = favoritos.length ? 'none' : 'block';
+
+                favoritos.forEach(function (p) {
+                    var precio = parseFloat(p.precio || 0).toFixed(2);
+
+                    var card = crear('div', 'tienda-card');
+
+                    var btn = crear('button', 'tienda-favorito-btn activo');
+                    btn.type = 'button';
+                    btn.setAttribute('aria-label', 'Quitar de favoritos');
+                    btn.title = 'Quitar de favoritos';
+                    btn.dataset.id = p.id;
+                    btn.dataset.nombre = p.nombre;
+                    btn.dataset.precio = p.precio;
+                    btn.dataset.imagen = p.imagen || '';
+                    btn.dataset.url = p.url;
+                    btn.appendChild(crear('i', 'heart icon'));
+                    card.appendChild(btn);
+
+                    var enlace = crear('a', 'tienda-card-link');
+                    enlace.href = p.url;
+                    var imgWrap = crear('div', 'tienda-card-img');
+                    if (p.imagen) {
+                        var img = document.createElement('img');
+                        img.src = p.imagen;
+                        img.alt = p.nombre;
+                        img.loading = 'lazy';
+                        imgWrap.appendChild(img);
+                    } else {
+                        imgWrap.appendChild(crear('i', 'box icon huge'));
+                    }
+                    enlace.appendChild(imgWrap);
+
+                    var body = crear('div', 'tienda-card-body');
+                    body.appendChild(crear('div', 'tienda-card-nombre', p.nombre));
+                    body.appendChild(crear('div', 'tienda-card-precio', 'S/ ' + precio));
+                    enlace.appendChild(body);
+                    card.appendChild(enlace);
+
+                    var verBtn = crear('a', 'ui fluid primary button');
+                    verBtn.href = p.url;
+                    verBtn.appendChild(crear('i', 'tag icon'));
+                    verBtn.appendChild(document.createTextNode(' Ver producto'));
+                    card.appendChild(verBtn);
+
+                    grid.appendChild(card);
+                });
+            }
+
+            pintar();
+            document.addEventListener('click', function (ev) {
+                if (ev.target.closest('.tienda-favorito-btn')) {
+                    setTimeout(pintar, 0);
+                }
+            });
+        });
+    </script>
+</div>
+</body>
+</html>

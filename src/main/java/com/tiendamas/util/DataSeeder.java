@@ -28,10 +28,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,7 +39,6 @@ import java.util.Optional;
 public class DataSeeder implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(DataSeeder.class);
-    private static final SecureRandom RANDOM = new SecureRandom();
 
     @Autowired
     private Environment environment;
@@ -75,6 +72,10 @@ public class DataSeeder implements CommandLineRunner {
 
         if (usuarioRepository.count() <= 0) {
             sembrarUsuariosDemo();
+        } else {
+            log.info("Ya existen usuarios en la base de datos; no se crean cuentas de demo. "
+                    + "Si no recordas ninguna contrasena, pedile a un administrador que te cree una cuenta "
+                    + "desde /usuarios, o borra la tabla 'usuario' y reinicia la aplicacion para regenerar las de demo.");
         }
 
         if (gastoRepository.count() <= 0) {
@@ -206,10 +207,11 @@ public class DataSeeder implements CommandLineRunner {
     private void sembrarUsuariosDemo() {
         String adminUsername = environment.getProperty("ADMIN_USERNAME", "admin");
         String adminPassword = environment.getProperty("ADMIN_PASSWORD");
-        if (adminPassword == null || adminPassword.isBlank()) {
-            adminPassword = generarPasswordAleatoria();
-            log.warn("ADMIN_PASSWORD no esta definida. Se genero una contrasena aleatoria para el usuario '{}': {}"
-                    + " -- cambiala apenas ingreses.", adminUsername, adminPassword);
+        boolean adminPasswordGenerada = adminPassword == null || adminPassword.isBlank();
+        if (adminPasswordGenerada) {
+            // Sin ADMIN_PASSWORD definida usamos una contraseña fija y conocida SOLO para desarrollo local
+            // (este seeder nunca corre con el perfil "prod": ver @Profile("!prod") en la clase).
+            adminPassword = "admin123";
         }
         usuarioService.crearUsuario(adminUsername, adminPassword, RolUsuario.ADMIN, "Administrador", "Sistema", null);
         usuarioService.crearUsuario("vendedor1", "vendedor123", RolUsuario.VENDEDOR, "Carlos", "Mendoza", null);
@@ -230,6 +232,15 @@ public class DataSeeder implements CommandLineRunner {
                 });
         usuarioService.crearUsuario("cliente2", "cliente123", RolUsuario.CLIENTE,
                 personaCliente2.getNombre(), personaCliente2.getApellido(), personaCliente2);
+
+        log.info("\n==================== CREDENCIALES DE DEMO (solo desarrollo) ====================\n"
+                + "  Administrador : " + adminUsername + " / " + adminPassword + (adminPasswordGenerada ? "  (por defecto, cambiala en /perfil)" : "  (desde ADMIN_PASSWORD)") + "\n"
+                + "  Vendedor      : vendedor1 / vendedor123\n"
+                + "  Vendedor      : vendedor2 / vendedor123\n"
+                + "  Cliente       : cliente1 / cliente123\n"
+                + "  Cliente (RUC) : cliente2 / cliente123\n"
+                + "  Entra en /login con cualquiera de estas cuentas.\n"
+                + "===============================================================================");
     }
 
     private void sembrarGastosDemo() {
@@ -284,12 +295,6 @@ public class DataSeeder implements CommandLineRunner {
             sueldo.setEstado(EstadoSueldo.PENDIENTE);
             sueldoRepository.save(sueldo);
         });
-    }
-
-    private String generarPasswordAleatoria() {
-        byte[] bytes = new byte[15];
-        RANDOM.nextBytes(bytes);
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
     private Optional<Persona> personaConDocumento(TipoDocumento tipo) {

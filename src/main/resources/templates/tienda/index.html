@@ -27,6 +27,21 @@
         <div class="tienda-beneficio"><i class="store icon"></i> Retiro gratis en tienda</div>
     </div>
 
+    <!-- Apartado: categorías destacadas en tarjetas visuales -->
+    <div class="tienda-seccion-categorias reveal" th:if="${imagenPorCategoria != null and !categorias.isEmpty()}">
+        <h2 class="tienda-seccion-titulo"><i class="th large icon"></i> Comprá por categoría</h2>
+        <div class="tienda-categorias-grid">
+            <a th:each="cat : ${categorias}" th:href="@{/tienda(categoriaId=${cat.id})}" class="tienda-categoria-tile">
+                <img th:if="${imagenPorCategoria[cat.id] != null}" th:src="@{${imagenPorCategoria[cat.id]}}" th:alt="${cat.nombre}" loading="lazy">
+                <i th:if="${imagenPorCategoria[cat.id] == null}" class="tags icon"></i>
+                <div class="tienda-categoria-tile-overlay">
+                    <span th:text="${cat.nombre}"></span>
+                    <i class="arrow right icon"></i>
+                </div>
+            </a>
+        </div>
+    </div>
+
     <!-- Filtros arriba de todo, para que se puedan usar sin tener que bajar por la página -->
     <div class="tienda-filtros" id="catalogo">
         <a th:href="@{/tienda(q=${q}, talla=${tallaSeleccionada}, precioRango=${precioRango}, orden=${orden})}"
@@ -103,6 +118,49 @@
         </div>
     </div>
 
+    <!-- Apartado: recién llegados -->
+    <div class="tienda-carrusel-seccion reveal" th:if="${recientes != null and !recientes.isEmpty()}">
+        <div class="tienda-carrusel-header">
+            <h3 class="ui header"><i class="gift icon"></i>Recién llegados</h3>
+            <div class="tienda-carrusel-flechas">
+                <button type="button" class="tienda-carrusel-flecha" onclick="desplazarCarrusel('carrusel-recientes', -1)" aria-label="Anterior"><i class="chevron left icon"></i></button>
+                <button type="button" class="tienda-carrusel-flecha" onclick="desplazarCarrusel('carrusel-recientes', 1)" aria-label="Siguiente"><i class="chevron right icon"></i></button>
+            </div>
+        </div>
+        <div class="tienda-carrusel" id="carrusel-recientes">
+            <div class="tienda-carrusel-card" th:each="p : ${recientes}">
+                <th:block th:replace="~{tienda/fragments :: tarjetaProductoContenido(${p})}"></th:block>
+            </div>
+        </div>
+    </div>
+
+    <!-- Apartado: por qué elegirnos, con contadores animados -->
+    <div class="tienda-stats-seccion reveal" th:if="${totalMarcas != null}">
+        <h2 class="tienda-seccion-titulo"><i class="thumbs up icon"></i> Por qué elegirnos</h2>
+        <div class="tienda-stats-grid">
+            <div class="tienda-stat-card">
+                <i class="boxes icon"></i>
+                <div class="tienda-stat-numero" th:attr="data-contar=${productos.size()}">0</div>
+                <div class="tienda-stat-label">Productos disponibles</div>
+            </div>
+            <div class="tienda-stat-card">
+                <i class="sitemap icon"></i>
+                <div class="tienda-stat-numero" th:attr="data-contar=${categorias.size()}">0</div>
+                <div class="tienda-stat-label">Categorías</div>
+            </div>
+            <div class="tienda-stat-card">
+                <i class="tags icon"></i>
+                <div class="tienda-stat-numero" th:attr="data-contar=${totalMarcas}">0</div>
+                <div class="tienda-stat-label">Marcas disponibles</div>
+            </div>
+            <div class="tienda-stat-card">
+                <i class="shield alternate icon"></i>
+                <div class="tienda-stat-numero" data-contar="100" data-sufijo="%">0</div>
+                <div class="tienda-stat-label">Pagos seguros</div>
+            </div>
+        </div>
+    </div>
+
     <h2 class="tienda-catalogo-titulo"><i class="th icon"></i> Catálogo completo</h2>
 
     <div class="ui message" th:if="${q != null and !q.isBlank()}">
@@ -141,6 +199,63 @@
             <th:block th:replace="~{tienda/fragments :: tarjetaProductoContenido(${p})}"></th:block>
         </div>
     </div>
+
+    <!-- Apartado: suscripción al newsletter -->
+    <div class="tienda-newsletter reveal" id="newsletter">
+        <div class="tienda-newsletter-inner">
+            <div class="tienda-newsletter-texto">
+                <h2><i class="paper plane icon"></i> Enterate primero de nuestras novedades</h2>
+                <p>Sumate a nuestra lista y recibí ofertas exclusivas y nuevos ingresos antes que nadie.</p>
+            </div>
+            <form th:action="@{/tienda/newsletter}" method="post" class="tienda-newsletter-form">
+                <input type="email" name="email" placeholder="tu@email.com" required aria-label="Correo electrónico">
+                <button type="submit" class="ui primary button"><i class="paper plane icon"></i> Suscribirme</button>
+            </form>
+        </div>
+        <div class="ui positive message" th:if="${newsletterOk}"><i class="check circle icon"></i> ¡Listo! Ya estás suscripto a nuestras novedades.</div>
+        <div class="ui negative message" th:if="${newsletterError == 'invalido'}"><i class="times circle icon"></i> Ingresá un correo electrónico válido.</div>
+        <div class="ui info message" th:if="${newsletterError == 'yaSuscrito'}"><i class="info circle icon"></i> Ese correo ya está suscripto. ¡Gracias por tu interés!</div>
+    </div>
+
+    <script>
+        (function () {
+            var prefiereMenosMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            var contadores = document.querySelectorAll('.tienda-stat-numero[data-contar]');
+            if (!contadores.length) return;
+
+            function animar(el) {
+                var meta = parseInt(el.dataset.contar, 10) || 0;
+                var sufijo = el.dataset.sufijo || '';
+                if (prefiereMenosMovimiento) {
+                    el.textContent = meta + sufijo;
+                    return;
+                }
+                var inicio = null;
+                var duracion = 1100;
+                function paso(marca) {
+                    if (!inicio) inicio = marca;
+                    var progreso = Math.min((marca - inicio) / duracion, 1);
+                    el.textContent = Math.floor(progreso * meta) + sufijo;
+                    if (progreso < 1) requestAnimationFrame(paso);
+                }
+                requestAnimationFrame(paso);
+            }
+
+            if ('IntersectionObserver' in window) {
+                var observador = new IntersectionObserver(function (entradas) {
+                    entradas.forEach(function (entrada) {
+                        if (entrada.isIntersecting) {
+                            animar(entrada.target);
+                            observador.unobserve(entrada.target);
+                        }
+                    });
+                }, { threshold: 0.4 });
+                contadores.forEach(function (el) { observador.observe(el); });
+            } else {
+                contadores.forEach(animar);
+            }
+        })();
+    </script>
 </div>
 </body>
 </html>

@@ -8,10 +8,12 @@ import com.tiendamas.entity.MetodoPago;
 import com.tiendamas.entity.Pedido;
 import com.tiendamas.entity.Persona;
 import com.tiendamas.entity.Producto;
+import com.tiendamas.entity.Suscriptor;
 import com.tiendamas.entity.Talla;
 import com.tiendamas.entity.TipoEntrega;
 import com.tiendamas.entity.Usuario;
 import com.tiendamas.entity.VarianteProducto;
+import com.tiendamas.repository.SuscriptorRepository;
 import com.tiendamas.service.CategoriaService;
 import com.tiendamas.service.PedidoService;
 import com.tiendamas.service.PersonaService;
@@ -23,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
@@ -58,6 +61,9 @@ public class TiendaController {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private SuscriptorRepository suscriptorRepository;
+
     @GetMapping
     public String index(@RequestParam(required = false) String q,
                          @RequestParam(required = false) Long categoriaId,
@@ -87,15 +93,28 @@ public class TiendaController {
         model.addAttribute("orden", orden);
         if ((q == null || q.isBlank()) && categoriaId == null && talla == null && precioRango == null) {
             model.addAttribute("masVendidos", pedidoService.obtenerMasVendidos(10));
+            model.addAttribute("recientes", productoService.obtenerRecientes());
+            long totalMarcas = productos.stream()
+                    .map(Producto::getMarca)
+                    .filter(m -> m != null && !m.isBlank())
+                    .distinct()
+                    .count();
+            model.addAttribute("totalMarcas", totalMarcas);
 
             Map<Categoria, List<Producto>> carruseles = new LinkedHashMap<>();
+            Map<Long, String> imagenPorCategoria = new LinkedHashMap<>();
             for (Categoria cat : categoriaService.obtenerPrincipales()) {
                 List<Producto> destacados = productoService.buscar(null, cat.getId(), null, null, null);
                 if (!destacados.isEmpty()) {
                     carruseles.put(cat, destacados.stream().limit(10).toList());
+                    destacados.stream()
+                            .filter(p -> p.getImagenUrl() != null)
+                            .findFirst()
+                            .ifPresent(p -> imagenPorCategoria.put(cat.getId(), p.getImagenUrl()));
                 }
             }
             model.addAttribute("carruseles", carruseles);
+            model.addAttribute("imagenPorCategoria", imagenPorCategoria);
         }
         model.addAttribute("titulo", "Tienda");
         model.addAttribute("metaDescripcion", "Ropa y accesorios para hombre, mujer y niños. Envío a domicilio o recojo en tienda, pago 100% seguro.");
@@ -114,6 +133,27 @@ public class TiendaController {
             return productos;
         }
         return productos.stream().sorted(comparador).collect(Collectors.toList());
+    }
+
+    @PostMapping("/newsletter")
+    public String suscribirNewsletter(@RequestParam String email, RedirectAttributes redirectAttributes) {
+        String correo = email == null ? "" : email.trim();
+        if (!correo.matches("^[\\w.+-]+@[\\w-]+\\.[a-zA-Z]{2,}$")) {
+            redirectAttributes.addFlashAttribute("newsletterError", "invalido");
+        } else if (suscriptorRepository.existsByEmailIgnoreCase(correo)) {
+            redirectAttributes.addFlashAttribute("newsletterError", "yaSuscrito");
+        } else {
+            suscriptorRepository.save(new Suscriptor(correo));
+            redirectAttributes.addFlashAttribute("newsletterOk", true);
+        }
+        return "redirect:/tienda#newsletter";
+    }
+
+    @GetMapping("/favoritos")
+    public String favoritos(Model model) {
+        model.addAttribute("titulo", "Mis Favoritos");
+        model.addAttribute("metaDescripcion", "Los productos que guardaste como favoritos en TiendaMas.");
+        return "tienda/favoritos";
     }
 
     @GetMapping("/info")

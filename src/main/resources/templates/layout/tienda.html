@@ -51,6 +51,11 @@
       <button type="submit" aria-label="Buscar"><i class="search icon"></i></button>
     </form>
 
+    <a th:href="@{/tienda/favoritos}" class="item tienda-cart-link" title="Ver favoritos" id="tiendaFavoritosLink">
+      <i class="heart icon"></i> Favoritos
+      <span class="tienda-cart-badge" id="tiendaFavoritosBadge" style="display:none;">0</span>
+    </a>
+
     <a th:href="@{/tienda/carrito}" class="item tienda-cart-link" title="Ver carrito">
       <i class="shopping cart icon"></i> Carrito
       <span class="tienda-cart-badge" th:if="${carritoCount != null and carritoCount > 0}" th:text="${carritoCount}"></span>
@@ -161,6 +166,10 @@
   </div>
 </footer>
 
+<button type="button" id="tiendaVolverArriba" class="tienda-volver-arriba" aria-label="Volver arriba" title="Volver arriba">
+  <i class="arrow up icon"></i>
+</button>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         $('.tienda-cuenta-dropdown').dropdown({ action: 'nothing' });
@@ -173,6 +182,120 @@
         var paso = (card ? card.offsetWidth + 16 : 240) * 2;
         el.scrollBy({ left: direccion * paso, behavior: 'smooth' });
     }
+
+    /* --- Navbar con sombra/blur al hacer scroll + botón "volver arriba" --- */
+    (function () {
+        var navbar = document.querySelector('.tienda-navbar');
+        var volverArriba = document.getElementById('tiendaVolverArriba');
+        function alScroll() {
+            var conScroll = window.scrollY > 8;
+            if (navbar) navbar.classList.toggle('con-scroll', conScroll);
+            if (volverArriba) volverArriba.classList.toggle('visible', window.scrollY > 500);
+        }
+        window.addEventListener('scroll', alScroll, { passive: true });
+        alScroll();
+        if (volverArriba) {
+            volverArriba.addEventListener('click', function () {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+    })();
+
+    /* --- Animación de aparición al hacer scroll (respeta "reducir movimiento") --- */
+    (function () {
+        var prefiereMenosMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var elementos = document.querySelectorAll('.reveal');
+        if (!elementos.length) return;
+        if (prefiereMenosMovimiento || !('IntersectionObserver' in window)) {
+            elementos.forEach(function (el) { el.classList.add('visible'); });
+            return;
+        }
+        var observador = new IntersectionObserver(function (entradas) {
+            entradas.forEach(function (entrada) {
+                if (entrada.isIntersecting) {
+                    entrada.target.classList.add('visible');
+                    observador.unobserve(entrada.target);
+                }
+            });
+        }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+        elementos.forEach(function (el) { observador.observe(el); });
+    })();
+
+    /* --- Favoritos: lista de deseos guardada en el navegador (localStorage) --- */
+    var TiendaFavoritos = (function () {
+        var CLAVE = 'tiendamas_favoritos';
+
+        function obtener() {
+            try {
+                return JSON.parse(localStorage.getItem(CLAVE)) || [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function guardar(lista) {
+            localStorage.setItem(CLAVE, JSON.stringify(lista));
+            actualizarBadge();
+        }
+
+        function esFavorito(id) {
+            return obtener().some(function (p) { return String(p.id) === String(id); });
+        }
+
+        function alternar(producto) {
+            var lista = obtener();
+            var idx = lista.findIndex(function (p) { return String(p.id) === String(producto.id); });
+            if (idx >= 0) {
+                lista.splice(idx, 1);
+            } else {
+                lista.unshift(producto);
+            }
+            guardar(lista);
+            return idx < 0;
+        }
+
+        function quitar(id) {
+            guardar(obtener().filter(function (p) { return String(p.id) !== String(id); }));
+        }
+
+        function actualizarBadge() {
+            var badge = document.getElementById('tiendaFavoritosBadge');
+            if (!badge) return;
+            var total = obtener().length;
+            badge.textContent = total;
+            badge.style.display = total > 0 ? 'inline-block' : 'none';
+        }
+
+        function actualizarBotones() {
+            document.querySelectorAll('.tienda-favorito-btn').forEach(function (btn) {
+                btn.classList.toggle('activo', esFavorito(btn.dataset.id));
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            actualizarBadge();
+            actualizarBotones();
+            document.addEventListener('click', function (ev) {
+                var btn = ev.target.closest('.tienda-favorito-btn');
+                if (!btn) return;
+                ev.preventDefault();
+                ev.stopPropagation();
+                var producto = {
+                    id: btn.dataset.id,
+                    nombre: btn.dataset.nombre,
+                    precio: btn.dataset.precio,
+                    imagen: btn.dataset.imagen || '',
+                    url: btn.dataset.url
+                };
+                var agregado = alternar(producto);
+                document.querySelectorAll('.tienda-favorito-btn[data-id="' + producto.id + '"]').forEach(function (b) {
+                    b.classList.toggle('activo', agregado);
+                });
+            });
+        });
+
+        return { obtener: obtener, quitar: quitar, esFavorito: esFavorito };
+    })();
 </script>
 
 </body>
