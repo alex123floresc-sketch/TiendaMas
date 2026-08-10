@@ -2767,6 +2767,52 @@ body {
     color: var(--color-blue);
 }
 
+/* --- Cambios y devoluciones --- */
+.tienda-devolucion-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.tienda-devolucion-item {
+    background: var(--color-white);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(20, 49, 93, 0.08);
+    padding: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.tienda-devolucion-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.tienda-devolucion-form {
+    min-width: 280px;
+    flex: 1;
+}
+.tienda-devolucion-form textarea {
+    width: 100%;
+}
+.tienda-devolucion-estado {
+    margin-top: 4px;
+}
+.devolucion-resolver-form {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: stretch;
+    min-width: 200px;
+}
+.devolucion-respuesta-input {
+    padding: 6px 8px;
+    border: 1px solid var(--color-beige-dark);
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
 /* --- Resumen financiero mensual (reportes) --- */
 .finanzas-grid {
     display: grid;

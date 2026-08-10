@@ -47,6 +47,9 @@
       <a href="/reportes" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/reportes')} ? 'seccion-actual'">
         <i class="chart bar icon"></i> Reportes
       </a>
+      <a href="/devoluciones" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/devoluciones')} ? 'seccion-actual'">
+        <i class="sync alternate icon"></i> Cambios y devoluciones
+      </a>
 
       <div class="admin-nav-section-label">Marketing</div>
       <a href="/suscriptores" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/suscriptores')} ? 'seccion-actual'">

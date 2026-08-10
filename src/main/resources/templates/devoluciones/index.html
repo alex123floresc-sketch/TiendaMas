@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base}">
+<body>
+<div th:fragment="content">
+
+    <h1 class="ui dividing header">
+        <i class="sync alternate icon"></i>
+        <div class="content">
+            Cambios y devoluciones
+            <div class="sub header">Solicitudes de cambio o devolución hechas por los clientes desde "Mis pedidos".</div>
+        </div>
+    </h1>
+
+    <div class="ui negative message" th:if="${error != null}">
+        <p th:text="${error}"></p>
+    </div>
+
+    <div th:if="${solicitudes.isEmpty()}" class="ui icon warning message">
+        <i class="info circle icon"></i>
+        <div class="content">
+            <div class="header">Sin solicitudes</div>
+            <p>Todavía no hay solicitudes de cambio o devolución.</p>
+        </div>
+    </div>
+
+    <table id="tablaDevoluciones" class="ui celled striped table" th:unless="${solicitudes.isEmpty()}">
+        <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Cliente</th>
+            <th>Pedido</th>
+            <th>Producto</th>
+            <th>Tipo</th>
+            <th>Motivo</th>
+            <th>Estado</th>
+            <th class="center aligned">Resolver</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="s : ${solicitudes}">
+            <td th:text="${s.fechaTexto}"></td>
+            <td th:text="${s.pedido.persona.nombre + ' ' + s.pedido.persona.apellido}" style="font-weight: bold;"></td>
+            <td><a th:href="@{/pedidos/{id}(id=${s.pedido.id})}" th:text="${s.pedido.numeroCompleto}"></a></td>
+            <td>
+                <span th:text="${s.detallePedido.producto.nombre}"></span>
+                <div class="hint" th:if="${s.detallePedido.talla != null or s.detallePedido.color != null}"
+                     th:text="(${s.detallePedido.talla} ?: '') + (${s.detallePedido.color != null and !s.detallePedido.color.isEmpty()} ? ' · ' + ${s.detallePedido.color} : '')"></div>
+            </td>
+            <td th:text="${s.tipo.etiqueta}"></td>
+            <td th:text="${s.motivo}"></td>
+            <td>
+                <span class="ui label"
+                      th:classappend="${s.estado.name() == 'PENDIENTE'} ? 'yellow' : (${s.estado.name() == 'APROBADA'} ? 'blue' : (${s.estado.name() == 'COMPLETADA'} ? 'green' : 'red'))"
+                      th:text="${s.estado.etiqueta}"></span>
+            </td>
+            <td class="center aligned">
+                <form th:action="@{/devoluciones/{id}/resolver(id=${s.id})}" method="post" class="ui form devolucion-resolver-form">
+                    <select name="estado" class="ui small dropdown">
+                        <option value="PENDIENTE" th:selected="${s.estado.name() == 'PENDIENTE'}">Pendiente</option>
+                        <option value="APROBADA" th:selected="${s.estado.name() == 'APROBADA'}">Aprobar</option>
+                        <option value="RECHAZADA" th:selected="${s.estado.name() == 'RECHAZADA'}">Rechazar</option>
+                        <option value="COMPLETADA" th:selected="${s.estado.name() == 'COMPLETADA'}">Completar</option>
+                    </select>
+                    <input type="text" name="respuesta" th:value="${s.respuestaAdmin}" placeholder="Nota para el cliente (opcional)" class="devolucion-respuesta-input">
+                    <button type="submit" class="ui small primary button">Guardar</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

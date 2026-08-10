@@ -6,14 +6,17 @@ import com.tiendamas.dto.ResultadoCupon;
 import com.tiendamas.dto.SugerenciaProducto;
 import com.tiendamas.entity.CanalVenta;
 import com.tiendamas.entity.Categoria;
+import com.tiendamas.entity.DetallePedido;
 import com.tiendamas.entity.MetodoPago;
 import com.tiendamas.entity.Pedido;
 import com.tiendamas.entity.Persona;
 import com.tiendamas.entity.Producto;
 import com.tiendamas.entity.Resena;
+import com.tiendamas.entity.SolicitudDevolucion;
 import com.tiendamas.entity.Suscriptor;
 import com.tiendamas.entity.Talla;
 import com.tiendamas.entity.TipoEntrega;
+import com.tiendamas.entity.TipoSolicitudDevolucion;
 import com.tiendamas.entity.Usuario;
 import com.tiendamas.entity.VarianteProducto;
 import com.tiendamas.repository.SuscriptorRepository;
@@ -23,6 +26,7 @@ import com.tiendamas.service.PedidoService;
 import com.tiendamas.service.PersonaService;
 import com.tiendamas.service.ProductoService;
 import com.tiendamas.service.ResenaService;
+import com.tiendamas.service.SolicitudDevolucionService;
 import com.tiendamas.service.UsuarioService;
 import com.tiendamas.service.impl.EnvioService;
 import com.tiendamas.web.Carrito;
@@ -79,6 +83,9 @@ public class TiendaController {
 
     @Autowired
     private ResenaService resenaService;
+
+    @Autowired
+    private SolicitudDevolucionService solicitudDevolucionService;
 
     @GetMapping
     public String index(@RequestParam(required = false) String q,
@@ -439,6 +446,44 @@ public class TiendaController {
         model.addAttribute("pedidos", pedidos);
         model.addAttribute("titulo", "Mis Pedidos");
         return "tienda/mis-pedidos";
+    }
+
+    @GetMapping("/pedidos/{id}/devolucion")
+    public String devolucionForm(@PathVariable Long id, Model model, Principal principal) {
+        Persona persona = personaDelUsuario(principal);
+        Pedido pedido = pedidoService.obtenerPorId(id);
+        boolean esDueno = pedido != null && persona != null && pedido.getPersona() != null
+                && pedido.getPersona().getId().equals(persona.getId());
+        if (!esDueno) {
+            return "redirect:/tienda/pedidos";
+        }
+        Map<Long, SolicitudDevolucion> solicitudPorDetalle = solicitudDevolucionService.obtenerPorPedido(id).stream()
+                .collect(Collectors.toMap(s -> s.getDetallePedido().getId(), s -> s, (a, b) -> a));
+        model.addAttribute("pedido", pedido);
+        model.addAttribute("solicitudPorDetalle", solicitudPorDetalle);
+        model.addAttribute("puedeSolicitarPorDetalle", pedido.getDetalles().stream()
+                .collect(Collectors.toMap(DetallePedido::getId,
+                        d -> solicitudDevolucionService.puedeSolicitar(d.getId(), persona.getId()))));
+        model.addAttribute("titulo", "Cambios y devoluciones");
+        return "tienda/devolucion-form";
+    }
+
+    @PostMapping("/pedidos/{id}/detalles/{detalleId}/devolucion")
+    public String crearDevolucion(@PathVariable Long id, @PathVariable Long detalleId,
+                                   @RequestParam TipoSolicitudDevolucion tipo,
+                                   @RequestParam String motivo,
+                                   Principal principal, RedirectAttributes redirectAttributes) {
+        Persona persona = personaDelUsuario(principal);
+        if (persona == null) {
+            return "redirect:/login";
+        }
+        try {
+            solicitudDevolucionService.crear(detalleId, persona.getId(), tipo, motivo);
+            redirectAttributes.addFlashAttribute("devolucionOk", true);
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("devolucionError", e.getMessage());
+        }
+        return "redirect:/tienda/pedidos/" + id + "/devolucion";
     }
 
     private Persona personaDelUsuario(Principal principal) {

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/tienda}">
+<body>
+<div th:fragment="content">
+
+    <nav class="tienda-breadcrumbs">
+        <a th:href="@{/tienda}">Tienda</a>
+        <i class="chevron right icon"></i>
+        <a th:href="@{/tienda/pedidos}">Mis pedidos</a>
+        <i class="chevron right icon"></i>
+        <span>Cambios y devoluciones</span>
+    </nav>
+
+    <h1 class="ui dividing header"><i class="sync alternate icon"></i> Cambios y devoluciones</h1>
+    <p class="hint">Pedido <strong th:text="${pedido.numeroCompleto}"></strong> · <span th:text="${pedido.fechaTexto}"></span></p>
+
+    <div class="ui positive message" th:if="${devolucionOk}">
+        <p>Tu solicitud fue enviada. Te avisaremos por correo cuando la revisemos.</p>
+    </div>
+    <div class="ui negative message" th:if="${devolucionError != null}">
+        <p th:text="${devolucionError}"></p>
+    </div>
+
+    <div class="tienda-devolucion-lista">
+        <div class="tienda-devolucion-item" th:each="det : ${pedido.detalles}">
+            <div class="tienda-devolucion-item-info">
+                <strong th:text="${det.producto.nombre}"></strong>
+                <span class="hint" th:if="${det.talla != null or det.color != null}"
+                      th:text="(${det.talla} ?: '') + (${det.color != null and !det.color.isEmpty()} ? ' · ' + ${det.color} : '')"></span>
+                <span class="hint" th:text="${det.cantidad} + ' x S/ ' + ${#numbers.formatDecimal(det.precioUnitario, 1, 2)}"></span>
+            </div>
+
+            <div th:with="solicitud=${solicitudPorDetalle.get(det.id)}">
+                <div th:if="${solicitud != null}" class="ui label tienda-devolucion-estado"
+                     th:classappend="${solicitud.estado.name() == 'PENDIENTE'} ? 'yellow' : (${solicitud.estado.name() == 'APROBADA'} ? 'blue' : (${solicitud.estado.name() == 'COMPLETADA'} ? 'green' : 'red'))">
+                    <span th:text="${solicitud.tipo.etiqueta} + ' · ' + ${solicitud.estado.etiqueta}"></span>
+                </div>
+
+                <form th:if="${solicitud == null and puedeSolicitarPorDetalle.get(det.id)}"
+                      th:action="@{/tienda/pedidos/{id}/detalles/{detalleId}/devolucion(id=${pedido.id},detalleId=${det.id})}"
+                      method="post" class="ui form tienda-devolucion-form">
+                    <div class="field">
+                        <div class="tienda-entrega-opciones">
+                            <label class="tienda-entrega-opcion">
+                                <input type="radio" name="tipo" value="CAMBIO" checked>
+                                <i class="exchange icon"></i> Cambio
+                            </label>
+                            <label class="tienda-entrega-opcion">
+                                <input type="radio" name="tipo" value="DEVOLUCION">
+                                <i class="undo icon"></i> Devolución
+                            </label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <textarea name="motivo" rows="2" placeholder="Contanos el motivo (talla incorrecta, producto con falla, no era lo que esperaba...)" required maxlength="500"></textarea>
+                    </div>
+                    <button type="submit" class="ui small button">Solicitar</button>
+                </form>
+
+                <p class="hint" th:if="${solicitud == null and !puedeSolicitarPorDetalle.get(det.id)}">
+                    <span th:if="${pedido.estado.name() != 'ENTREGADO'}">Vas a poder solicitar un cambio o devolución una vez que el pedido esté entregado.</span>
+                    <span th:if="${pedido.estado.name() == 'ENTREGADO'}">Este producto ya no está dentro del plazo de 15 días para cambios y devoluciones.</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

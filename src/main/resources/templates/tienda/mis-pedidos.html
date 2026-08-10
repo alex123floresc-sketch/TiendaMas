@@ -50,7 +50,12 @@
             <div class="tienda-pedido-card-footer">
                 <span><i class="truck icon"></i> <span th:text="${pedido.tipoEntrega != null ? pedido.tipoEntrega.etiqueta : '—'}"></span></span>
                 <span><i class="money bill alternate icon"></i> <span th:text="${pedido.metodoPago != null ? pedido.metodoPago.etiqueta : '—'}"></span></span>
-                <a th:href="@{/pedidos/{id}(id=${pedido.id})}" class="ui small info button" style="margin-left:auto;">
+                <a th:if="${pedido.estado != null and pedido.estado.name() == 'ENTREGADO'}"
+                   th:href="@{/tienda/pedidos/{id}/devolucion(id=${pedido.id})}" class="ui small button" style="margin-left:auto;">
+                    <i class="sync alternate icon"></i> Cambio o devolución
+                </a>
+                <a th:href="@{/pedidos/{id}(id=${pedido.id})}" class="ui small info button"
+                   th:style="${pedido.estado != null and pedido.estado.name() == 'ENTREGADO'} ? '' : 'margin-left:auto;'">
                     <i class="eye icon"></i> Ver comprobante
                 </a>
             </div>
