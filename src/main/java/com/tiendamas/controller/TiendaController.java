@@ -267,6 +267,14 @@ public class TiendaController {
         offer.put("availability", producto.tieneStock() ? "https://schema.org/InStock" : "https://schema.org/OutOfStock");
         offer.put("url", baseUrl + "/tienda/productos/" + producto.getId());
         jsonLd.put("offers", offer);
+        int totalResenas = resenaService.obtenerPorProducto(producto.getId()).size();
+        if (totalResenas > 0) {
+            Map<String, Object> aggregateRating = new LinkedHashMap<>();
+            aggregateRating.put("@type", "AggregateRating");
+            aggregateRating.put("ratingValue", resenaService.promedioPorProducto(producto.getId()));
+            aggregateRating.put("reviewCount", totalResenas);
+            jsonLd.put("aggregateRating", aggregateRating);
+        }
         try {
             return objectMapper.writeValueAsString(jsonLd);
         } catch (JacksonException e) {

@@ -233,6 +233,84 @@ body {
     color: var(--color-text-muted);
     font-size: 0.78em;
 }
+/* --- Reseñas de productos --- */
+.tienda-resena-resumen {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin: 14px 0 20px;
+}
+.tienda-resena-promedio {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--color-navy);
+}
+.tienda-resena-estrellas {
+    display: inline-flex;
+    gap: 2px;
+}
+.tienda-resena-estrellas .icon,
+.tienda-resena-item-header .icon {
+    color: #F2B400;
+    font-size: 16px;
+    margin: 0 !important;
+}
+.tienda-resena-estrellas .icon.outline {
+    color: var(--color-beige-dark);
+}
+.tienda-resena-form {
+    background: var(--color-beige);
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 20px;
+}
+.tienda-resena-input-estrellas {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap: 4px;
+    width: fit-content;
+}
+.tienda-resena-input-estrellas input {
+    display: none;
+}
+.tienda-resena-input-estrellas .icon {
+    color: var(--color-beige-dark);
+    font-size: 26px;
+    cursor: pointer;
+    margin: 0 !important;
+    transition: color 0.1s ease;
+}
+.tienda-resena-input-estrellas label:hover .icon,
+.tienda-resena-input-estrellas label:hover ~ label .icon,
+.tienda-resena-input-estrellas label:has(input:checked) .icon,
+.tienda-resena-input-estrellas label:has(input:checked) ~ label .icon {
+    color: #F2B400;
+}
+.tienda-resena-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.tienda-resena-item {
+    border-top: 1px solid var(--color-beige-dark);
+    padding-top: 14px;
+}
+.tienda-resena-item-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+}
+.tienda-resena-item-header .tienda-resena-estrellas .icon {
+    font-size: 14px;
+}
+.tienda-resena-item p {
+    color: var(--color-text);
+    margin: 0;
+}
+
 .capas-menu-divider {
     height: 1px;
     background: var(--color-beige-dark);

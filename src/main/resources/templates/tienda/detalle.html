@@ -93,8 +93,9 @@
         <div class="tienda-resena-resumen">
             <div class="tienda-resena-promedio" th:text="${#numbers.formatDecimal(promedioResenas, 1, 1)}">0.0</div>
             <div>
-                <div class="tienda-resena-estrellas" th:each="i : ${#numbers.sequence(1, 5)}">
-                    <i class="star icon" th:classappend="${i <= T(java.lang.Math).round(promedioResenas)} ? '' : 'outline'"></i>
+                <div class="tienda-resena-estrellas">
+                    <i class="star icon" th:each="i : ${#numbers.sequence(1, 5)}"
+                       th:classappend="${i <= T(java.lang.Math).round(promedioResenas)} ? '' : 'outline'"></i>
                 </div>
                 <div class="hint" th:text="${#lists.size(resenas)} + ${#lists.size(resenas) == 1 ? ' reseña' : ' reseñas'}">0 reseñas</div>
             </div>
