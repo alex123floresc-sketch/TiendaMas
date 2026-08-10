@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base}">
+<body>
+<div th:fragment="content">
+
+    <h1 class="ui dividing header">
+        <i class="envelope open icon"></i>
+        <div class="content">
+            Suscriptores del newsletter
+            <div class="sub header">Personas que dejaron su correo en la tienda para recibir novedades y ofertas.</div>
+        </div>
+    </h1>
+
+    <div th:if="${suscriptores.isEmpty()}" class="ui icon warning message">
+        <i class="info circle icon"></i>
+        <div class="content">
+            <div class="header">Todavía no hay suscriptores</div>
+            <p>Cuando alguien se suscriba desde el formulario de la tienda, va a aparecer acá.</p>
+        </div>
+    </div>
+
+    <table class="ui celled striped table" th:unless="${suscriptores.isEmpty()}">
+        <thead>
+        <tr>
+            <th class="one wide">ID</th>
+            <th class="eight wide">Correo</th>
+            <th class="four wide">Fecha de suscripción</th>
+            <th class="three wide center aligned">Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="s : ${suscriptores}">
+            <td th:text="${s.id}"></td>
+            <td th:text="${s.email}" style="font-weight: bold;"></td>
+            <td th:text="${#temporals.format(s.fechaSuscripcion, 'dd/MM/yyyy HH:mm')}"></td>
+            <td class="center aligned">
+                <form th:action="@{/suscriptores/{id}/eliminar(id=${s.id})}" method="post"
+                      th:onsubmit="return confirm('¿Quitar a ' + '${s.email}' + ' de la lista de suscriptores?')">
+                    <button type="submit" class="ui small red button" title="Eliminar">
+                        <i class="trash icon"></i>
+                    </button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

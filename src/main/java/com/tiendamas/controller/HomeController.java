@@ -6,6 +6,7 @@ import com.tiendamas.repository.CategoriaRepository;
 import com.tiendamas.repository.PedidoRepository;
 import com.tiendamas.repository.PersonaRepository;
 import com.tiendamas.repository.ProductoRepository;
+import com.tiendamas.repository.SuscriptorRepository;
 import com.tiendamas.repository.VarianteProductoRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,15 +24,17 @@ public class HomeController {
     private final PersonaRepository personaRepository;
     private final PedidoRepository pedidoRepository;
     private final CategoriaRepository categoriaRepository;
+    private final SuscriptorRepository suscriptorRepository;
 
     public HomeController(ProductoRepository productoRepository, VarianteProductoRepository varianteProductoRepository,
                            PersonaRepository personaRepository, PedidoRepository pedidoRepository,
-                           CategoriaRepository categoriaRepository) {
+                           CategoriaRepository categoriaRepository, SuscriptorRepository suscriptorRepository) {
         this.productoRepository = productoRepository;
         this.varianteProductoRepository = varianteProductoRepository;
         this.personaRepository = personaRepository;
         this.pedidoRepository = pedidoRepository;
         this.categoriaRepository = categoriaRepository;
+        this.suscriptorRepository = suscriptorRepository;
     }
 
     /**
@@ -65,6 +68,7 @@ public class HomeController {
         model.addAttribute("totalPersonas", personaRepository.count());
         model.addAttribute("totalPedidos", pedidoRepository.count());
         model.addAttribute("totalCategorias", categoriaRepository.count());
+        model.addAttribute("totalSuscriptores", suscriptorRepository.count());
         model.addAttribute("ingresosTotales", ingresosTotales);
         model.addAttribute("stockBajo", stockBajo);
 

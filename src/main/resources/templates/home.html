@@ -7,7 +7,7 @@
         <div class="content">Panel de TiendaMas</div>
     </h1>
 
-    <div class="ui four statistics">
+    <div class="ui five statistics">
         <div class="statistic">
             <div class="value" th:text="${totalProductos}">0</div>
             <div class="label">Productos</div>
@@ -23,6 +23,10 @@
         <div class="statistic">
             <div class="value" th:text="${totalPersonas}">0</div>
             <div class="label">Clientes</div>
+        </div>
+        <div class="statistic">
+            <div class="value" th:text="${totalSuscriptores}">0</div>
+            <div class="label">Suscriptores</div>
         </div>
     </div>
 
@@ -54,7 +58,7 @@
 
     <div class="ui segment">
         <h3 class="ui header">Accesos rápidos</h3>
-        <div class="ui four stackable cards">
+        <div class="ui five stackable cards">
             <a href="/productos" class="ui card">
                 <div class="content">
                     <i class="tshirt icon"></i> <span class="header">Productos</span>
@@ -77,6 +81,12 @@
                 <div class="content">
                     <i class="cash register icon"></i> <span class="header">Punto de venta</span>
                     <div class="description">Registra una venta al instante.</div>
+                </div>
+            </a>
+            <a href="/suscriptores" class="ui card">
+                <div class="content">
+                    <i class="envelope open icon"></i> <span class="header">Suscriptores</span>
+                    <div class="description">Correos captados por el newsletter de la tienda.</div>
                 </div>
             </a>
         </div>

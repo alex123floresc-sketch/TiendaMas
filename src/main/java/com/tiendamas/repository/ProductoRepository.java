@@ -21,11 +21,11 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
            "(:q IS NULL OR LOWER(p.nombre) LIKE CONCAT('%', :q, '%') " +
            "OR LOWER(COALESCE(p.marca, '')) LIKE CONCAT('%', :q, '%') " +
            "OR LOWER(COALESCE(v.codigoBarras, '')) LIKE CONCAT('%', :q, '%')) AND " +
-           "(:talla IS NULL OR v.talla = :talla) AND " +
+           "(:tallas IS NULL OR v.talla IN :tallas) AND " +
            "(:precioMin IS NULL OR p.precio >= :precioMin) AND " +
            "(:precioMax IS NULL OR p.precio <= :precioMax) " +
            "ORDER BY p.nombre ASC")
     List<Producto> buscar(@Param("q") String q, @Param("categoriaId") Long categoriaId,
-                           @Param("talla") Talla talla, @Param("precioMin") Double precioMin,
+                           @Param("tallas") List<Talla> tallas, @Param("precioMin") Double precioMin,
                            @Param("precioMax") Double precioMax);
 }

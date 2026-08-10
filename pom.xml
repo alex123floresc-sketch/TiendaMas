@@ -9,7 +9,7 @@
         <relativePath/> </parent>
     <groupId>com.tiendamas</groupId>
     <artifactId>tiendaMas</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.1.0</version>
     <name>tiendaMas</name>
     <description>TiendaMas - Sistema de ventas e inventario</description>
     <url/>

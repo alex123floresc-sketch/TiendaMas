@@ -44,44 +44,52 @@
 
     <!-- Filtros arriba de todo, para que se puedan usar sin tener que bajar por la página -->
     <div class="tienda-filtros" id="catalogo">
-        <a th:href="@{/tienda(q=${q}, talla=${tallaSeleccionada}, precioRango=${precioRango}, orden=${orden})}"
+        <a th:href="@{/tienda(q=${q}, talla=${tallasSeleccionadas}, precioRango=${precioRango}, orden=${orden})}"
            class="ui label" th:classappend="${categoriaSeleccionada == null} ? 'blue'">Todas</a>
         <a th:each="cat : ${categorias}"
-           th:href="@{/tienda(q=${q}, categoriaId=${cat.id}, talla=${tallaSeleccionada}, precioRango=${precioRango}, orden=${orden})}"
+           th:href="@{/tienda(q=${q}, categoriaId=${cat.id}, talla=${tallasSeleccionadas}, precioRango=${precioRango}, orden=${orden})}"
            class="ui label"
            th:classappend="${categoriaSeleccionada != null and categoriaSeleccionada == cat.id} ? 'blue'"
            th:text="${cat.nombre}"></a>
     </div>
 
-    <div class="tienda-filtros-panel">
+    <form th:action="@{/tienda}" method="get" class="tienda-filtros-panel" id="formFiltros">
+        <input type="hidden" name="q" th:value="${q}">
+        <input type="hidden" name="categoriaId" th:value="${categoriaSeleccionada}">
+        <input type="hidden" name="precioRango" th:value="${precioRango}">
+        <input type="hidden" name="orden" th:value="${orden}">
+
         <div class="tienda-filtro-grupo">
-            <span class="tienda-filtro-label"><i class="expand icon"></i> Talla</span>
+            <span class="tienda-filtro-label"><i class="expand icon"></i> Talla <small>(elegí varias)</small></span>
             <div class="tienda-filtro-chips">
-                <a th:each="t : ${tallas}"
-                   th:href="@{/tienda(q=${q}, categoriaId=${categoriaSeleccionada}, talla=${tallaSeleccionada == t ? null : t}, precioRango=${precioRango}, orden=${orden})}"
-                   class="tienda-chip" th:classappend="${tallaSeleccionada == t} ? 'activo'"
-                   th:text="${t.etiqueta}"></a>
+                <label class="tienda-chip tienda-chip-checkbox" th:each="t : ${tallas}"
+                       th:classappend="${tallasSeleccionadas.contains(t)} ? 'activo'">
+                    <input type="checkbox" name="talla" th:value="${t}"
+                           th:checked="${tallasSeleccionadas.contains(t)}"
+                           onchange="this.closest('label').classList.toggle('activo', this.checked); document.getElementById('formFiltros').submit();">
+                    <span th:text="${t.etiqueta}"></span>
+                </label>
             </div>
         </div>
         <div class="tienda-filtro-grupo">
             <span class="tienda-filtro-label"><i class="dollar sign icon"></i> Precio</span>
             <div class="tienda-filtro-chips">
-                <a th:href="@{/tienda(q=${q}, categoriaId=${categoriaSeleccionada}, talla=${tallaSeleccionada}, precioRango=${precioRango == '0-50' ? null : '0-50'}, orden=${orden})}"
+                <a th:href="@{/tienda(q=${q}, categoriaId=${categoriaSeleccionada}, talla=${tallasSeleccionadas}, precioRango=${precioRango == '0-50' ? null : '0-50'}, orden=${orden})}"
                    class="tienda-chip" th:classappend="${precioRango == '0-50'} ? 'activo'">Hasta S/ 50</a>
-                <a th:href="@{/tienda(q=${q}, categoriaId=${categoriaSeleccionada}, talla=${tallaSeleccionada}, precioRango=${precioRango == '50-100' ? null : '50-100'}, orden=${orden})}"
+                <a th:href="@{/tienda(q=${q}, categoriaId=${categoriaSeleccionada}, talla=${tallasSeleccionadas}, precioRango=${precioRango == '50-100' ? null : '50-100'}, orden=${orden})}"
                    class="tienda-chip" th:classappend="${precioRango == '50-100'} ? 'activo'">S/ 50 – S/ 100</a>
-                <a th:href="@{/tienda(q=${q}, categoriaId=${categoriaSeleccionada}, talla=${tallaSeleccionada}, precioRango=${precioRango == '100-200' ? null : '100-200'}, orden=${orden})}"
+                <a th:href="@{/tienda(q=${q}, categoriaId=${categoriaSeleccionada}, talla=${tallasSeleccionadas}, precioRango=${precioRango == '100-200' ? null : '100-200'}, orden=${orden})}"
                    class="tienda-chip" th:classappend="${precioRango == '100-200'} ? 'activo'">S/ 100 – S/ 200</a>
-                <a th:href="@{/tienda(q=${q}, categoriaId=${categoriaSeleccionada}, talla=${tallaSeleccionada}, precioRango=${precioRango == '200+' ? null : '200+'}, orden=${orden})}"
+                <a th:href="@{/tienda(q=${q}, categoriaId=${categoriaSeleccionada}, talla=${tallasSeleccionadas}, precioRango=${precioRango == '200+' ? null : '200+'}, orden=${orden})}"
                    class="tienda-chip" th:classappend="${precioRango == '200+'} ? 'activo'">Más de S/ 200</a>
             </div>
         </div>
-        <a th:if="${tallaSeleccionada != null or precioRango != null}"
+        <a th:if="${!tallasSeleccionadas.isEmpty() or precioRango != null}"
            th:href="@{/tienda(q=${q}, categoriaId=${categoriaSeleccionada}, orden=${orden})}"
            class="tienda-filtro-limpiar">
             <i class="times icon"></i> Quitar filtros
         </a>
-    </div>
+    </form>
 
     <!-- Carrusel: los más vendidos (se desplaza a los costados con flechas o arrastrando) -->
     <div class="tienda-carrusel-seccion" th:if="${masVendidos != null and !masVendidos.isEmpty()}">
@@ -194,9 +202,21 @@
         <a th:href="@{/tienda}" class="ui primary button">Ver todos los productos</a>
     </div>
 
-    <div class="tienda-grid">
-        <div class="tienda-card" th:each="p : ${productos}">
-            <th:block th:replace="~{tienda/fragments :: tarjetaProductoContenido(${p})}"></th:block>
+    <div class="tienda-carrusel-seccion reveal" th:each="grupo : ${catalogoAgrupado}" th:unless="${productos.isEmpty()}">
+        <div class="tienda-carrusel-header">
+            <h3 class="ui header"><i class="tag icon"></i><span th:text="${grupo.key.nombre}"></span>
+                <span class="tienda-carrusel-contador" th:text="'(' + ${grupo.value.size()} + ')'"></span></h3>
+            <div class="tienda-carrusel-flechas">
+                <button type="button" class="tienda-carrusel-flecha"
+                        th:onclick="'desplazarCarrusel(\'carrusel-catalogo-' + ${grupo.key.id} + '\', -1)'" aria-label="Anterior"><i class="chevron left icon"></i></button>
+                <button type="button" class="tienda-carrusel-flecha"
+                        th:onclick="'desplazarCarrusel(\'carrusel-catalogo-' + ${grupo.key.id} + '\', 1)'" aria-label="Siguiente"><i class="chevron right icon"></i></button>
+            </div>
+        </div>
+        <div class="tienda-carrusel" th:id="'carrusel-catalogo-' + ${grupo.key.id}">
+            <div class="tienda-carrusel-card" th:each="p : ${grupo.value}">
+                <th:block th:replace="~{tienda/fragments :: tarjetaProductoContenido(${p})}"></th:block>
+            </div>
         </div>
     </div>
 

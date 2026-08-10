@@ -31,6 +31,7 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -68,7 +69,7 @@ public class TiendaController {
     @GetMapping
     public String index(@RequestParam(required = false) String q,
                          @RequestParam(required = false) Long categoriaId,
-                         @RequestParam(required = false) Talla talla,
+                         @RequestParam(required = false) List<Talla> talla,
                          @RequestParam(required = false) String precioRango,
                          @RequestParam(required = false, defaultValue = "relevancia") String orden, Model model) {
         Double precioMin = null;
@@ -82,17 +83,24 @@ public class TiendaController {
                 default -> precioRango = null;
             }
         }
-        List<Producto> productos = ordenar(productoService.buscar(q, categoriaId, talla, precioMin, precioMax), orden);
+        boolean sinTallas = talla == null || talla.isEmpty();
+        List<Producto> productos = ordenar(productoService.buscar(q, categoriaId, sinTallas ? null : talla, precioMin, precioMax), orden);
+
+        Map<Categoria, List<Producto>> catalogoAgrupado = new LinkedHashMap<>();
+        for (Producto p : productos) {
+            catalogoAgrupado.computeIfAbsent(p.getCategoria(), k -> new ArrayList<>()).add(p);
+        }
 
         model.addAttribute("productos", productos);
+        model.addAttribute("catalogoAgrupado", catalogoAgrupado);
         model.addAttribute("categorias", categoriaService.obtenerPrincipales());
         model.addAttribute("categoriaSeleccionada", categoriaId);
         model.addAttribute("tallas", Talla.values());
-        model.addAttribute("tallaSeleccionada", talla);
+        model.addAttribute("tallasSeleccionadas", sinTallas ? List.of() : talla);
         model.addAttribute("precioRango", precioRango);
         model.addAttribute("q", q);
         model.addAttribute("orden", orden);
-        if ((q == null || q.isBlank()) && categoriaId == null && talla == null && precioRango == null) {
+        if ((q == null || q.isBlank()) && categoriaId == null && sinTallas && precioRango == null) {
             model.addAttribute("masVendidos", pedidoService.obtenerMasVendidos(10));
             model.addAttribute("recientes", productoService.obtenerRecientes());
             long totalMarcas = productos.stream()

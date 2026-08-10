@@ -24,7 +24,8 @@
 <nav class="tienda-navbar">
   <a th:href="@{/tienda}" class="tienda-brand"><i class="shop icon"></i> TiendaMas</a>
 
-  <button type="button" class="tienda-nav-toggle" onclick="document.querySelector('.tienda-nav-links').classList.toggle('open')">
+  <button type="button" class="tienda-nav-toggle" aria-label="Abrir menú"
+          onclick="document.querySelector('.tienda-nav-links').classList.toggle('open'); this.classList.toggle('open')">
     <i class="bars icon"></i>
   </button>
 
@@ -61,7 +62,8 @@
 
     <a th:href="@{/tienda/carrito}" class="item tienda-cart-link" title="Ver carrito">
       <i class="shopping cart icon"></i> Carrito
-      <span class="tienda-cart-badge" th:if="${carritoCount != null and carritoCount > 0}" th:text="${carritoCount}"></span>
+      <span class="tienda-cart-badge" th:if="${carritoCount != null and carritoCount > 0}" th:text="${carritoCount}"
+            th:classappend="${param.agregado != null} ? 'tienda-cart-badge-pulso'"></span>
     </a>
 
     <a th:href="@{/login}" class="item tienda-nav-login" th:unless="${usuarioAutenticado}">
@@ -175,7 +177,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        $('.tienda-cuenta-dropdown').dropdown({ action: 'nothing' });
+        $('.tienda-cuenta-dropdown').dropdown({ action: 'nothing', transition: 'slide down', duration: 220 });
     });
 
     function desplazarCarrusel(id, direccion) {

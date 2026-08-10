@@ -59,9 +59,9 @@ public class ProductoService {
         return buscar(query, categoriaId, null, null, null);
     }
 
-    public List<Producto> buscar(String query, Long categoriaId, Talla talla, Double precioMin, Double precioMax) {
+    public List<Producto> buscar(String query, Long categoriaId, List<Talla> tallas, Double precioMin, Double precioMax) {
         String q = (query == null || query.isBlank()) ? null : query.trim().toLowerCase();
-        return productoRepository.buscar(q, categoriaId, talla, precioMin, precioMax);
+        return productoRepository.buscar(q, categoriaId, tallas, precioMin, precioMax);
     }
 
     public Producto guardarConVariantes(ProductoForm form, Categoria categoria, String imagenUrl) {

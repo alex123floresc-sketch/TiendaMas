@@ -42,6 +42,11 @@
         <i class="chart bar icon"></i> Reportes
       </a>
 
+      <div class="admin-nav-section-label">Marketing</div>
+      <a href="/suscriptores" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/suscriptores')} ? 'seccion-actual'">
+        <i class="envelope open icon"></i> Suscriptores
+      </a>
+
       <div class="admin-nav-section-label">Finanzas</div>
       <a href="/gastos" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/gastos')} ? 'seccion-actual'">
         <i class="money bill wave icon"></i> Gastos
