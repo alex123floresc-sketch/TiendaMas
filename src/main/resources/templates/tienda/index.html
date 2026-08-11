@@ -28,12 +28,18 @@
     </div>
 
     <!-- Apartado: categorías destacadas en tarjetas visuales -->
-    <div class="tienda-seccion-categorias reveal" th:if="${imagenPorCategoria != null and !categorias.isEmpty()}">
+    <div class="tienda-seccion-categorias reveal" th:if="${categorias != null and !categorias.isEmpty()}">
         <h2 class="tienda-seccion-titulo"><i class="th large icon"></i> Comprá por categoría</h2>
         <div class="tienda-categorias-grid">
-            <a th:each="cat : ${categorias}" th:href="@{/tienda(categoriaId=${cat.id})}" class="tienda-categoria-tile">
-                <img th:if="${imagenPorCategoria[cat.id] != null}" th:src="@{${imagenPorCategoria[cat.id]}}" th:alt="${cat.nombre}" loading="lazy">
-                <i th:if="${imagenPorCategoria[cat.id] == null}" class="tags icon"></i>
+            <a th:each="cat : ${categorias}" th:href="@{/tienda(categoriaId=${cat.id})}"
+               th:class="'tienda-categoria-tile tienda-categoria-tile-' + ${#strings.toLowerCase(cat.nombre) == 'niños' ? 'ninos' : #strings.toLowerCase(cat.nombre)}">
+                <th:block th:switch="${cat.nombre}">
+                    <i th:case="'Hombre'" class="male icon"></i>
+                    <i th:case="'Mujer'" class="female icon"></i>
+                    <i th:case="'Niños'" class="child icon"></i>
+                    <i th:case="'Accesorios'" class="shopping bag icon"></i>
+                    <i th:case="*" class="tags icon"></i>
+                </th:block>
                 <div class="tienda-categoria-tile-overlay">
                     <span th:text="${cat.nombre}"></span>
                     <i class="arrow right icon"></i>
@@ -113,18 +119,20 @@
     </div>
 
     <!-- Un carrusel por cada categoría principal -->
-    <div class="tienda-carrusel-seccion" th:each="entry : ${carruseles}">
+    <div class="tienda-carrusel-seccion" th:each="entry : ${carruseles}" th:with="totalItems=${#lists.size(entry.value)}">
         <div class="tienda-carrusel-header">
             <h3 class="ui header"><i class="tag icon"></i><span th:text="${entry.key.nombre}"></span></h3>
             <div class="tienda-carrusel-flechas">
-                <button type="button" class="tienda-carrusel-flecha"
-                        th:onclick="'desplazarCarrusel(\'carrusel-cat-' + ${entry.key.id} + '\', -1)'" aria-label="Anterior"><i class="chevron left icon"></i></button>
-                <button type="button" class="tienda-carrusel-flecha"
-                        th:onclick="'desplazarCarrusel(\'carrusel-cat-' + ${entry.key.id} + '\', 1)'" aria-label="Siguiente"><i class="chevron right icon"></i></button>
+                <th:block th:if="${totalItems > 5}">
+                    <button type="button" class="tienda-carrusel-flecha"
+                            th:onclick="'desplazarCarrusel(\'carrusel-cat-' + ${entry.key.id} + '\', -1)'" aria-label="Anterior"><i class="chevron left icon"></i></button>
+                    <button type="button" class="tienda-carrusel-flecha"
+                            th:onclick="'desplazarCarrusel(\'carrusel-cat-' + ${entry.key.id} + '\', 1)'" aria-label="Siguiente"><i class="chevron right icon"></i></button>
+                </th:block>
                 <a th:href="@{/tienda(categoriaId=${entry.key.id})}" class="tienda-carrusel-vertodo"><span>Ver todo</span> <i class="arrow right icon"></i></a>
             </div>
         </div>
-        <div class="tienda-carrusel" th:id="'carrusel-cat-' + ${entry.key.id}">
+        <div class="tienda-carrusel" th:classappend="${totalItems <= 5} ? 'tienda-carrusel-compacto'" th:id="'carrusel-cat-' + ${entry.key.id}">
             <div class="tienda-carrusel-card" th:each="p : ${entry.value}">
                 <th:block th:replace="~{tienda/fragments :: tarjetaProductoContenido(${p})}"></th:block>
             </div>
@@ -174,56 +182,62 @@
         </div>
     </div>
 
-    <h2 class="tienda-catalogo-titulo"><i class="th icon"></i> Catálogo completo</h2>
+    <!-- Esta vista agrupada por categoría solo se muestra cuando hay una búsqueda/filtro activo:
+         sin filtros, las mismas categorías ya se recorren arriba (más vendidos, un carrusel por
+         categoría, recién llegados), así que repetirlas acá era mostrar el catálogo dos veces. -->
+    <th:block th:if="${hayFiltros}">
+        <h2 class="tienda-catalogo-titulo"><i class="th icon"></i> Catálogo completo</h2>
 
-    <div class="ui message" th:if="${q != null and !q.isBlank()}">
-        Resultados de búsqueda para "<strong th:text="${q}"></strong>" (<span th:text="${productos.size()}"></span>)
-        — <a th:href="@{/tienda}">quitar filtro</a>
-    </div>
-
-    <div class="tienda-toolbar" th:unless="${productos.isEmpty()}">
-        <div class="tienda-toolbar-count">
-            <span th:text="${productos.size()}"></span> producto<span th:if="${productos.size() != 1}">s</span>
+        <div class="ui message" th:if="${q != null and !q.isBlank()}">
+            Resultados de búsqueda para "<strong th:text="${q}"></strong>" (<span th:text="${productos.size()}"></span>)
+            — <a th:href="@{/tienda}">quitar filtro</a>
         </div>
-        <form th:action="@{/tienda}" method="get" class="tienda-toolbar-orden">
-            <input type="hidden" name="q" th:value="${q}">
-            <input type="hidden" name="categoriaId" th:value="${categoriaSeleccionada}">
-            <label for="ordenSelect">Ordenar por</label>
-            <select id="ordenSelect" name="orden" class="tienda-select" onchange="this.form.submit()">
-                <option value="relevancia" th:selected="${orden == 'relevancia'}">Relevancia</option>
-                <option value="precio_asc" th:selected="${orden == 'precio_asc'}">Precio: menor a mayor</option>
-                <option value="precio_desc" th:selected="${orden == 'precio_desc'}">Precio: mayor a menor</option>
-                <option value="nombre_az" th:selected="${orden == 'nombre_az'}">Nombre: A-Z</option>
-                <option value="nombre_za" th:selected="${orden == 'nombre_za'}">Nombre: Z-A</option>
-            </select>
-        </form>
-    </div>
 
-    <div class="tienda-empty" th:if="${productos.isEmpty()}">
-        <i class="box open icon"></i>
-        <h3 th:if="${q != null and !q.isBlank()}">No encontramos productos que coincidan con tu búsqueda</h3>
-        <h3 th:unless="${q != null and !q.isBlank()}">No hay productos disponibles en esta categoría por ahora</h3>
-        <p>Probá con otra palabra o mirá el catálogo completo.</p>
-        <a th:href="@{/tienda}" class="ui primary button">Ver todos los productos</a>
-    </div>
+        <div class="tienda-toolbar" th:unless="${productos.isEmpty()}">
+            <div class="tienda-toolbar-count">
+                <span th:text="${productos.size()}"></span> producto<span th:if="${productos.size() != 1}">s</span>
+            </div>
+            <form th:action="@{/tienda}" method="get" class="tienda-toolbar-orden">
+                <input type="hidden" name="q" th:value="${q}">
+                <input type="hidden" name="categoriaId" th:value="${categoriaSeleccionada}">
+                <label for="ordenSelect">Ordenar por</label>
+                <select id="ordenSelect" name="orden" class="tienda-select" onchange="this.form.submit()">
+                    <option value="relevancia" th:selected="${orden == 'relevancia'}">Relevancia</option>
+                    <option value="precio_asc" th:selected="${orden == 'precio_asc'}">Precio: menor a mayor</option>
+                    <option value="precio_desc" th:selected="${orden == 'precio_desc'}">Precio: mayor a menor</option>
+                    <option value="nombre_az" th:selected="${orden == 'nombre_az'}">Nombre: A-Z</option>
+                    <option value="nombre_za" th:selected="${orden == 'nombre_za'}">Nombre: Z-A</option>
+                </select>
+            </form>
+        </div>
 
-    <div class="tienda-carrusel-seccion reveal" th:each="grupo : ${catalogoAgrupado}" th:unless="${productos.isEmpty()}">
-        <div class="tienda-carrusel-header">
-            <h3 class="ui header"><i class="tag icon"></i><span th:text="${grupo.key.nombre}"></span>
-                <span class="tienda-carrusel-contador" th:text="'(' + ${grupo.value.size()} + ')'"></span></h3>
-            <div class="tienda-carrusel-flechas">
-                <button type="button" class="tienda-carrusel-flecha"
-                        th:onclick="'desplazarCarrusel(\'carrusel-catalogo-' + ${grupo.key.id} + '\', -1)'" aria-label="Anterior"><i class="chevron left icon"></i></button>
-                <button type="button" class="tienda-carrusel-flecha"
-                        th:onclick="'desplazarCarrusel(\'carrusel-catalogo-' + ${grupo.key.id} + '\', 1)'" aria-label="Siguiente"><i class="chevron right icon"></i></button>
+        <div class="tienda-empty" th:if="${productos.isEmpty()}">
+            <i class="box open icon"></i>
+            <h3 th:if="${q != null and !q.isBlank()}">No encontramos productos que coincidan con tu búsqueda</h3>
+            <h3 th:unless="${q != null and !q.isBlank()}">No hay productos disponibles en esta categoría por ahora</h3>
+            <p>Probá con otra palabra o mirá el catálogo completo.</p>
+            <a th:href="@{/tienda}" class="ui primary button">Ver todos los productos</a>
+        </div>
+
+        <div class="tienda-carrusel-seccion reveal" th:each="grupo : ${catalogoAgrupado}" th:unless="${productos.isEmpty()}"
+             th:with="totalGrupo=${grupo.value.size()}">
+            <div class="tienda-carrusel-header">
+                <h3 class="ui header"><i class="tag icon"></i><span th:text="${grupo.key.nombre}"></span>
+                    <span class="tienda-carrusel-contador" th:text="'(' + ${totalGrupo} + ')'"></span></h3>
+                <div class="tienda-carrusel-flechas" th:if="${totalGrupo > 5}">
+                    <button type="button" class="tienda-carrusel-flecha"
+                            th:onclick="'desplazarCarrusel(\'carrusel-catalogo-' + ${grupo.key.id} + '\', -1)'" aria-label="Anterior"><i class="chevron left icon"></i></button>
+                    <button type="button" class="tienda-carrusel-flecha"
+                            th:onclick="'desplazarCarrusel(\'carrusel-catalogo-' + ${grupo.key.id} + '\', 1)'" aria-label="Siguiente"><i class="chevron right icon"></i></button>
+                </div>
+            </div>
+            <div class="tienda-carrusel" th:classappend="${totalGrupo <= 5} ? 'tienda-carrusel-compacto'" th:id="'carrusel-catalogo-' + ${grupo.key.id}">
+                <div class="tienda-carrusel-card" th:each="p : ${grupo.value}">
+                    <th:block th:replace="~{tienda/fragments :: tarjetaProductoContenido(${p})}"></th:block>
+                </div>
             </div>
         </div>
-        <div class="tienda-carrusel" th:id="'carrusel-catalogo-' + ${grupo.key.id}">
-            <div class="tienda-carrusel-card" th:each="p : ${grupo.value}">
-                <th:block th:replace="~{tienda/fragments :: tarjetaProductoContenido(${p})}"></th:block>
-            </div>
-        </div>
-    </div>
+    </th:block>
 
     <!-- Apartado: suscripción al newsletter -->
     <div class="tienda-newsletter reveal" id="newsletter">

@@ -12,59 +12,73 @@
 </head>
 <body class="login-page">
 
-<div class="login-box">
-    <div class="ui raised segment">
+<div class="login-shell">
 
-        <h2 class="ui header">
-            <i class="shop icon"></i>
-            <div class="content">
-                TiendaMas
-                <div class="sub header">Introduce tus credenciales para continuar</div>
-            </div>
-        </h2>
-
-        <div class="ui negative message" th:if="${param.error}">
-            <div class="header">Error de autenticación</div>
-            <p>El usuario o la contraseña son incorrectos.</p>
+    <div class="login-brand-panel">
+        <div class="login-brand-content">
+            <div class="login-brand-badge"><i class="shop icon"></i></div>
+            <h1>TiendaMas</h1>
+            <p>Ropa y accesorios para hombre, mujer y niños, con envío a domicilio o retiro en tienda.</p>
+            <ul class="login-brand-features">
+                <li><i class="truck icon"></i> Envío a todo el país</li>
+                <li><i class="lock icon"></i> Pagos 100% seguros</li>
+                <li><i class="sync alternate icon"></i> Cambios sin costo</li>
+            </ul>
         </div>
-
-        <div class="ui info message" th:if="${param.logout}">
-            <p>Has cerrado sesión correctamente.</p>
-        </div>
-
-        <div class="ui positive message" th:if="${param.registrado}">
-            <p>Cuenta creada correctamente. Ya puedes iniciar sesión.</p>
-        </div>
-
-        <form th:action="@{/login}" method="POST" class="ui form">
-
-            <div class="field">
-                <label>Usuario</label>
-                <div class="ui left icon input">
-                    <i class="user icon"></i>
-                    <input type="text" name="username" placeholder="Nombre de usuario" autocomplete="username" required autofocus>
-                </div>
-            </div>
-
-            <div class="field">
-                <label>Contraseña</label>
-                <div class="ui left icon input">
-                    <i class="lock icon"></i>
-                    <input type="password" name="password" placeholder="Tu contraseña" autocomplete="current-password" required>
-                </div>
-            </div>
-
-            <button class="ui fluid primary large submit button" type="submit">
-                Ingresar
-            </button>
-        </form>
-
-        <p style="text-align:center; margin-top: 16px;">
-            ¿Compras en línea? <a th:href="@{/registro}">Crea una cuenta de cliente</a>
-        </p>
     </div>
 
-    <p class="login-footer">&copy; 2026 TiendaMas · Moda para toda la familia</p>
+    <div class="login-form-panel">
+        <div class="login-box">
+
+            <div class="login-box-header">
+                <h2>Iniciar sesión</h2>
+                <p class="hint">Ingresa tus credenciales para continuar</p>
+            </div>
+
+            <div class="ui negative message" th:if="${param.error}">
+                <div class="header">Error de autenticación</div>
+                <p>El usuario o la contraseña son incorrectos.</p>
+            </div>
+
+            <div class="ui info message" th:if="${param.logout}">
+                <p>Has cerrado sesión correctamente.</p>
+            </div>
+
+            <div class="ui positive message" th:if="${param.registrado}">
+                <p>Cuenta creada correctamente. Ya puedes iniciar sesión.</p>
+            </div>
+
+            <form th:action="@{/login}" method="POST" class="ui form">
+
+                <div class="field">
+                    <label>Usuario</label>
+                    <div class="ui left icon input">
+                        <i class="user icon"></i>
+                        <input type="text" name="username" placeholder="Nombre de usuario" autocomplete="username" required autofocus>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label>Contraseña</label>
+                    <div class="ui left icon input">
+                        <i class="lock icon"></i>
+                        <input type="password" name="password" placeholder="Tu contraseña" autocomplete="current-password" required>
+                    </div>
+                </div>
+
+                <button class="ui fluid primary large submit button" type="submit">
+                    Ingresar
+                </button>
+            </form>
+
+            <p class="login-box-footer">
+                ¿Compras en línea? <a th:href="@{/registro}">Crea una cuenta de cliente</a>
+            </p>
+        </div>
+
+        <p class="login-copyright">&copy; 2026 TiendaMas · Moda para toda la familia</p>
+    </div>
+
 </div>
 
 </body>

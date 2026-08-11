@@ -12,86 +12,100 @@
 </head>
 <body class="login-page">
 
-<div class="login-box" style="max-width: 520px;">
-    <div class="ui raised segment">
+<div class="login-shell login-shell-registro">
 
-        <h2 class="ui header">
-            <i class="user plus icon"></i>
-            <div class="content">
-                Crear cuenta de cliente
-                <div class="sub header">Regístrate para comprar en línea y ver tu historial de pedidos.</div>
-            </div>
-        </h2>
-
-        <div class="ui negative message" th:if="${error}">
-            <p th:text="${error}"></p>
+    <div class="login-brand-panel">
+        <div class="login-brand-content">
+            <div class="login-brand-badge"><i class="user plus icon"></i></div>
+            <h1>Creá tu cuenta</h1>
+            <p>Registrate para comprar en línea, seguir tus pedidos y juntar puntos de fidelidad en cada compra.</p>
+            <ul class="login-brand-features">
+                <li><i class="gift icon"></i> Puntos por cada compra</li>
+                <li><i class="list icon"></i> Historial de pedidos</li>
+                <li><i class="sync alternate icon"></i> Cambios y devoluciones</li>
+            </ul>
         </div>
-
-        <form th:action="@{/registro}" th:object="${registroForm}" method="POST" class="ui form">
-
-            <div class="field required">
-                <label>Usuario</label>
-                <input type="text" th:field="*{username}" placeholder="Nombre de usuario" autocomplete="username" required>
-            </div>
-
-            <div class="field required">
-                <label>Contraseña</label>
-                <input type="password" th:field="*{password}" placeholder="Contraseña" autocomplete="new-password" required>
-            </div>
-
-            <div class="two fields">
-                <div class="field required">
-                    <label>Nombre</label>
-                    <input type="text" th:field="*{nombre}" placeholder="Ej. Juan" required>
-                </div>
-                <div class="field required">
-                    <label>Apellido</label>
-                    <input type="text" th:field="*{apellido}" placeholder="Ej. Pérez" required>
-                </div>
-            </div>
-
-            <div class="field required">
-                <label>Email</label>
-                <input type="email" th:field="*{email}" placeholder="juan.perez@example.com" autocomplete="email" required>
-            </div>
-
-            <div class="two fields">
-                <div class="field">
-                    <label>Teléfono</label>
-                    <input type="tel" th:field="*{telefono}" placeholder="987654321">
-                </div>
-                <div class="field">
-                    <label>Dirección</label>
-                    <input type="text" th:field="*{direccion}" placeholder="Ej. Av. Primavera 123">
-                </div>
-            </div>
-
-            <div class="two fields">
-                <div class="field required">
-                    <label>Tipo de documento</label>
-                    <select th:field="*{tipoDocumento}" class="ui fluid dropdown" required>
-                        <option value="">-- Selecciona --</option>
-                        <option value="DNI">DNI (Boleta)</option>
-                        <option value="RUC">RUC (Factura)</option>
-                    </select>
-                </div>
-                <div class="field required">
-                    <label>Número de documento</label>
-                    <input type="text" th:field="*{numeroDocumento}" placeholder="Ej. 12345678" required>
-                </div>
-            </div>
-
-            <div class="ui divider"></div>
-
-            <button class="ui fluid primary large submit button" type="submit">
-                Crear cuenta
-            </button>
-        </form>
-
-        <p style="text-align:center; margin-top: 16px;">
-            ¿Ya tienes cuenta? <a th:href="@{/login}">Inicia sesión</a>
-        </p>
     </div>
+
+    <div class="login-form-panel">
+        <div class="login-box login-box-ancho">
+
+            <div class="login-box-header">
+                <h2>Crear cuenta de cliente</h2>
+                <p class="hint">Regístrate para comprar en línea y ver tu historial de pedidos.</p>
+            </div>
+
+            <div class="ui negative message" th:if="${error}">
+                <p th:text="${error}"></p>
+            </div>
+
+            <form th:action="@{/registro}" th:object="${registroForm}" method="POST" class="ui form">
+
+                <div class="field required">
+                    <label>Usuario</label>
+                    <input type="text" th:field="*{username}" placeholder="Nombre de usuario" autocomplete="username" required>
+                </div>
+
+                <div class="field required">
+                    <label>Contraseña</label>
+                    <input type="password" th:field="*{password}" placeholder="Contraseña" autocomplete="new-password" required>
+                </div>
+
+                <div class="two fields">
+                    <div class="field required">
+                        <label>Nombre</label>
+                        <input type="text" th:field="*{nombre}" placeholder="Ej. Juan" required>
+                    </div>
+                    <div class="field required">
+                        <label>Apellido</label>
+                        <input type="text" th:field="*{apellido}" placeholder="Ej. Pérez" required>
+                    </div>
+                </div>
+
+                <div class="field required">
+                    <label>Email</label>
+                    <input type="email" th:field="*{email}" placeholder="juan.perez@example.com" autocomplete="email" required>
+                </div>
+
+                <div class="two fields">
+                    <div class="field">
+                        <label>Teléfono</label>
+                        <input type="tel" th:field="*{telefono}" placeholder="987654321">
+                    </div>
+                    <div class="field">
+                        <label>Dirección</label>
+                        <input type="text" th:field="*{direccion}" placeholder="Ej. Av. Primavera 123">
+                    </div>
+                </div>
+
+                <div class="two fields">
+                    <div class="field required">
+                        <label>Tipo de documento</label>
+                        <select th:field="*{tipoDocumento}" class="ui fluid dropdown" required>
+                            <option value="">-- Selecciona --</option>
+                            <option value="DNI">DNI (Boleta)</option>
+                            <option value="RUC">RUC (Factura)</option>
+                        </select>
+                    </div>
+                    <div class="field required">
+                        <label>Número de documento</label>
+                        <input type="text" th:field="*{numeroDocumento}" placeholder="Ej. 12345678" required>
+                    </div>
+                </div>
+
+                <div class="ui divider"></div>
+
+                <button class="ui fluid primary large submit button" type="submit">
+                    Crear cuenta
+                </button>
+            </form>
+
+            <p class="login-box-footer">
+                ¿Ya tienes cuenta? <a th:href="@{/login}">Inicia sesión</a>
+            </p>
+        </div>
+    </div>
+
 </div>
 
 </body>

@@ -122,8 +122,14 @@ public class TiendaController {
             catalogoAgrupado.computeIfAbsent(p.getCategoria(), k -> new ArrayList<>()).add(p);
         }
 
+        boolean sinFiltros = (q == null || q.isBlank()) && categoriaId == null && sinTallas && precioRango == null;
+
         model.addAttribute("productos", productos);
-        model.addAttribute("catalogoAgrupado", catalogoAgrupado);
+        // Agrupado por categoría solo hace falta como vista de resultados cuando hay un filtro activo;
+        // sin filtros, ya se cubre con "Los más vendidos" + un carrusel por categoría + "Recién llegados"
+        // de más abajo, y mostrarlo también acá era mostrar las mismas categorías dos veces seguidas.
+        model.addAttribute("catalogoAgrupado", sinFiltros ? Map.of() : catalogoAgrupado);
+        model.addAttribute("hayFiltros", !sinFiltros);
         model.addAttribute("categorias", categoriaService.obtenerPrincipales());
         model.addAttribute("categoriaSeleccionada", categoriaId);
         model.addAttribute("tallas", Talla.values());
@@ -131,7 +137,7 @@ public class TiendaController {
         model.addAttribute("precioRango", precioRango);
         model.addAttribute("q", q);
         model.addAttribute("orden", orden);
-        if ((q == null || q.isBlank()) && categoriaId == null && sinTallas && precioRango == null) {
+        if (sinFiltros) {
             model.addAttribute("masVendidos", pedidoService.obtenerMasVendidos(10));
             model.addAttribute("recientes", productoService.obtenerRecientes());
             long totalMarcas = productos.stream()
@@ -142,19 +148,13 @@ public class TiendaController {
             model.addAttribute("totalMarcas", totalMarcas);
 
             Map<Categoria, List<Producto>> carruseles = new LinkedHashMap<>();
-            Map<Long, String> imagenPorCategoria = new LinkedHashMap<>();
             for (Categoria cat : categoriaService.obtenerPrincipales()) {
                 List<Producto> destacados = productoService.buscar(null, cat.getId(), null, null, null);
                 if (!destacados.isEmpty()) {
                     carruseles.put(cat, destacados.stream().limit(10).toList());
-                    destacados.stream()
-                            .filter(p -> p.getImagenPrincipal() != null)
-                            .findFirst()
-                            .ifPresent(p -> imagenPorCategoria.put(cat.getId(), p.getImagenPrincipal()));
                 }
             }
             model.addAttribute("carruseles", carruseles);
-            model.addAttribute("imagenPorCategoria", imagenPorCategoria);
         }
         model.addAttribute("titulo", "Tienda");
         model.addAttribute("metaDescripcion", "Ropa y accesorios para hombre, mujer y niños. Envío a domicilio o recojo en tienda, pago 100% seguro.");

@@ -1965,7 +1965,7 @@ body {
 }
 .tienda-card-img {
     background: var(--color-cream);
-    border-radius: 8px;
+    border-radius: 12px;
     height: 150px;
     display: flex;
     align-items: center;
@@ -1996,39 +1996,9 @@ body {
 .tienda-card:nth-child(5n+5) .tienda-card-img,
 .tienda-carrusel-card:nth-child(5n+5) .tienda-card-img { height: 180px; }
 
-/* Formas variadas: la foto de cada producto rota entre rectángulo, círculo y
-   rectángulo redondeado, para que el catálogo no se vea todo en cuadrados. */
 .tienda-card-img,
 .tienda-carrusel-card .tienda-card-img {
     transition: border-radius 0.3s ease, width 0.3s ease;
-}
-
-/* 1 de cada 3: rectángulo (forma por defecto, esquinas apenas curvas) — conserva el alto de arriba. */
-
-/* 2 de cada 3: círculo, alternando entre grande y mediano para que tampoco se vean todos del mismo tamaño.
-   El pseudo-selector :nth-child se repite a propósito: sube la especificidad para que el círculo
-   gane siempre a las reglas de alto por posición de arriba (incluidas las de la versión móvil),
-   sin importar en qué orden aparezcan en la hoja de estilos. */
-.tienda-card:nth-child(6n+2):nth-child(6n+2) .tienda-card-img,
-.tienda-carrusel-card:nth-child(6n+2):nth-child(6n+2) .tienda-card-img {
-    height: auto;
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    border-radius: 50%;
-}
-.tienda-card:nth-child(6n+5):nth-child(6n+5) .tienda-card-img,
-.tienda-carrusel-card:nth-child(6n+5):nth-child(6n+5) .tienda-card-img {
-    height: auto;
-    width: 74%;
-    margin: 0 auto;
-    aspect-ratio: 1 / 1;
-    border-radius: 50%;
-}
-
-/* 3 de cada 3: rectángulo bien redondeado — conserva el alto de arriba. */
-.tienda-card:nth-child(3n+3) .tienda-card-img,
-.tienda-carrusel-card:nth-child(3n+3) .tienda-card-img {
-    border-radius: 28px;
 }
 .tienda-detalle-img {
     background: var(--color-cream);
@@ -2288,6 +2258,12 @@ body {
     scroll-behavior: smooth;
     padding: 2px 2px 14px 2px;
     -webkit-overflow-scrolling: touch;
+}
+/* Cuando la categoría tiene pocos productos (≤5, ya entran todos en pantalla), el carrusel
+   no tiene nada para desplazar: se le saca el comportamiento de scroll para que no parezca
+   una fila de catálogo a medio cargar. */
+.tienda-carrusel-compacto {
+    overflow-x: visible;
 }
 .tienda-carrusel::-webkit-scrollbar {
     height: 8px;
@@ -3063,21 +3039,139 @@ body {
 /* Página de login (sin sidebar) */
 .login-page {
     min-height: 100vh;
+    margin: 0;
+}
+.login-shell {
+    min-height: 100vh;
+    display: flex;
+}
+
+/* --- Panel de marca (izquierda): solo decorativo, se oculta en pantallas angostas --- */
+.login-brand-panel {
+    flex: 1 1 45%;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--color-cream);
-    padding: 20px;
+    padding: 60px;
+    background:
+        radial-gradient(circle at 15% 15%, rgba(96, 165, 250, 0.18), transparent 45%),
+        linear-gradient(150deg, var(--color-navy) 0%, var(--color-navy-dark) 100%);
+    position: relative;
+    overflow: hidden;
+}
+.login-brand-content {
+    max-width: 380px;
+    color: var(--color-white);
+    position: relative;
+    z-index: 1;
+}
+.login-brand-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: var(--color-blue);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+    margin-bottom: 24px;
+}
+.login-brand-badge .icon {
+    margin: 0 !important;
+    font-size: 1.5em;
+    color: var(--color-white) !important;
+}
+.login-brand-content h1 {
+    font-size: 2.2em;
+    font-weight: 800;
+    margin: 0 0 12px 0;
+}
+.login-brand-content > p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.05em;
+    line-height: 1.5;
+    margin: 0 0 32px 0;
+}
+.login-brand-features {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+.login-brand-features li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 600;
+    font-size: 0.95em;
+}
+.login-brand-features .icon {
+    color: var(--color-blue-light);
+    width: 20px;
+    text-align: center;
+}
+
+/* --- Panel de formulario (derecha) --- */
+.login-form-panel {
+    flex: 1 1 55%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-white);
+    padding: 40px 20px;
 }
 .login-box {
     width: 100%;
-    max-width: 420px;
+    max-width: 380px;
 }
-.login-footer {
+.login-box-header {
+    margin-bottom: 24px;
+}
+.login-box-header h2 {
+    margin: 0 0 4px 0;
+    font-size: 1.6em;
+    font-weight: 800;
+    color: var(--color-navy);
+}
+.login-box-header .hint {
+    margin: 0;
+}
+.login-box-footer {
+    text-align: center;
+    margin-top: 20px;
+}
+.login-copyright {
     text-align: center;
     color: var(--color-text-muted);
     font-size: 12px;
-    margin-top: 16px;
+    margin-top: 24px;
+}
+
+/* El formulario de registro tiene bastantes más campos que el de login: se le da más
+   aire (panel de marca angosto, caja de formulario más ancha con filas de 2 columnas). */
+.login-shell-registro .login-brand-panel {
+    flex: 1 1 32%;
+    padding: 48px;
+}
+.login-shell-registro .login-form-panel {
+    flex: 1 1 68%;
+    padding: 48px 20px;
+}
+.login-box-ancho {
+    max-width: 520px;
+}
+
+@media (max-width: 768px) {
+    .login-brand-panel {
+        display: none;
+    }
+    .login-form-panel {
+        flex: 1 1 auto;
+    }
 }
 
 /* --- Páginas de error (404, 500, 403...) --- */
@@ -3601,7 +3695,7 @@ body {
     align-items: center;
     justify-content: center;
     background: linear-gradient(135deg, var(--color-navy), var(--color-blue));
-    color: var(--color-blue-light);
+    color: rgba(255, 255, 255, 0.75);
     font-size: 2.4em;
     text-decoration: none;
     box-shadow: 0 6px 16px rgba(20, 49, 93, 0.14);
@@ -3610,6 +3704,17 @@ body {
 .tienda-categoria-tile:hover {
     transform: translateY(-5px);
     box-shadow: 0 16px 30px rgba(20, 49, 93, 0.24);
+}
+/* Variación sutil de tono por categoría, para que la grilla no se vea plana
+   repitiendo el mismo degradé en las 4-5 tarjetas. */
+.tienda-categoria-tile-mujer {
+    background: linear-gradient(135deg, #241B3A, #7C3AED);
+}
+.tienda-categoria-tile-ninos {
+    background: linear-gradient(135deg, #0F2E2A, #0D9488);
+}
+.tienda-categoria-tile-accesorios {
+    background: linear-gradient(135deg, #2B2210, #B45309);
 }
 .tienda-categoria-tile img {
     position: absolute;
