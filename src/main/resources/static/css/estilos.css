@@ -234,11 +234,24 @@ body {
     font-size: 0.78em;
 }
 /* --- Reseñas de productos --- */
+.tienda-resena-cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+.tienda-resena-cabecera .ui.header {
+    margin-bottom: 0;
+}
 .tienda-resena-resumen {
     display: flex;
     align-items: center;
-    gap: 18px;
-    margin: 14px 0 20px;
+    gap: 14px;
+    background: var(--color-beige);
+    border-radius: 10px;
+    padding: 8px 18px;
 }
 .tienda-resena-promedio {
     font-size: 28px;
