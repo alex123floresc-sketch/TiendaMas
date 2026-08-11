@@ -164,6 +164,18 @@ etc.) — no sirven como referencia histórica, hay que mirar el diff si hace fa
   siempre registra las teclas en inputs con ícono de Semantic UI). Si falla repetidas
   veces tras varios intentos, no es necesariamente un bug de la app — verificar por
   `curl` que las credenciales funcionan server-side antes de asumir que algo está roto.
+- **CUIDADO: las cookies de sesión NO distinguen por puerto, solo por host.** El
+  navegador que controla `claude-in-chrome` es el navegador real del usuario. Si se
+  levanta una instancia temporal en otro puerto (ej. 9105) y se la visita en ese mismo
+  navegador mientras el usuario tiene una sesión real abierta en el puerto 9096, el
+  `Set-Cookie` de la instancia temporal PISA la cookie `JSESSIONID` de "localhost" —
+  y la próxima vez que el usuario use su app real, esa cookie ya no es válida ahí, así
+  que Spring Security lo trata como anónimo y lo manda a `/login` sin ningún error de
+  por medio. Esto pasó de verdad (2026-08-11) y el usuario lo reportó como "la página
+  me saca de la aplicación". Mitigación: preferir verificación por `curl` (no toca
+  cookies del navegador real) para lo que no requiera JS/visual; si hace falta
+  navegador, avisar al usuario que puede necesitar volver a loguearse después, o que
+  borre cookies de "localhost" si le pasa.
 
 ## Estado actual / trabajo en curso
 
@@ -180,8 +192,33 @@ Ya hecho en esta pasada de rediseño:
 - Panel admin: tarjeta de KPI de ingresos y accesos rápidos con iconos
 - Detalle de producto: selector de variante sin radio+swatch redundante (el swatch de
   color es ahora el propio indicador de selección), columna de imagen más alta y
-  centrada para balancear el layout de dos columnas, y "también te puede interesar"
-  unificado al mismo patrón de carrusel del resto de la tienda
+  centrada para balancear el layout de dos columnas, "también te puede interesar"
+  unificado al carrusel, y caja de reseñas reorganizada (título+resumen en la misma
+  fila en vez de contenido apretado a la izquierda con la caja vacía a la derecha)
+- Tarjetas de producto: se sacó el masonry con `columns:` (rompía el orden de lectura
+  izq-a-der) y se reemplazó por `.tienda-grid` como CSS Grid real; la variedad de
+  alturas de imagen (estilo Pinterest) se restauró a pedido del usuario, pero con
+  `align-items: start` (grid) / `flex-start` (carrusel) para que las tarjetas NO se
+  estiren a una altura de fila compartida — así la variedad no vuelve a dejar huecos
+  vacíos dentro de ninguna tarjeta. Mismo criterio aplicado al collage de fotos del
+  hero: con 1-2 fotos disponibles (en vez de las 4 que la grilla espera), la(s) foto(s)
+  ocupan toda la caja en lugar de dejar celdas vacías.
+- **Panel de contenido editable** (`/contenido`, solo ADMIN): entidad `ContenidoSitio`
+  (tabla `contenido_sitio`, clave/valor libre) + `ContenidoService` (devuelve un
+  `Map<String,String>` con defaults hardcodeados en `ContenidoServiceImpl` para toda
+  clave sin fila en la DB, así nunca queda vacío) + `ContenidoController`. El mapa se
+  expone como atributo de modelo `contenido` vía `CarritoModelAttributes` (ya corre en
+  toda vista de `TiendaController`/`PosController`). Cubre: banner principal (título/
+  subtítulo/botón), pie de página (descripción, teléfono, email, horario, link de
+  mapa, redes sociales — antes hardcodeados y algunos ni siquiera eran enlaces reales)
+  y las 8 secciones de `/tienda/info`. Simplificación consciente: las secciones de
+  info que antes tenían texto con links/listas embebidas (trabaja-con-nosotros,
+  libro-de-reclamaciones, preguntas-frecuentes) pasaron a texto plano editable con
+  `white-space:pre-line` (clase `.tienda-info-texto`) — se perdió el auto-link de
+  email/teléfono dentro del cuerpo y el estilo distintivo de cada pregunta del FAQ,
+  a cambio de que el admin pueda editar todo sin tocar código. Si en el futuro se
+  quiere más fidelidad ahí, habría que volver a estructurar esas claves en vez de
+  texto libre.
 
 Pendiente (próximos pasos naturales si no hay redirección):
 - Pasada visual sobre el resto del panel admin: listados/formularios de productos,
@@ -190,3 +227,7 @@ Pendiente (próximos pasos naturales si no hay redirección):
   en esa pantalla puntual — probar primero con curl/verificación server-side)
 - Revisar consistencia de `border-radius` y `box-shadow` en `estilos.css` (deuda de
   diseño detectada: valores literales inconsistentes en vez de una escala definida)
+- El pedido de "todo lo que se muestra en la página web tiene que estar disponible
+  para editar" se cubrió para el contenido de marketing/textos fijos (arriba). La
+  gestión de productos/categorías/pedidos/cupones/etc. ya existía de antes en el
+  admin — no se tocó, solo se confirmó que ya cumple ese pedido.

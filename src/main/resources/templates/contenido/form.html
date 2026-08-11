@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base}">
+<body>
+<div th:fragment="content" style="max-width: 850px; margin: 0 auto;">
+
+    <h1 class="ui dividing header">
+        <i class="edit outline icon"></i>
+        <div class="content">
+            Contenido del sitio
+            <div class="sub header">Edita los textos e información de contacto que se muestran en la tienda pública, sin tocar código.</div>
+        </div>
+    </h1>
+
+    <div class="ui positive message" th:if="${param.guardado}">
+        <i class="check circle icon"></i> Los cambios se guardaron. Ya están visibles en la tienda.
+    </div>
+
+    <form th:action="@{/contenido}" method="post" class="ui form">
+
+        <div class="ui segment">
+            <h3 class="ui header"><i class="image icon"></i> Banner principal (portada de la tienda)</h3>
+            <div class="field">
+                <label>Título</label>
+                <input type="text" name="hero.titulo" th:value="${contenido['hero.titulo']}">
+            </div>
+            <div class="field">
+                <label>Subtítulo</label>
+                <textarea name="hero.subtitulo" rows="2" th:text="${contenido['hero.subtitulo']}"></textarea>
+            </div>
+            <div class="field">
+                <label>Texto del botón</label>
+                <input type="text" name="hero.boton" th:value="${contenido['hero.boton']}">
+            </div>
+        </div>
+
+        <div class="ui segment">
+            <h3 class="ui header"><i class="address book icon"></i> Pie de página y contacto</h3>
+            <div class="field">
+                <label>Descripción de la marca</label>
+                <textarea name="footer.descripcion" rows="3" th:text="${contenido['footer.descripcion']}"></textarea>
+            </div>
+            <div class="two fields">
+                <div class="field">
+                    <label>Teléfono</label>
+                    <input type="text" name="footer.telefono" th:value="${contenido['footer.telefono']}">
+                </div>
+                <div class="field">
+                    <label>Email de contacto</label>
+                    <input type="email" name="footer.email" th:value="${contenido['footer.email']}">
+                </div>
+            </div>
+            <div class="two fields">
+                <div class="field">
+                    <label>Horario de atención</label>
+                    <input type="text" name="footer.horario" th:value="${contenido['footer.horario']}">
+                </div>
+                <div class="field">
+                    <label>Link de Google Maps</label>
+                    <input type="text" name="footer.mapaUrl" th:value="${contenido['footer.mapaUrl']}" placeholder="https://www.google.com/maps?q=...">
+                </div>
+            </div>
+            <div class="ui divider"></div>
+            <small class="hint" style="display:block; margin-bottom:10px;">Redes sociales (opcional). Dejá el campo vacío para que el ícono no aparezca en el pie de página.</small>
+            <div class="two fields">
+                <div class="field">
+                    <label>Facebook (URL)</label>
+                    <input type="text" name="footer.facebookUrl" th:value="${contenido['footer.facebookUrl']}" placeholder="https://facebook.com/tutienda">
+                </div>
+                <div class="field">
+                    <label>Instagram (URL)</label>
+                    <input type="text" name="footer.instagramUrl" th:value="${contenido['footer.instagramUrl']}" placeholder="https://instagram.com/tutienda">
+                </div>
+            </div>
+            <div class="field">
+                <label>WhatsApp (número con código de país, sin espacios ni signos)</label>
+                <input type="text" name="footer.whatsappNumero" th:value="${contenido['footer.whatsappNumero']}" placeholder="51900948480">
+            </div>
+        </div>
+
+        <div class="ui segment">
+            <h3 class="ui header"><i class="info circle icon"></i> Página de información y ayuda</h3>
+            <small class="hint" style="display:block; margin-bottom:14px;">Estos textos aparecen en "Información y ayuda" (el pie de página enlaza a cada sección). Podés usar varias líneas.</small>
+
+            <div class="field">
+                <label>Quiénes somos</label>
+                <textarea name="info.quienesSomos" rows="3" th:text="${contenido['info.quienesSomos']}"></textarea>
+            </div>
+            <div class="field">
+                <label>Trabaja con nosotros</label>
+                <textarea name="info.trabajaConNosotros" rows="2" th:text="${contenido['info.trabajaConNosotros']}"></textarea>
+            </div>
+            <div class="field">
+                <label>Libro de reclamaciones</label>
+                <textarea name="info.libroReclamaciones" rows="3" th:text="${contenido['info.libroReclamaciones']}"></textarea>
+            </div>
+            <div class="field">
+                <label>Preguntas frecuentes</label>
+                <small class="hint" style="display:block; margin-bottom:6px;">Alterná una línea de pregunta y una (o más) de respuesta, separando cada par con una línea en blanco.</small>
+                <textarea name="info.preguntasFrecuentes" rows="8" th:text="${contenido['info.preguntasFrecuentes']}"></textarea>
+            </div>
+            <div class="field">
+                <label>Envíos y entregas</label>
+                <textarea name="info.enviosYEntregas" rows="2" th:text="${contenido['info.enviosYEntregas']}"></textarea>
+            </div>
+            <div class="field">
+                <label>Cambios y devoluciones</label>
+                <textarea name="info.cambiosYDevoluciones" rows="2" th:text="${contenido['info.cambiosYDevoluciones']}"></textarea>
+            </div>
+            <div class="field">
+                <label>Términos y condiciones</label>
+                <textarea name="info.terminosYCondiciones" rows="3" th:text="${contenido['info.terminosYCondiciones']}"></textarea>
+            </div>
+            <div class="field">
+                <label>Política de privacidad</label>
+                <textarea name="info.politicaDePrivacidad" rows="3" th:text="${contenido['info.politicaDePrivacidad']}"></textarea>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="ui blue button">
+                <i class="save icon"></i> Guardar cambios
+            </button>
+            <a href="/dashboard" class="ui button">Cancelar</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

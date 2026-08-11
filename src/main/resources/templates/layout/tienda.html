@@ -117,7 +117,7 @@
 
     <div class="tienda-footer-col tienda-footer-brand">
       <a th:href="@{/tienda}" class="tienda-footer-brand-link"><i class="shop icon"></i> TiendaMas</a>
-      <p>Ropa y accesorios para hombre, mujer y niños: prendas de calidad, atención cercana y entrega rápida, ya sea en línea o en el mostrador.</p>
+      <p th:text="${contenido['footer.descripcion']}">Ropa y accesorios para hombre, mujer y niños: prendas de calidad, atención cercana y entrega rápida, ya sea en línea o en el mostrador.</p>
       <div class="tienda-footer-label">Aceptamos</div>
       <div class="tienda-footer-pagos">
         <i class="cc visa icon" title="Visa"></i>
@@ -161,17 +161,22 @@
     <div class="tienda-footer-col">
       <h4>Contacto</h4>
       <ul class="tienda-footer-contacto">
-        <li><i class="map marker alternate icon"></i> <a href="https://www.google.com/maps?q=-15.492302105189488,-70.13447502049469" target="_blank" rel="noopener">Ver ubicación en el mapa</a></li>
-        <li><i class="phone icon"></i> <a href="tel:+51900948480">+51 900 948 480</a></li>
-        <li><i class="envelope icon"></i> <a href="mailto:contacto@tiendamas.com">contacto@tiendamas.com</a></li>
-        <li><i class="clock outline icon"></i> Lun. a Vie. 9:00–19:00 hs.</li>
+        <li><i class="map marker alternate icon"></i> <a th:href="${contenido['footer.mapaUrl']}" target="_blank" rel="noopener">Ver ubicación en el mapa</a></li>
+        <li><i class="phone icon"></i> <a th:href="'tel:' + ${#strings.replace(contenido['footer.telefono'], ' ', '')}" th:text="${contenido['footer.telefono']}">+51 900 948 480</a></li>
+        <li><i class="envelope icon"></i> <a th:href="'mailto:' + ${contenido['footer.email']}" th:text="${contenido['footer.email']}">contacto@tiendamas.com</a></li>
+        <li><i class="clock outline icon"></i> <span th:text="${contenido['footer.horario']}">Lun. a Vie. 9:00–19:00 hs.</span></li>
       </ul>
-      <div class="tienda-footer-label">Síguenos</div>
-      <div class="tienda-footer-social">
-        <span class="tienda-social-icon" title="Facebook"><i class="facebook f icon"></i></span>
-        <span class="tienda-social-icon" title="Instagram"><i class="instagram icon"></i></span>
-        <span class="tienda-social-icon" title="WhatsApp"><i class="whatsapp icon"></i></span>
-      </div>
+      <th:block th:if="${!#strings.isEmpty(contenido['footer.facebookUrl']) or !#strings.isEmpty(contenido['footer.instagramUrl']) or !#strings.isEmpty(contenido['footer.whatsappNumero'])}">
+        <div class="tienda-footer-label">Síguenos</div>
+        <div class="tienda-footer-social">
+          <a th:if="${!#strings.isEmpty(contenido['footer.facebookUrl'])}" th:href="${contenido['footer.facebookUrl']}"
+             target="_blank" rel="noopener" class="tienda-social-icon" title="Facebook"><i class="facebook f icon"></i></a>
+          <a th:if="${!#strings.isEmpty(contenido['footer.instagramUrl'])}" th:href="${contenido['footer.instagramUrl']}"
+             target="_blank" rel="noopener" class="tienda-social-icon" title="Instagram"><i class="instagram icon"></i></a>
+          <a th:if="${!#strings.isEmpty(contenido['footer.whatsappNumero'])}" th:href="'https://wa.me/' + ${contenido['footer.whatsappNumero']}"
+             target="_blank" rel="noopener" class="tienda-social-icon" title="WhatsApp"><i class="whatsapp icon"></i></a>
+        </div>
+      </th:block>
     </div>
 
   </div>

@@ -55,6 +55,9 @@
       <a href="/suscriptores" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/suscriptores')} ? 'seccion-actual'">
         <i class="envelope open icon"></i> Suscriptores
       </a>
+      <a href="/contenido" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/contenido')} ? 'seccion-actual'">
+        <i class="edit outline icon"></i> Contenido del sitio
+      </a>
 
       <div class="admin-nav-section-label">Finanzas</div>
       <a href="/gastos" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/gastos')} ? 'seccion-actual'">

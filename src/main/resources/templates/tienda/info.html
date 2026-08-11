@@ -24,72 +24,46 @@
 
     <section class="ui segment tienda-info-seccion" id="quienes-somos">
         <h3 class="ui header"><i class="shop icon"></i> Quiénes somos</h3>
-        <p>TiendaMas es una tienda de ropa y accesorios para hombre, mujer y niños. Trabajamos con prendas de
-            calidad, atención cercana y entrega rápida, ya sea comprando en línea o directamente en el mostrador
-            de nuestra tienda física.</p>
+        <p class="tienda-info-texto" th:text="${contenido['info.quienesSomos']}">TiendaMas es una tienda de ropa y accesorios para hombre, mujer y niños.</p>
     </section>
 
     <section class="ui segment tienda-info-seccion" id="trabaja-con-nosotros">
         <h3 class="ui header"><i class="briefcase icon"></i> Trabaja con nosotros</h3>
-        <p>¿Te gustaría formar parte de nuestro equipo? Escríbenos a
-            <a href="mailto:contacto@tiendamas.com">contacto@tiendamas.com</a> contándonos un poco sobre ti y
-            revisaremos tu postulación apenas tengamos una vacante disponible.</p>
+        <p class="tienda-info-texto" th:text="${contenido['info.trabajaConNosotros']}">¿Te gustaría formar parte de nuestro equipo?</p>
     </section>
 
     <section class="ui segment tienda-info-seccion" id="libro-de-reclamaciones">
         <h3 class="ui header"><i class="clipboard list icon"></i> Libro de reclamaciones</h3>
-        <p>Conforme a lo establecido en el Código de Protección y Defensa del Consumidor, este establecimiento
-            cuenta con un Libro de Reclamaciones a tu disposición. Para registrar una queja o reclamo,
-            contáctanos por cualquiera de estos medios y te atenderemos a la brevedad:</p>
+        <p class="tienda-info-texto" th:text="${contenido['info.libroReclamaciones']}">Conforme a lo establecido en el Código de Protección y Defensa del Consumidor...</p>
         <ul>
-            <li><i class="envelope icon"></i> <a href="mailto:contacto@tiendamas.com">contacto@tiendamas.com</a></li>
-            <li><i class="phone icon"></i> <a href="tel:+51900948480">+51 900 948 480</a></li>
+            <li><i class="envelope icon"></i> <a th:href="'mailto:' + ${contenido['footer.email']}" th:text="${contenido['footer.email']}">contacto@tiendamas.com</a></li>
+            <li><i class="phone icon"></i> <a th:href="'tel:' + ${#strings.replace(contenido['footer.telefono'], ' ', '')}" th:text="${contenido['footer.telefono']}">+51 900 948 480</a></li>
         </ul>
     </section>
 
     <section class="ui segment tienda-info-seccion" id="preguntas-frecuentes">
         <h3 class="ui header"><i class="question circle icon"></i> Preguntas frecuentes</h3>
-        <div class="tienda-faq-item">
-            <div class="tienda-faq-pregunta">¿Cómo hago un pedido?</div>
-            <p>Elige tus productos, agrégalos al carrito y sigue los pasos del checkout. Necesitarás una cuenta
-                de cliente con tus datos de contacto y documento para poder emitir tu boleta o factura.</p>
-        </div>
-        <div class="tienda-faq-item">
-            <div class="tienda-faq-pregunta">¿Qué métodos de pago aceptan?</div>
-            <p>Efectivo contra entrega, tarjeta de crédito/débito, Yape/Plin y transferencia bancaria.</p>
-        </div>
-        <div class="tienda-faq-item">
-            <div class="tienda-faq-pregunta">¿Puedo recoger mi pedido en tienda?</div>
-            <p>Sí, al finalizar tu compra puedes elegir "Retiro en tienda" sin costo adicional.</p>
-        </div>
+        <p class="tienda-info-texto" th:text="${contenido['info.preguntasFrecuentes']}">Preguntas frecuentes...</p>
     </section>
 
     <section class="ui segment tienda-info-seccion" id="envios-y-entregas">
         <h3 class="ui header"><i class="truck icon"></i> Envíos y entregas</h3>
-        <p>Realizamos envíos a todo el país. Una vez confirmado tu pedido, te avisaremos por correo cuando
-            salga en camino. También puedes optar por el retiro gratuito en nuestra tienda física.</p>
+        <p class="tienda-info-texto" th:text="${contenido['info.enviosYEntregas']}">Realizamos envíos a todo el país.</p>
     </section>
 
     <section class="ui segment tienda-info-seccion" id="cambios-y-devoluciones">
         <h3 class="ui header"><i class="sync alternate icon"></i> Cambios y devoluciones</h3>
-        <p>Si una prenda no te queda como esperabas, puedes solicitar un cambio sin costo dentro de los 15 días
-            posteriores a la entrega, siempre que el producto conserve sus etiquetas y no haya sido usado.
-            Escríbenos a <a href="mailto:contacto@tiendamas.com">contacto@tiendamas.com</a> indicando el número
-            de tu pedido para coordinar el cambio.</p>
+        <p class="tienda-info-texto" th:text="${contenido['info.cambiosYDevoluciones']}">Si una prenda no te queda como esperabas...</p>
     </section>
 
     <section class="ui segment tienda-info-seccion" id="terminos-y-condiciones">
         <h3 class="ui header"><i class="file alternate icon"></i> Términos y condiciones</h3>
-        <p>Al comprar en TiendaMas aceptas que los precios y la disponibilidad de stock pueden variar sin previo
-            aviso, que los datos de facturación (documento y razón social) deben ser correctos y vigentes, y que
-            el uso de este sitio está sujeto a las leyes de protección al consumidor vigentes en Perú.</p>
+        <p class="tienda-info-texto" th:text="${contenido['info.terminosYCondiciones']}">Al comprar en TiendaMas aceptas...</p>
     </section>
 
     <section class="ui segment tienda-info-seccion" id="politica-de-privacidad">
         <h3 class="ui header"><i class="lock icon"></i> Política de privacidad</h3>
-        <p>Tus datos personales (nombre, documento, dirección y contacto) se usan únicamente para procesar tus
-            pedidos y emitir tus comprobantes de pago. No compartimos tu información con terceros salvo que sea
-            necesario para completar la entrega de tu pedido.</p>
+        <p class="tienda-info-texto" th:text="${contenido['info.politicaDePrivacidad']}">Tus datos personales se usan únicamente para procesar tus pedidos.</p>
     </section>
 
     <script th:inline="javascript">

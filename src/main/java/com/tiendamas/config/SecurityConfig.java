@@ -35,7 +35,8 @@ public class SecurityConfig {
                         .requestMatchers("/pos/**").hasAnyRole("VENDEDOR", "ADMIN")
 
                         .requestMatchers("/dashboard", "/personas/**", "/categorias/**", "/productos/**", "/reportes/**",
-                                "/gastos/**", "/sueldos/**", "/usuarios/**", "/suscriptores/**", "/devoluciones/**").hasRole("ADMIN")
+                                "/gastos/**", "/sueldos/**", "/usuarios/**", "/suscriptores/**", "/devoluciones/**",
+                                "/contenido/**").hasRole("ADMIN")
                         .requestMatchers("/pedidos", "/pedidos/nuevo", "/pedidos/*/eliminar", "/pedidos/*/estado").hasRole("ADMIN")
 
                         .requestMatchers("/pedidos/**").authenticated()

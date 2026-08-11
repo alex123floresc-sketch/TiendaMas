@@ -1723,7 +1723,7 @@ body {
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.08);
     color: var(--color-white);
-    cursor: default;
+    text-decoration: none;
     transition: background-color 0.2s ease, transform 0.2s ease;
 }
 .tienda-social-icon:hover {
@@ -3667,16 +3667,8 @@ body {
     color: var(--color-text-muted);
     line-height: 1.9;
 }
-.tienda-faq-item {
-    margin-bottom: 14px;
-}
-.tienda-faq-item:last-child {
-    margin-bottom: 0;
-}
-.tienda-faq-pregunta {
-    font-weight: 700;
-    color: var(--color-navy);
-    margin-bottom: 2px;
+.tienda-info-texto {
+    white-space: pre-line;
 }
 
 /* --- Tienda: navbar con sombra/blur al hacer scroll --- */

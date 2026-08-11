@@ -6,10 +6,10 @@
     <div class="tienda-hero">
         <div class="tienda-hero-inner">
             <div class="tienda-hero-text">
-                <h1>Moda para toda la familia</h1>
-                <p>Ropa y accesorios para hombre, mujer y niños, con envío a domicilio o recojo en tienda.</p>
+                <h1 th:text="${contenido['hero.titulo']}">Moda para toda la familia</h1>
+                <p th:text="${contenido['hero.subtitulo']}">Ropa y accesorios para hombre, mujer y niños, con envío a domicilio o recojo en tienda.</p>
                 <a href="#catalogo" class="ui white button tienda-hero-cta">
-                    <i class="arrow down icon"></i> Ver catálogo
+                    <i class="arrow down icon"></i> <span th:text="${contenido['hero.boton']}">Ver catálogo</span>
                 </a>
             </div>
             <div class="tienda-hero-collage" th:if="${!#lists.isEmpty(productosConImagen)}"
