@@ -40,6 +40,50 @@ en conversaciones anteriores, sin tener que redescubrirlo a golpes.
   `cliente123`.
 - DB local esperada: MySQL en `localhost:3306/TiendaMas`, usuario `root` (ver
   `application.yml` para overrides por variable de entorno).
+- **Para probar login/sesión/roles sin arriesgar la sesión real del usuario ni sus
+  datos**: levantar una instancia temporal apuntando a una base de datos AISLADA con
+  `createDatabaseIfNotExist=true` en la URL, ej.:
+  `DB_URL="jdbc:mysql://localhost:3306/tiendamas_diag?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true" PORT=9111 ./mvnw.cmd -o spring-boot:run`
+  — con la base vacía, `AdminPasswordSync` crea `admin`/`admin123` automáticamente
+  (perfil no-prod), y `DataSeeder` siembra catálogo/clientes de demo. Después se puede
+  loguear con `curl` (jar de cookies propio, `-b`/`-c`) y navegar todas las rutas
+  admin/POS con esa sesión — así se verifica de verdad si un problema de login/sesión
+  es un bug real de la app o no, sin usar el navegador real del usuario. Esto fue
+  clave para descartar (dos veces) que el "me saca de la aplicación" fuera un bug de
+  código: login + navegación por ~20 rutas admin/tienda/POS funcionó perfecto por
+  `curl`, confirmando que la causa real era la contaminación de cookies entre puertos
+  (ver más abajo), no la app. No hace falta borrar esa base de diagnóstico después
+  (queda aislada de `TiendaMas`, no afecta nada), pero se puede si se quiere prolijo.
+
+## Despliegue (Render)
+
+- `Dockerfile`, `docker-compose.yml`, `render.yaml` y `DEPLOY.md` ya están en la raíz
+  del repo. `render.yaml` define el Web Service (`runtime: docker`) con las env vars
+  necesarias marcadas `sync: false` (las completa el usuario al crear el Blueprint
+  en Render).
+- **Render no ofrece MySQL administrado** (solo Postgres/Redis nativo) — decisión ya
+  tomada con el usuario (2026-08-11): usar un proveedor externo de MySQL con plan
+  gratuito. PlanetScale ya NO tiene free tier (lo sacaron); Aiven sí tiene un free
+  tier real (1GB, sin tarjeta) — es la opción sugerida en `DEPLOY.md`. Railway es
+  alternativa pero verificar su pricing vigente antes de recomendarlo, cambia seguido.
+  **No migrar a PostgreSQL** salvo que el usuario lo pida explícitamente — ya se le
+  preguntó y prefirió mantener MySQL con proveedor externo antes que arriesgar romper
+  algo cambiando de dialecto/driver.
+- La app YA está lista para "prod" sin tocar nada más: `ProdAdminSeeder` (perfil
+  `prod`) crea el admin inicial solo desde `ADMIN_USERNAME`/`ADMIN_PASSWORD` (falla
+  silenciosamente con un warning si no están, no inventa credenciales), y
+  `WeakCredentialsGuard` (perfil `prod`) rota automáticamente cualquier cuenta
+  ADMIN/VENDEDOR que todavía tenga una contraseña de fábrica conocida (`admin123`,
+  `vendedor123`). `DataSeeder` (todo el catálogo/clientes de demo) está anotado
+  `@Profile("!prod")`, así que **nunca corre en producción** — una base de datos
+  nueva en Render arranca limpia automáticamente, sin necesidad de borrar nada a
+  mano. El usuario decidió explícitamente NO tocar su base de datos LOCAL de
+  desarrollo (la sigue usando tal cual, con sus datos de prueba).
+- El repo es **público** en GitHub. Los valores por defecto hardcodeados en el código
+  (`admin123`, `mysql123@` como fallback de `DB_PASSWORD`) son visibles para
+  cualquiera — nunca asumir que son secretos; en Render hay que definir
+  `ADMIN_PASSWORD`/`DB_PASSWORD` reales como variables de entorno, nunca confiar en
+  los defaults.
 
 ## Estructura de paquetes (ya reorganizada, mantener este patrón)
 

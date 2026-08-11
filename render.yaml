@@ -1,0 +1,39 @@
+services:
+  - name: tiendamas
+    type: web
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    region: oregon
+    healthCheckPath: /
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      # Base de datos MySQL externa (Render no ofrece MySQL administrado).
+      # Ejemplo con PlanetScale/Railway/Aiven: jdbc:mysql://host:puerto/basededatos?useSSL=true&serverTimezone=UTC
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      # Cuenta de administrador inicial. Obligatorias en "prod": sin estas dos,
+      # la app arranca sin ningún usuario administrador (ver ProdAdminSeeder).
+      - key: ADMIN_USERNAME
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      # Envío de correos (opcional, pero recomendado — confirmaciones de pedido, etc.)
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+      # Pasarela de pago Culqi (opcional — sin CULQUI_SECRET_KEY el pago con
+      # tarjeta se deshabilita solo, el resto de la tienda funciona igual)
+      - key: CULQUI_PUBLIC_KEY
+        sync: false
+      - key: CULQUI_SECRET_KEY
+        sync: false
