@@ -87,10 +87,17 @@
         </aside>
     </div>
 
-    <div th:if="${recomendados != null and not #lists.isEmpty(recomendados)}" class="reveal" style="margin-top: 30px;">
-        <h3 class="ui header"><i class="thumbs up icon"></i> También te puede interesar</h3>
-        <div class="tienda-grid">
-            <div class="tienda-card" th:each="p : ${recomendados}">
+    <div class="tienda-carrusel-seccion reveal" th:if="${recomendados != null and not #lists.isEmpty(recomendados)}"
+         th:with="totalRecomendados=${#lists.size(recomendados)}" style="margin-top: 30px;">
+        <div class="tienda-carrusel-header">
+            <h3 class="ui header"><i class="thumbs up icon"></i> También te puede interesar</h3>
+            <div class="tienda-carrusel-flechas" th:if="${totalRecomendados > 5}">
+                <button type="button" class="tienda-carrusel-flecha" onclick="desplazarCarrusel('carrusel-recomendados', -1)" aria-label="Anterior"><i class="chevron left icon"></i></button>
+                <button type="button" class="tienda-carrusel-flecha" onclick="desplazarCarrusel('carrusel-recomendados', 1)" aria-label="Siguiente"><i class="chevron right icon"></i></button>
+            </div>
+        </div>
+        <div class="tienda-carrusel" th:classappend="${totalRecomendados <= 5} ? 'tienda-carrusel-compacto'" id="carrusel-recomendados">
+            <div class="tienda-carrusel-card" th:each="p : ${recomendados}">
                 <th:block th:replace="~{tienda/fragments :: tarjetaProductoContenido(${p})}"></th:block>
             </div>
         </div>
