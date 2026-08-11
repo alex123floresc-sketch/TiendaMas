@@ -2067,6 +2067,7 @@ body {
 .tienda-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    align-items: start;
     gap: 20px;
 }
 .tienda-card {
@@ -2102,6 +2103,20 @@ body {
     color: var(--color-blue-light);
     overflow: hidden;
 }
+/* Alturas de imagen variadas (estilo Pinterest) para que el catálogo no se vea todo
+   parejo. Las tarjetas NO se estiran a una altura de fila compartida (align-items:
+   start / flex-start más abajo), así que la variedad no deja huecos vacíos dentro de
+   ninguna tarjeta: cada una crece solo lo que necesita su propio contenido. */
+.tienda-card:nth-child(5n+1) .tienda-card-img,
+.tienda-carrusel-card:nth-child(5n+1) .tienda-card-img { height: 210px; }
+.tienda-card:nth-child(5n+2) .tienda-card-img,
+.tienda-carrusel-card:nth-child(5n+2) .tienda-card-img { height: 150px; }
+.tienda-card:nth-child(5n+3) .tienda-card-img,
+.tienda-carrusel-card:nth-child(5n+3) .tienda-card-img { height: 180px; }
+.tienda-card:nth-child(5n+4) .tienda-card-img,
+.tienda-carrusel-card:nth-child(5n+4) .tienda-card-img { height: 160px; }
+.tienda-card:nth-child(5n+5) .tienda-card-img,
+.tienda-carrusel-card:nth-child(5n+5) .tienda-card-img { height: 195px; }
 .tienda-card-img img {
     width: 100%;
     height: 100%;
@@ -2370,6 +2385,7 @@ body {
 }
 .tienda-carrusel {
     display: flex;
+    align-items: flex-start;
     gap: 16px;
     overflow-x: auto;
     scroll-snap-type: x proximity;
@@ -3512,9 +3528,11 @@ body {
     .tienda-carrusel-card {
         width: 165px;
     }
-    .tienda-carrusel-card .tienda-card-img {
-        height: 135px;
-    }
+    .tienda-carrusel-card:nth-child(5n+1) .tienda-card-img { height: 155px; }
+    .tienda-carrusel-card:nth-child(5n+2) .tienda-card-img { height: 110px; }
+    .tienda-carrusel-card:nth-child(5n+3) .tienda-card-img { height: 135px; }
+    .tienda-carrusel-card:nth-child(5n+4) .tienda-card-img { height: 118px; }
+    .tienda-carrusel-card:nth-child(5n+5) .tienda-card-img { height: 145px; }
     .tienda-carrusel-vertodo span {
         display: none;
     }
@@ -3979,9 +3997,11 @@ body {
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
     }
-    .tienda-card-img {
-        height: 130px;
-    }
+    .tienda-card:nth-child(5n+1) .tienda-card-img { height: 150px; }
+    .tienda-card:nth-child(5n+2) .tienda-card-img { height: 108px; }
+    .tienda-card:nth-child(5n+3) .tienda-card-img { height: 130px; }
+    .tienda-card:nth-child(5n+4) .tienda-card-img { height: 116px; }
+    .tienda-card:nth-child(5n+5) .tienda-card-img { height: 140px; }
     #formCodigo .fields {
         gap: 8px;
     }
