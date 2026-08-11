@@ -214,6 +214,29 @@ etc.) — no sirven como referencia histórica, hay que mirar el diff si hace fa
 - **CSRF**: los `th:action` con Spring Security lo inyectan solo; para llamadas AJAX hay
   que usar el meta `<meta name="_csrf">` / `<meta name="_csrf_header">` ya agregado en
   los layouts.
+- **"A veces al loguearme me manda un error" — causa raíz real encontrada (2026-08-11):**
+  cuando un POST llega con el token CSRF vencido (típicamente porque la sesión expiró
+  mientras el usuario tenía un formulario abierto), Spring lo trata como "hace falta
+  autenticarse" y redirige a `/login`, pero por el camino la petición queda internamente
+  reenviada a `/error` — y esa es la URL que `RequestCache` guardaba. El
+  `RoleBasedAuthSuccessHandler` (`config/RoleBasedAuthSuccessHandler.java`) la reproducía
+  sin más después de un login exitoso, así que el usuario caía en la pantalla de error
+  justo al loguearse con éxito, de forma intermitente (solo cuando había una sesión
+  vencida de por medio). Además nunca se llamaba `requestCache.removeRequest(...)`, así
+  que ese destino guardado podía seguir reapareciendo en logueos posteriores. Fix:
+  `SecurityConfig` ahora define su propio bean `RequestCache` con un
+  `setRequestMatcher(...)` que solo guarda GET normales (nunca `/error`, nunca un POST) —
+  ver el bean `requestCache()` — y el success handler limpia el request guardado siempre
+  que lo lee. Sumado a esto: `/personas/**` es ADMIN-only, pero el POS (accesible a
+  VENDEDOR) tiene un link para registrar un cliente nuevo al vuelo
+  (`pos/index.html` → `/personas/nuevo`) — un VENDEDOR que lo usaba recibía 403 al abrir
+  el formulario, y si lograba guardarlo el redirect a `/personas` (el listado) también le
+  daba 403. Ahora `GET /personas/nuevo` y `POST /personas` están permitidos también para
+  VENDEDOR, y `PersonaController.guardar()` redirige a `/pos` en vez de `/personas` cuando
+  quien guarda no es ADMIN. Si aparece un nuevo reporte de "error al loguearme", sospechar
+  primero de este mismo patrón (request guardado apuntando a algo que el rol actual no
+  puede ver, o a `/error`) antes de asumir que es cookies cruzadas entre puertos (ver más
+  abajo, que es un problema aparte y solo de testing local).
 - **Antes de usar un ícono de Semantic UI que no esté ya probado en este proyecto,
   verificarlo contra el CSS real** (`curl https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/components/icon.min.css`
   y buscar `icon.palabra1.palabra2`), no asumir que existe por analogía con Font
