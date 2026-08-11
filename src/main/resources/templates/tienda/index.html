@@ -121,7 +121,8 @@
     </div>
 
     <!-- Un carrusel por cada categoría principal -->
-    <div class="tienda-carrusel-seccion" th:each="entry : ${carruseles}" th:with="totalItems=${#lists.size(entry.value)}">
+    <div class="tienda-carrusel-seccion" th:each="entry : ${carruseles}"
+         th:with="totalItems=${#lists.size(entry.value)}, claseTamano='tienda-tam-' + ${#strings.toLowerCase(entry.key.tamanoTarjeta.name())}">
         <div class="tienda-carrusel-header">
             <h3 class="ui header"><i class="tag icon"></i><span th:text="${entry.key.nombre}"></span></h3>
             <div class="tienda-carrusel-flechas">
@@ -134,7 +135,7 @@
                 <a th:href="@{/tienda(categoriaId=${entry.key.id})}" class="tienda-carrusel-vertodo"><span>Ver todo</span> <i class="arrow right icon"></i></a>
             </div>
         </div>
-        <div class="tienda-carrusel" th:classappend="${totalItems <= 5} ? 'tienda-carrusel-compacto'" th:id="'carrusel-cat-' + ${entry.key.id}">
+        <div class="tienda-carrusel" th:classappend="${(totalItems <= 5 ? 'tienda-carrusel-compacto ' : '') + claseTamano}" th:id="'carrusel-cat-' + ${entry.key.id}">
             <div class="tienda-carrusel-card" th:each="p : ${entry.value}">
                 <th:block th:replace="~{tienda/fragments :: tarjetaProductoContenido(${p})}"></th:block>
             </div>
@@ -222,7 +223,7 @@
         </div>
 
         <div class="tienda-carrusel-seccion reveal" th:each="grupo : ${catalogoAgrupado}" th:unless="${productos.isEmpty()}"
-             th:with="totalGrupo=${grupo.value.size()}">
+             th:with="totalGrupo=${grupo.value.size()}, claseTamano='tienda-tam-' + ${#strings.toLowerCase(grupo.key.tamanoTarjeta.name())}">
             <div class="tienda-carrusel-header">
                 <h3 class="ui header"><i class="tag icon"></i><span th:text="${grupo.key.nombre}"></span>
                     <span class="tienda-carrusel-contador" th:text="'(' + ${totalGrupo} + ')'"></span></h3>
@@ -233,7 +234,7 @@
                             th:onclick="'desplazarCarrusel(\'carrusel-catalogo-' + ${grupo.key.id} + '\', 1)'" aria-label="Siguiente"><i class="chevron right icon"></i></button>
                 </div>
             </div>
-            <div class="tienda-carrusel" th:classappend="${totalGrupo <= 5} ? 'tienda-carrusel-compacto'" th:id="'carrusel-catalogo-' + ${grupo.key.id}">
+            <div class="tienda-carrusel" th:classappend="${(totalGrupo <= 5 ? 'tienda-carrusel-compacto ' : '') + claseTamano}" th:id="'carrusel-catalogo-' + ${grupo.key.id}">
                 <div class="tienda-carrusel-card" th:each="p : ${grupo.value}">
                     <th:block th:replace="~{tienda/fragments :: tarjetaProductoContenido(${p})}"></th:block>
                 </div>

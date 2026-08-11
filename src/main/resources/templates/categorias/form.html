@@ -48,6 +48,19 @@
                 </p>
             </div>
 
+            <div class="field">
+                <label for="tamanoTarjeta">Tamaño de tarjeta en el catálogo:</label>
+                <select id="tamanoTarjeta" th:field="*{tamanoTarjeta}" class="ui fluid dropdown">
+                    <option th:each="t : ${T(com.tiendamas.entity.TamanoTarjetaCategoria).values()}"
+                            th:value="${t}" th:text="${t.etiqueta}"></option>
+                </select>
+                <p class="hint" style="margin-top:6px;">
+                    Define la altura de la foto de los productos de esta categoría en el catálogo y los
+                    carruseles. Todas las tarjetas de una misma categoría comparten el mismo tamaño — usalo,
+                    por ejemplo, para que Zapatillas se vea distinto de Camisas.
+                </p>
+            </div>
+
             <div class="ui divider"></div>
 
             <div class="form-actions">

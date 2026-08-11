@@ -196,13 +196,26 @@ Ya hecho en esta pasada de rediseño:
   unificado al carrusel, y caja de reseñas reorganizada (título+resumen en la misma
   fila en vez de contenido apretado a la izquierda con la caja vacía a la derecha)
 - Tarjetas de producto: se sacó el masonry con `columns:` (rompía el orden de lectura
-  izq-a-der) y se reemplazó por `.tienda-grid` como CSS Grid real; la variedad de
-  alturas de imagen (estilo Pinterest) se restauró a pedido del usuario, pero con
-  `align-items: start` (grid) / `flex-start` (carrusel) para que las tarjetas NO se
-  estiren a una altura de fila compartida — así la variedad no vuelve a dejar huecos
-  vacíos dentro de ninguna tarjeta. Mismo criterio aplicado al collage de fotos del
-  hero: con 1-2 fotos disponibles (en vez de las 4 que la grilla espera), la(s) foto(s)
-  ocupan toda la caja en lugar de dejar celdas vacías.
+  izq-a-der) y se reemplazó por `.tienda-grid` como CSS Grid real. La variedad de
+  tamaños de imagen (estilo Pinterest) pasó por dos versiones: primero aleatoria por
+  posición (`nth-child`) — el usuario la rechazó porque generaba alturas distintas
+  *dentro de una misma categoría*, que seguía viéndose asimétrico — y terminó siendo
+  **por categoría**: `Categoria.tamanoTarjeta` (enum `TamanoTarjetaCategoria`: NORMAL/
+  ANCHO/ALTO/COMPACTO, editable desde `/categorias`) controla la altura de imagen de
+  *todas* las tarjetas de esa categoría a la vez, vía una clase `tienda-tam-<valor>`
+  puesta en el `.tienda-carrusel`/`.tienda-grid` de esa sección (ver `tienda/index.html`,
+  loops de `carruseles` y `catalogoAgrupado`). Así cada categoría es internamente
+  simétrica, y la variedad queda entre categorías (ej. Zapatillas ancha vs. Camisas
+  alta), no dentro de una. Getter de la entidad nunca devuelve null (default NORMAL)
+  para no romper categorías creadas antes de que este campo existiera.
+  También se cambió `.tienda-card-img img` de `object-fit: cover` a `contain` +
+  `object-position: center`, para que la foto completa quede centrada en la caja en
+  vez de recortada — con fotos de producto de proporciones mixtas (retrato/paisaje,
+  como las de los datos de demo) `cover` las recortaba de forma dispareja y se veía
+  descentrado.
+  Mismo criterio de "no dejar hueco" aplicado al collage de fotos del hero: con 1-2
+  fotos disponibles (en vez de las 4 que la grilla espera), la(s) foto(s) ocupan toda
+  la caja en lugar de dejar celdas vacías.
 - **Panel de contenido editable** (`/contenido`, solo ADMIN): entidad `ContenidoSitio`
   (tabla `contenido_sitio`, clave/valor libre) + `ContenidoService` (devuelve un
   `Map<String,String>` con defaults hardcodeados en `ContenidoServiceImpl` para toda

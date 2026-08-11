@@ -2103,24 +2103,21 @@ body {
     color: var(--color-blue-light);
     overflow: hidden;
 }
-/* Alturas de imagen variadas (estilo Pinterest) para que el catálogo no se vea todo
-   parejo. Las tarjetas NO se estiran a una altura de fila compartida (align-items:
-   start / flex-start más abajo), así que la variedad no deja huecos vacíos dentro de
-   ninguna tarjeta: cada una crece solo lo que necesita su propio contenido. */
-.tienda-card:nth-child(5n+1) .tienda-card-img,
-.tienda-carrusel-card:nth-child(5n+1) .tienda-card-img { height: 210px; }
-.tienda-card:nth-child(5n+2) .tienda-card-img,
-.tienda-carrusel-card:nth-child(5n+2) .tienda-card-img { height: 150px; }
-.tienda-card:nth-child(5n+3) .tienda-card-img,
-.tienda-carrusel-card:nth-child(5n+3) .tienda-card-img { height: 180px; }
-.tienda-card:nth-child(5n+4) .tienda-card-img,
-.tienda-carrusel-card:nth-child(5n+4) .tienda-card-img { height: 160px; }
-.tienda-card:nth-child(5n+5) .tienda-card-img,
-.tienda-carrusel-card:nth-child(5n+5) .tienda-card-img { height: 195px; }
+/* Tamaño de tarjeta por categoría (configurable desde /categorias): todas las tarjetas
+   de una misma categoría comparten altura, así que la sección se ve simétrica; lo que
+   varía es de una categoría a otra (p. ej. Zapatillas ancha vs. Camisas alta). Se aplica
+   una clase tienda-tam-* en el contenedor .tienda-carrusel/.tienda-grid de esa sección. */
+.tienda-tam-ancho .tienda-card-img { height: 145px; }
+.tienda-tam-alto .tienda-card-img { height: 230px; }
+.tienda-tam-compacto .tienda-card-img { height: 130px; }
 .tienda-card-img img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    /* "contain" en vez de "cover": la foto entera queda centrada dentro de la caja en
+       vez de recortada para llenarla — con fotos de producto de distinta proporción
+       (retrato/paisaje) esto evita que se vean descentradas o cortadas de forma dispareja. */
+    object-fit: contain;
+    object-position: center;
     transition: transform 0.4s ease;
 }
 .tienda-card:hover .tienda-card-img img {
@@ -3528,11 +3525,12 @@ body {
     .tienda-carrusel-card {
         width: 165px;
     }
-    .tienda-carrusel-card:nth-child(5n+1) .tienda-card-img { height: 155px; }
-    .tienda-carrusel-card:nth-child(5n+2) .tienda-card-img { height: 110px; }
-    .tienda-carrusel-card:nth-child(5n+3) .tienda-card-img { height: 135px; }
-    .tienda-carrusel-card:nth-child(5n+4) .tienda-card-img { height: 118px; }
-    .tienda-carrusel-card:nth-child(5n+5) .tienda-card-img { height: 145px; }
+    .tienda-carrusel-card .tienda-card-img {
+        height: 135px;
+    }
+    .tienda-tam-ancho .tienda-card-img { height: 108px; }
+    .tienda-tam-alto .tienda-card-img { height: 170px; }
+    .tienda-tam-compacto .tienda-card-img { height: 100px; }
     .tienda-carrusel-vertodo span {
         display: none;
     }
@@ -3989,11 +3987,9 @@ body {
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
     }
-    .tienda-card:nth-child(5n+1) .tienda-card-img { height: 150px; }
-    .tienda-card:nth-child(5n+2) .tienda-card-img { height: 108px; }
-    .tienda-card:nth-child(5n+3) .tienda-card-img { height: 130px; }
-    .tienda-card:nth-child(5n+4) .tienda-card-img { height: 116px; }
-    .tienda-card:nth-child(5n+5) .tienda-card-img { height: 140px; }
+    .tienda-card-img {
+        height: 130px;
+    }
     #formCodigo .fields {
         gap: 8px;
     }
