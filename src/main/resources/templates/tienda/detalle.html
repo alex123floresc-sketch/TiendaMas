@@ -140,10 +140,17 @@
         <p class="hint" th:if="${#lists.isEmpty(resenas)}">Todavía no hay reseñas para este producto.</p>
     </div>
 
-    <div th:if="${relacionados != null and not #lists.isEmpty(relacionados)}" class="reveal" style="margin-top: 30px;">
-        <h3 class="ui header"><i class="thumbs up icon"></i> También te puede interesar</h3>
-        <div class="tienda-grid">
-            <div class="tienda-card" th:each="p : ${relacionados}">
+    <div class="tienda-carrusel-seccion reveal" th:if="${relacionados != null and not #lists.isEmpty(relacionados)}"
+         th:with="totalRelacionados=${#lists.size(relacionados)}" style="margin-top: 30px;">
+        <div class="tienda-carrusel-header">
+            <h3 class="ui header"><i class="thumbs up icon"></i> También te puede interesar</h3>
+            <div class="tienda-carrusel-flechas" th:if="${totalRelacionados > 5}">
+                <button type="button" class="tienda-carrusel-flecha" onclick="desplazarCarrusel('carrusel-relacionados', -1)" aria-label="Anterior"><i class="chevron left icon"></i></button>
+                <button type="button" class="tienda-carrusel-flecha" onclick="desplazarCarrusel('carrusel-relacionados', 1)" aria-label="Siguiente"><i class="chevron right icon"></i></button>
+            </div>
+        </div>
+        <div class="tienda-carrusel" th:classappend="${totalRelacionados <= 5} ? 'tienda-carrusel-compacto'" id="carrusel-relacionados">
+            <div class="tienda-carrusel-card" th:each="p : ${relacionados}">
                 <th:block th:replace="~{tienda/fragments :: tarjetaProductoContenido(${p})}"></th:block>
             </div>
         </div>
