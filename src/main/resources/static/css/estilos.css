@@ -3170,6 +3170,24 @@ body {
         padding: 20px;
     }
 
+    /* Semantic UI no trae una variante "stackable" para .ui.statistics: sin esto, los
+       números de las tarjetas de resumen (dashboard, detalle de cliente) quedan todos
+       amontonados en una sola fila apretada. Las clases numeradas de Semantic (.three.statistics,
+       .five.statistics, etc.) fijan su propio ancho por elemento con más especificidad que un
+       selector genérico, así que hace falta pisarlas explícitamente con !important. */
+    .ui.statistics {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: flex-start !important;
+        gap: 20px;
+    }
+    .ui.statistics .statistic,
+    .ui[class*="statistics"] .statistic {
+        width: 40% !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+    }
+
     /* Tienda: navbar colapsa a menú desplegable */
     .tienda-navbar {
         position: relative;
