@@ -58,11 +58,11 @@
 <table class="kpis">
     <tr>
         <td><span class="valor" th:text="'S/ ' + ${#numbers.formatDecimal(totalVentas, 1, 2)}">S/ 0.00</span><span class="etiqueta">Ventas totales</span></td>
-        <td><span class="valor" th:text="${totalPedidos}">0</span><span class="etiqueta">Pedidos</span></td>
+        <td><span class="valor" th:text="${#numbers.formatDecimal(totalPedidos, 1, 0)}">0</span><span class="etiqueta">Pedidos</span></td>
         <td><span class="valor" th:text="'S/ ' + ${#numbers.formatDecimal(ticketPromedio, 1, 2)}">S/ 0.00</span><span class="etiqueta">Ticket promedio</span></td>
-        <td><span class="valor" th:text="${totalUnidadesVendidas}">0</span><span class="etiqueta">Unidades vendidas</span></td>
-        <td><span class="valor" th:text="${totalClientes}">0</span><span class="etiqueta">Clientes</span></td>
-        <td><span class="valor" th:text="${totalProductos}">0</span><span class="etiqueta">Productos</span></td>
+        <td><span class="valor" th:text="${#numbers.formatDecimal(totalUnidadesVendidas, 1, 0)}">0</span><span class="etiqueta">Unidades vendidas</span></td>
+        <td><span class="valor" th:text="${#numbers.formatDecimal(totalClientes, 1, 0)}">0</span><span class="etiqueta">Clientes</span></td>
+        <td><span class="valor" th:text="${#numbers.formatDecimal(totalProductos, 1, 0)}">0</span><span class="etiqueta">Productos</span></td>
     </tr>
 </table>
 

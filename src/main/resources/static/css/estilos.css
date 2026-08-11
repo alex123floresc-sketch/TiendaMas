@@ -802,10 +802,13 @@ body {
     color: var(--color-blue);
 }
 
-/* --- Reportes: grilla de estadísticas del resumen (más de 5, Semantic no lo cubre) --- */
+/* --- Reportes: grilla de estadísticas del resumen (más de 5, Semantic no lo cubre) ---
+   Columnas fijas (no auto-fit): con auto-fit, según el ancho disponible la última fila
+   puede quedar con menos tarjetas que se estiran distinto a las de arriba — se ve
+   despareja. Con 6 tarjetas, 3 columnas da siempre 2 filas parejas de 3. */
 .ui.statistics.reporte-stats-grid {
     display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 20px;
 }
 .ui.statistics.reporte-stats-grid .statistic {
@@ -838,6 +841,44 @@ body {
 .reporte-stat-card.clientes .icon { color: #0EA5E9; }
 .reporte-stat-card.productos { border-left-color: var(--color-navy); }
 .reporte-stat-card.productos .icon { color: var(--color-navy); }
+
+/* Fila inferior de cada tarjeta: valor auxiliar + variación vs. período anterior */
+.reporte-stat-card-extra {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 2px;
+    min-height: 20px;
+}
+.reporte-stat-card-sublabel {
+    color: var(--color-text-muted);
+    font-size: 0.78em;
+}
+.reporte-kpi-variacion {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.78em;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: var(--color-beige);
+    color: var(--color-text-muted);
+}
+.reporte-kpi-variacion .icon {
+    margin: 0 !important;
+    font-size: 0.95em !important;
+    color: inherit !important;
+}
+.reporte-kpi-variacion.positiva {
+    background: #DCFCE7;
+    color: #15803D;
+}
+.reporte-kpi-variacion.negativa {
+    background: #FEE2E2;
+    color: #B91C1C;
+}
 
 /* Segmentos / tarjetas */
 .ui.segment {
@@ -3446,6 +3487,9 @@ body {
     }
     .admin-content {
         padding: 20px;
+    }
+    .ui.statistics.reporte-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
     .container {
         padding: 20px;

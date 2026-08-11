@@ -1,6 +1,7 @@
 package com.tiendamas.controller;
 
 import com.tiendamas.dto.ClienteResumen;
+import com.tiendamas.dto.ComparacionKpi;
 import com.tiendamas.dto.RecomendacionReabastecimiento;
 import com.tiendamas.dto.ResumenMensual;
 import com.tiendamas.dto.ResumenVentasPeriodo;
@@ -38,6 +39,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -204,6 +206,30 @@ public class ReporteController {
 
         double ticketPromedio = pedidos.isEmpty() ? 0.0 : totalVentas / pedidos.size();
 
+        // Período anterior de igual duración (o últimos 30 días si no hay filtro), para
+        // mostrar "vs. período anterior" junto a los KPIs principales del resumen.
+        LocalDate finActual = hasta != null ? hasta : LocalDate.now();
+        LocalDate inicioActual = desde != null ? desde : finActual.minusDays(29);
+        long diasPeriodo = ChronoUnit.DAYS.between(inicioActual, finActual) + 1;
+        LocalDate finAnterior = inicioActual.minusDays(1);
+        LocalDate inicioAnterior = finAnterior.minusDays(diasPeriodo - 1);
+        List<Pedido> pedidosPeriodoAnterior = filtrarPorFecha(todosPedidos, inicioAnterior, finAnterior);
+
+        double ventasAnterior = 0.0;
+        int unidadesAnterior = 0;
+        for (Pedido p : pedidosPeriodoAnterior) {
+            ventasAnterior += p.getTotal() != null ? p.getTotal() : 0.0;
+            for (DetallePedido d : p.getDetalles()) {
+                unidadesAnterior += d.getCantidad() != null ? d.getCantidad() : 0;
+            }
+        }
+        double ticketAnterior = pedidosPeriodoAnterior.isEmpty() ? 0.0 : ventasAnterior / pedidosPeriodoAnterior.size();
+
+        ComparacionKpi comparacionVentas = new ComparacionKpi(totalVentas, ventasAnterior);
+        ComparacionKpi comparacionPedidos = new ComparacionKpi(pedidos.size(), pedidosPeriodoAnterior.size());
+        ComparacionKpi comparacionUnidades = new ComparacionKpi(totalUnidades, unidadesAnterior);
+        ComparacionKpi comparacionTicket = new ComparacionKpi(ticketPromedio, ticketAnterior);
+
         List<Map.Entry<String, Integer>> masVendidos = unidadesPorProducto.entrySet().stream()
                 .sorted((a, b) -> b.getValue() - a.getValue())
                 .limit(TOP_PRODUCTOS_LIMITE)
@@ -242,6 +268,12 @@ public class ReporteController {
         datos.put("totalProductos", productos.size());
         datos.put("totalUnidadesVendidas", totalUnidades);
         datos.put("ticketPromedio", ticketPromedio);
+        datos.put("unidadesPorPedido", pedidos.isEmpty() ? 0.0 : totalUnidades / (double) pedidos.size());
+        datos.put("comparacionVentas", comparacionVentas);
+        datos.put("comparacionPedidos", comparacionPedidos);
+        datos.put("comparacionUnidades", comparacionUnidades);
+        datos.put("comparacionTicket", comparacionTicket);
+        datos.put("diasPeriodoComparado", diasPeriodo);
         datos.put("masVendidos", masVendidos);
         datos.put("ventasPorCategoria", ventasPorCategoria);
         datos.put("ventasPorCanal", ventasPorCanal);

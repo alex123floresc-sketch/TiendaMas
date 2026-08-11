@@ -163,6 +163,23 @@ etc.) — no sirven como referencia histórica, hay que mirar el diff si hace fa
   bandera tipo `ventasGraficosListos`), nunca en `DOMContentLoaded` a ciegas: un
   canvas dentro de un contenedor `display:none` mide 0×0 en el momento de crear el
   `Chart`, y aunque el panel se muestre después el gráfico queda roto/en blanco.
+- Patrón de tarjeta KPI con variación (`dto/ComparacionKpi.java` + CSS
+  `.reporte-stat-card-extra`/`.reporte-kpi-variacion`): compara el valor del
+  período filtrado contra el mismo período (misma duración) inmediatamente
+  anterior — sin filtro de fechas, por defecto usa "últimos 30 días vs. los 30
+  anteriores a esos". `ComparacionKpi.isSinBase()` cuando ambos valores son 0 (no
+  hay nada que comparar, se oculta el badge en vez de mostrar división por cero).
+  Este es el patrón "estructura tipo reportes" que el usuario pidió replicar en
+  el resto del panel admin cuando haya KPIs numéricos que valga la pena comparar
+  en el tiempo (ej. valdría en Pedidos, Gastos — evaluar caso por caso, no forzarlo
+  donde no hay una serie temporal natural).
+- **Grillas de tarjetas: nunca `auto-fit`/`auto-fill` con un número fijo y conocido
+  de tarjetas** (ej. las 6 del resumen de reportes) — según el ancho disponible la
+  última fila puede quedar con menos tarjetas que se estiran distinto a las de
+  arriba, y se ve despareja/asimétrico (mismo patrón de bug que las tarjetas de
+  producto). Usar `repeat(N, 1fr)` con N elegido para que el total de tarjetas
+  quede parejo (todas las filas completas), con breakpoints responsive explícitos
+  para pantallas chicas — no dejar que el navegador decida cuántas entran.
 - **"tshirt icon" (y variantes) NO es un ícono válido en Semantic UI 2.5.0** — no
   existe en su hoja de íconos (verificado contra el CSS real del CDN), así que se
   renderiza vacío/invisible. Se usó por error en varios lugares para representar

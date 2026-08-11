@@ -44,36 +44,79 @@
 
     <div class="reporte-tab-panel" id="panel-resumen">
         <h2 class="reporte-seccion-titulo"><i class="tachometer alternate icon"></i> Resumen del período</h2>
+        <p class="hint" style="margin-bottom: 14px;">
+            Las variaciones (<i class="arrow up icon" style="margin:0;"></i>/<i class="arrow down icon" style="margin:0;"></i>) comparan contra
+            <span th:if="${desde != null or hasta != null}">los <strong th:text="${diasPeriodoComparado}"></strong> día<span th:if="${diasPeriodoComparado != 1}">s</span> inmediatamente anteriores al rango elegido</span>
+            <span th:unless="${desde != null or hasta != null}">los 30 días previos a los últimos 30 días</span>.
+        </p>
         <div class="ui stackable statistics reporte-stats-grid" style="margin-bottom: 30px;">
             <div class="statistic reporte-stat-card ventas">
                 <i class="money bill alternate icon"></i>
                 <div class="value" th:text="'S/ ' + ${#numbers.formatDecimal(totalVentas, 1, 2)}"></div>
                 <div class="label">Ventas totales</div>
+                <div class="reporte-stat-card-extra">
+                    <span></span>
+                    <span class="reporte-kpi-variacion" th:unless="${comparacionVentas.sinBase}"
+                          th:classappend="${comparacionVentas.subio} ? 'positiva' : (${comparacionVentas.bajo} ? 'negativa' : '')">
+                        <i th:class="${comparacionVentas.subio} ? 'arrow up icon' : (${comparacionVentas.bajo} ? 'arrow down icon' : 'minus icon')"></i>
+                        <span th:text="${#numbers.formatDecimal(comparacionVentas.variacionPorcentaje, 1, 1)} + '%'"></span>
+                    </span>
+                </div>
             </div>
             <div class="statistic reporte-stat-card pedidos">
                 <i class="list icon"></i>
-                <div class="value" th:text="${totalPedidos}"></div>
+                <div class="value" th:text="${#numbers.formatDecimal(totalPedidos, 1, 0)}"></div>
                 <div class="label">Pedidos</div>
+                <div class="reporte-stat-card-extra">
+                    <span></span>
+                    <span class="reporte-kpi-variacion" th:unless="${comparacionPedidos.sinBase}"
+                          th:classappend="${comparacionPedidos.subio} ? 'positiva' : (${comparacionPedidos.bajo} ? 'negativa' : '')">
+                        <i th:class="${comparacionPedidos.subio} ? 'arrow up icon' : (${comparacionPedidos.bajo} ? 'arrow down icon' : 'minus icon')"></i>
+                        <span th:text="${#numbers.formatDecimal(comparacionPedidos.variacionPorcentaje, 1, 1)} + '%'"></span>
+                    </span>
+                </div>
             </div>
             <div class="statistic reporte-stat-card ticket">
                 <i class="ticket alternate icon"></i>
                 <div class="value" th:text="'S/ ' + ${#numbers.formatDecimal(ticketPromedio, 1, 2)}"></div>
                 <div class="label">Ticket promedio</div>
+                <div class="reporte-stat-card-extra">
+                    <span></span>
+                    <span class="reporte-kpi-variacion" th:unless="${comparacionTicket.sinBase}"
+                          th:classappend="${comparacionTicket.subio} ? 'positiva' : (${comparacionTicket.bajo} ? 'negativa' : '')">
+                        <i th:class="${comparacionTicket.subio} ? 'arrow up icon' : (${comparacionTicket.bajo} ? 'arrow down icon' : 'minus icon')"></i>
+                        <span th:text="${#numbers.formatDecimal(comparacionTicket.variacionPorcentaje, 1, 1)} + '%'"></span>
+                    </span>
+                </div>
             </div>
             <div class="statistic reporte-stat-card unidades">
                 <i class="boxes icon"></i>
-                <div class="value" th:text="${totalUnidadesVendidas}"></div>
+                <div class="value" th:text="${#numbers.formatDecimal(totalUnidadesVendidas, 1, 0)}"></div>
                 <div class="label">Unidades vendidas</div>
+                <div class="reporte-stat-card-extra">
+                    <span class="reporte-stat-card-sublabel" th:text="${#numbers.formatDecimal(unidadesPorPedido, 1, 1)} + ' / pedido'"></span>
+                    <span class="reporte-kpi-variacion" th:unless="${comparacionUnidades.sinBase}"
+                          th:classappend="${comparacionUnidades.subio} ? 'positiva' : (${comparacionUnidades.bajo} ? 'negativa' : '')">
+                        <i th:class="${comparacionUnidades.subio} ? 'arrow up icon' : (${comparacionUnidades.bajo} ? 'arrow down icon' : 'minus icon')"></i>
+                        <span th:text="${#numbers.formatDecimal(comparacionUnidades.variacionPorcentaje, 1, 1)} + '%'"></span>
+                    </span>
+                </div>
             </div>
             <div class="statistic reporte-stat-card clientes">
                 <i class="users icon"></i>
-                <div class="value" th:text="${totalClientes}"></div>
+                <div class="value" th:text="${#numbers.formatDecimal(totalClientes, 1, 0)}"></div>
                 <div class="label">Clientes</div>
+                <div class="reporte-stat-card-extra">
+                    <span class="reporte-stat-card-sublabel">registrados en total</span>
+                </div>
             </div>
             <div class="statistic reporte-stat-card productos">
                 <i class="shopping bag icon"></i>
-                <div class="value" th:text="${totalProductos}"></div>
+                <div class="value" th:text="${#numbers.formatDecimal(totalProductos, 1, 0)}"></div>
                 <div class="label">Productos</div>
+                <div class="reporte-stat-card-extra">
+                    <span class="reporte-stat-card-sublabel">en el catálogo</span>
+                </div>
             </div>
         </div>
 
