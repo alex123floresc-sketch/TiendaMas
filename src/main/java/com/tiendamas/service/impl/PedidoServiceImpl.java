@@ -17,7 +17,11 @@ import com.tiendamas.entity.TipoEntrega;
 import com.tiendamas.entity.VarianteProducto;
 import com.tiendamas.repository.DetallePedidoRepository;
 import com.tiendamas.repository.PedidoRepository;
+import com.tiendamas.service.ComprobantePdfService;
+import com.tiendamas.service.CuponService;
 import com.tiendamas.service.EmailService;
+import com.tiendamas.service.EnvioService;
+import com.tiendamas.service.FidelidadService;
 import com.tiendamas.service.PedidoService;
 import com.tiendamas.service.PersonaService;
 import com.tiendamas.service.ProductoService;
@@ -65,10 +69,10 @@ public class PedidoServiceImpl implements PedidoService {
     private EnvioService envioService;
 
     @Autowired
-    private com.tiendamas.service.CuponService cuponService;
+    private CuponService cuponService;
 
     @Autowired
-    private com.tiendamas.service.FidelidadService fidelidadService;
+    private FidelidadService fidelidadService;
 
     @Override
     public List<Pedido> obtenerTodos() {

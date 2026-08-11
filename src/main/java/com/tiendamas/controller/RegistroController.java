@@ -18,7 +18,7 @@ public class RegistroController {
     @GetMapping("/registro")
     public String mostrarFormulario(Model model) {
         model.addAttribute("registroForm", new RegistroForm());
-        return "registro";
+        return "auth/registro";
     }
 
     @PostMapping("/registro")
@@ -26,7 +26,7 @@ public class RegistroController {
         if (registroForm.getUsername() == null || registroForm.getUsername().isBlank()
                 || usuarioService.existeUsername(registroForm.getUsername())) {
             model.addAttribute("error", "Ese nombre de usuario ya está en uso o no es válido.");
-            return "registro";
+            return "auth/registro";
         }
         usuarioService.registrarCliente(registroForm);
         return "redirect:/login?registrado=true";

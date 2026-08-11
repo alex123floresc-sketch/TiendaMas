@@ -1,4 +1,4 @@
-package com.tiendamas.service.impl;
+package com.tiendamas.service;
 
 import com.tiendamas.dto.ResultadoPago;
 import org.slf4j.Logger;

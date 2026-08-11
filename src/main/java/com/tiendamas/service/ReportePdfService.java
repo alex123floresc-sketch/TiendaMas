@@ -1,4 +1,4 @@
-package com.tiendamas.service.impl;
+package com.tiendamas.service;
 
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import org.jsoup.Jsoup;

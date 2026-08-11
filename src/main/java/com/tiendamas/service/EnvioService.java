@@ -1,4 +1,4 @@
-package com.tiendamas.service.impl;
+package com.tiendamas.service;
 
 import com.tiendamas.entity.TipoEntrega;
 import org.springframework.beans.factory.annotation.Value;
