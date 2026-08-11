@@ -1813,6 +1813,21 @@ body {
     transform: rotate(2deg);
 }
 .tienda-hero-foto-4:hover { transform: rotate(2deg) scale(1.05); }
+/* Con 3-4 fotos la grilla de arriba llena la caja entera. Con 1-2 fotos disponibles,
+   en vez de dejar celdas vacías (espacio muerto dentro de la caja), la foto ocupa todo
+   el ancho/alto disponible para que la caja se vea completa y no a medio llenar. */
+.tienda-hero-collage-1 .tienda-hero-foto-1 {
+    grid-column: 1 / 3;
+    grid-row: 1 / 3;
+}
+.tienda-hero-collage-2 .tienda-hero-foto-1 {
+    grid-column: 1;
+    grid-row: 1 / 3;
+}
+.tienda-hero-collage-2 .tienda-hero-foto-2 {
+    grid-column: 2;
+    grid-row: 1 / 3;
+}
 .tienda-hero h1 {
     margin: 0 0 8px 0;
 }

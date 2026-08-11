@@ -12,7 +12,9 @@
                     <i class="arrow down icon"></i> Ver catálogo
                 </a>
             </div>
-            <div class="tienda-hero-collage" th:if="${!#lists.isEmpty(productosConImagen)}">
+            <div class="tienda-hero-collage" th:if="${!#lists.isEmpty(productosConImagen)}"
+                 th:with="totalFotos=${#lists.size(productosConImagen) > 4 ? 4 : #lists.size(productosConImagen)}"
+                 th:classappend="${totalFotos <= 2} ? ('tienda-hero-collage-' + ${totalFotos})">
                 <img th:each="p, it : ${productosConImagen}" th:if="${it.index < 4}"
                      th:src="@{${p.imagenPrincipal}}" th:alt="${p.nombre}"
                      th:class="'tienda-hero-foto tienda-hero-foto-' + (${it.index}+1)">
