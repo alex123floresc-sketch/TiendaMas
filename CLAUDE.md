@@ -239,6 +239,28 @@ etc.) — no sirven como referencia histórica, hay que mirar el diff si hace fa
   Como cada click de navegación es una recarga de página completa (no es una
   SPA), el sidebar vuelve a arrancar colapsado solo con cargar la página
   siguiente — no hace falta JS para "volver a colapsar después de un click".
+  **Confirmado en vivo con browser real (2026-08-11)**: el hover expande bien
+  (sin superposición de elementos), y clickear un ítem navega correctamente sin
+  clicks accidentales — no hay bug de la app acá.
+
+## Automatización de navegador — hallazgos adicionales (2026-08-11)
+
+- La acción `hover` de `claude-in-chrome` puede ser MÁS que un simple mousemove:
+  en una sesión de prueba, un solo `hover` sobre el sidebar terminó registrando
+  una navegación real (a `/reportes`) y aparentemente un click extra sobre un
+  botón ("Financiero"), y en otra ronda de pruebas se disparó sin querer una
+  descarga real de PDF a la carpeta Descargas del usuario. No confiar en `hover`
+  para verificar nada crítico sin luego confirmar con una captura Y con una
+  lectura de estado por JS que coincidan entre sí.
+- Una pestaña puede quedar en un estado **internamente contradictorio**: una
+  screenshot mostraba contenido normal (barra lateral expandida, tabla con
+  filas) pero `javascript_tool` en la MISMA pestaña un instante después reportaba
+  `window.innerHeight` de 147px y elementos del sidebar con `left: -250` (fuera
+  de pantalla, como si estuviera en el layout mobile con el panel cerrado) — un
+  estado físicamente imposible dado lo que la captura mostraba. Sospechar
+  corrupción de pestaña (ver sección de abajo) cuando la lectura por JS no
+  cuadra con lo que se ve en la captura, no asumir que el layout real está roto.
+  `resize_window` seguía sin ser confiable para fijar un viewport real.
 
 ## Convenciones de colaboración con este usuario
 
