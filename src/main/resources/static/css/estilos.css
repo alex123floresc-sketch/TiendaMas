@@ -2037,8 +2037,9 @@ body {
 }
 
 .tienda-grid {
-    columns: 4 220px;
-    column-gap: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
 }
 .tienda-card {
     position: relative;
@@ -2046,12 +2047,9 @@ body {
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(20, 49, 93, 0.10);
     padding: 16px;
-    display: inline-flex;
-    width: 100%;
+    display: flex;
     flex-direction: column;
     gap: 12px;
-    break-inside: avoid;
-    margin-bottom: 20px;
     transition: transform 0.22s ease, box-shadow 0.22s ease;
 }
 .tienda-card:hover {
@@ -2061,11 +2059,15 @@ body {
 .tienda-card-link {
     text-decoration: none;
     color: inherit;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
-.tienda-card-img {
+.tienda-card-img,
+.tienda-carrusel-card .tienda-card-img {
     background: var(--color-cream);
     border-radius: 12px;
-    height: 150px;
+    height: 180px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2081,23 +2083,10 @@ body {
 .tienda-card:hover .tienda-card-img img {
     transform: scale(1.08);
 }
-/* Alturas variadas para que la grilla y los carruseles no se vean uniformes (estilo masonry).
-   Se define primero el tamaño (cada 5 tarjetas) y más abajo la forma (cada 3 tarjetas); como
-   los ciclos no coinciden, el catálogo combina 15 variantes de tamaño + forma distintas. */
-.tienda-card:nth-child(5n+1) .tienda-card-img,
-.tienda-carrusel-card:nth-child(5n+1) .tienda-card-img { height: 195px; }
-.tienda-card:nth-child(5n+2) .tienda-card-img,
-.tienda-carrusel-card:nth-child(5n+2) .tienda-card-img { height: 130px; }
-.tienda-card:nth-child(5n+3) .tienda-card-img,
-.tienda-carrusel-card:nth-child(5n+3) .tienda-card-img { height: 165px; }
-.tienda-card:nth-child(5n+4) .tienda-card-img,
-.tienda-carrusel-card:nth-child(5n+4) .tienda-card-img { height: 145px; }
-.tienda-card:nth-child(5n+5) .tienda-card-img,
-.tienda-carrusel-card:nth-child(5n+5) .tienda-card-img { height: 180px; }
-
-.tienda-card-img,
-.tienda-carrusel-card .tienda-card-img {
-    transition: border-radius 0.3s ease, width 0.3s ease;
+.tienda-card-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 .tienda-detalle-img {
     background: var(--color-cream);
@@ -2160,6 +2149,8 @@ body {
     color: var(--color-success);
     font-weight: 700;
     font-size: 1.1em;
+    margin-top: auto;
+    padding-top: 6px;
 }
 .tienda-card-tallas {
     display: flex;
@@ -3493,11 +3484,9 @@ body {
     .tienda-carrusel-card {
         width: 165px;
     }
-    .tienda-carrusel-card:nth-child(5n+1) .tienda-card-img { height: 145px; }
-    .tienda-carrusel-card:nth-child(5n+2) .tienda-card-img { height: 105px; }
-    .tienda-carrusel-card:nth-child(5n+3) .tienda-card-img { height: 125px; }
-    .tienda-carrusel-card:nth-child(5n+4) .tienda-card-img { height: 112px; }
-    .tienda-carrusel-card:nth-child(5n+5) .tienda-card-img { height: 135px; }
+    .tienda-carrusel-card .tienda-card-img {
+        height: 135px;
+    }
     .tienda-carrusel-vertodo span {
         display: none;
     }
@@ -3959,17 +3948,12 @@ body {
         max-height: 340px;
     }
     .tienda-grid {
-        columns: 2;
-        column-gap: 12px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
     }
-    .tienda-card {
-        margin-bottom: 12px;
+    .tienda-card-img {
+        height: 130px;
     }
-    .tienda-card:nth-child(5n+1) .tienda-card-img { height: 150px; }
-    .tienda-card:nth-child(5n+2) .tienda-card-img { height: 110px; }
-    .tienda-card:nth-child(5n+3) .tienda-card-img { height: 130px; }
-    .tienda-card:nth-child(5n+4) .tienda-card-img { height: 118px; }
-    .tienda-card:nth-child(5n+5) .tienda-card-img { height: 140px; }
     #formCodigo .fields {
         gap: 8px;
     }
