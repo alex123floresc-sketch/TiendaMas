@@ -30,9 +30,12 @@
         </div>
     </div>
 
-    <div class="ui segment">
-        <h3 class="ui header">Ingresos totales</h3>
-        <p class="ui big label">S/ <span th:text="${#numbers.formatDecimal(ingresosTotales, 1, 2)}">0.00</span></p>
+    <div class="admin-kpi-card">
+        <div class="admin-kpi-icon"><i class="dollar sign icon"></i></div>
+        <div>
+            <div class="admin-kpi-label">Ingresos totales</div>
+            <div class="admin-kpi-value">S/ <span th:text="${#numbers.formatDecimal(ingresosTotales, 1, 2)}">0.00</span></div>
+        </div>
     </div>
 
     <div class="ui segment" th:if="${not #lists.isEmpty(stockBajo)}">
@@ -58,35 +61,40 @@
 
     <div class="ui segment">
         <h3 class="ui header">Accesos rápidos</h3>
-        <div class="ui five stackable cards">
-            <a href="/productos" class="ui card">
-                <div class="content">
-                    <i class="tshirt icon"></i> <span class="header">Productos</span>
-                    <div class="description">Catálogo, tallas, colores y existencias.</div>
+        <div class="admin-quicklinks-grid">
+            <a href="/productos" class="admin-quicklink">
+                <div class="admin-quicklink-icon"><i class="tshirt icon"></i></div>
+                <div>
+                    <div class="admin-quicklink-title">Productos</div>
+                    <div class="admin-quicklink-desc">Catálogo, tallas, colores y existencias.</div>
                 </div>
             </a>
-            <a href="/pedidos" class="ui card">
-                <div class="content">
-                    <i class="list icon"></i> <span class="header">Pedidos</span>
-                    <div class="description">Ventas registradas a tus clientes.</div>
+            <a href="/pedidos" class="admin-quicklink">
+                <div class="admin-quicklink-icon"><i class="list icon"></i></div>
+                <div>
+                    <div class="admin-quicklink-title">Pedidos</div>
+                    <div class="admin-quicklink-desc">Ventas registradas a tus clientes.</div>
                 </div>
             </a>
-            <a href="/reportes" class="ui card">
-                <div class="content">
-                    <i class="chart bar icon"></i> <span class="header">Reportes</span>
-                    <div class="description">Estadísticas de ventas del negocio.</div>
+            <a href="/reportes" class="admin-quicklink">
+                <div class="admin-quicklink-icon"><i class="chart bar icon"></i></div>
+                <div>
+                    <div class="admin-quicklink-title">Reportes</div>
+                    <div class="admin-quicklink-desc">Estadísticas de ventas del negocio.</div>
                 </div>
             </a>
-            <a href="/pos" class="ui card">
-                <div class="content">
-                    <i class="cash register icon"></i> <span class="header">Punto de venta</span>
-                    <div class="description">Registra una venta al instante.</div>
+            <a href="/pos" class="admin-quicklink">
+                <div class="admin-quicklink-icon"><i class="cash register icon"></i></div>
+                <div>
+                    <div class="admin-quicklink-title">Punto de venta</div>
+                    <div class="admin-quicklink-desc">Registra una venta al instante.</div>
                 </div>
             </a>
-            <a href="/suscriptores" class="ui card">
-                <div class="content">
-                    <i class="envelope open icon"></i> <span class="header">Suscriptores</span>
-                    <div class="description">Correos captados por el newsletter de la tienda.</div>
+            <a href="/suscriptores" class="admin-quicklink">
+                <div class="admin-quicklink-icon"><i class="envelope open icon"></i></div>
+                <div>
+                    <div class="admin-quicklink-title">Suscriptores</div>
+                    <div class="admin-quicklink-desc">Correos captados por el newsletter de la tienda.</div>
                 </div>
             </a>
         </div>

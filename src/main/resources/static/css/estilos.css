@@ -601,17 +601,29 @@ body {
     border-color: var(--color-blue);
     background: var(--color-beige);
 }
+/* El radio nativo queda oculto: el propio swatch (si hay color) o el resaltado del
+   chip (si no) ya avisan cuál está elegida — mostrar un círculo vacío al lado de un
+   swatch de color era redundante. El <label> sigue activando el input al hacer clic. */
 .tienda-variante-opcion input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
     margin: 0;
 }
 .tienda-variante-swatch {
     display: inline-block;
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
-    border: 1px solid var(--color-beige-dark);
+    border: 2px solid var(--color-beige-dark);
     vertical-align: middle;
-    margin-right: 4px;
+    margin-right: 2px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.tienda-variante-opcion:has(input:checked) .tienda-variante-swatch {
+    border-color: var(--color-blue);
+    box-shadow: 0 0 0 2px var(--color-white), 0 0 0 4px var(--color-blue);
 }
 .carrito-item-cell {
     display: flex;
@@ -782,6 +794,93 @@ body {
 }
 .ui.statistics .statistic > .label {
     color: var(--color-text-muted) !important;
+}
+
+/* --- Dashboard: tarjeta de ingresos totales --- */
+.admin-kpi-card {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    background: linear-gradient(135deg, #0F3D2A, var(--color-success));
+    border-radius: 12px;
+    padding: 22px 26px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 20px rgba(22, 163, 74, 0.22);
+}
+.admin-kpi-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.15);
+    flex-shrink: 0;
+}
+.admin-kpi-icon .icon {
+    margin: 0 !important;
+    font-size: 1.4em;
+    color: var(--color-white) !important;
+}
+.admin-kpi-label {
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 600;
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 2px;
+}
+.admin-kpi-value {
+    color: var(--color-white);
+    font-size: 1.9em;
+    font-weight: 800;
+}
+
+/* --- Dashboard: accesos rápidos --- */
+.admin-quicklinks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 16px;
+}
+.admin-quicklink {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: var(--color-white);
+    border: 1px solid var(--color-beige-dark);
+    border-radius: 12px;
+    padding: 18px;
+    text-decoration: none !important;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.admin-quicklink:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 22px rgba(20, 49, 93, 0.14);
+    border-color: var(--color-blue);
+}
+.admin-quicklink-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--color-beige);
+    flex-shrink: 0;
+}
+.admin-quicklink-icon .icon {
+    margin: 0 !important;
+    color: var(--color-blue);
+}
+.admin-quicklink-title {
+    color: var(--color-navy);
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+.admin-quicklink-desc {
+    color: var(--color-text-muted);
+    font-size: 0.85em;
+    line-height: 1.4;
 }
 
 /* Miniaturas e imágenes de producto (listado y formulario admin) */
@@ -2003,7 +2102,7 @@ body {
 .tienda-detalle-img {
     background: var(--color-cream);
     border-radius: 10px;
-    height: 260px;
+    height: 420px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2334,6 +2433,10 @@ body {
 }
 .tienda-detalle-media {
     position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
 }
 .tienda-badge-agotado {
     position: absolute;
@@ -3402,6 +3505,12 @@ body {
     .tienda-carrito-layout,
     .tienda-checkout-layout {
         grid-template-columns: 1fr;
+    }
+    .tienda-detalle-media {
+        height: auto;
+    }
+    .tienda-detalle-img {
+        height: 280px;
     }
     .tienda-carrito-resumen {
         position: static;
