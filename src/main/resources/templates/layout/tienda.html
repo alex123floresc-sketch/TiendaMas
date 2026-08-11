@@ -78,7 +78,7 @@
     </a>
 
     <a th:href="@{/login}" class="item tienda-nav-login" th:unless="${usuarioAutenticado}">
-      <i class="sign in alternate icon"></i> Iniciar sesión
+      <i class="sign in icon"></i> Iniciar sesión
     </a>
     <a th:href="@{/registro}" class="item ui primary button tienda-nav-registro" th:unless="${usuarioAutenticado}">
       Crear cuenta
@@ -101,7 +101,7 @@
         <a th:href="@{/tienda/pedidos}" class="item"><i class="list icon"></i> Mis pedidos</a>
         <div class="divider"></div>
         <form th:action="@{/logout}" method="post" class="item logout-link-form">
-          <button type="submit" class="logout-link-button"><i class="sign out alternate icon"></i> Cerrar sesión</button>
+          <button type="submit" class="logout-link-button"><i class="sign out icon"></i> Cerrar sesión</button>
         </form>
       </div>
     </div>

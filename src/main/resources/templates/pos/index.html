@@ -108,7 +108,7 @@
         </div>
 
         <div class="pos-col-side" id="colCobrar" th:style="${carrito.empty} ? 'display:none' : ''">
-            <h2 class="ui header"><i class="cash register icon"></i> Cobrar</h2>
+            <h2 class="ui header"><i class="calculator icon"></i> Cobrar</h2>
             <div class="ui segment">
                 <form th:action="@{/pos/checkout}" method="post" class="ui form">
                     <div class="field required">
@@ -136,7 +136,7 @@
                     </div>
 
                     <button type="submit" class="ui positive big fluid button">
-                        <i class="cash register icon"></i> Cobrar y emitir comprobante
+                        <i class="calculator icon"></i> Cobrar y emitir comprobante
                     </button>
                 </form>
 

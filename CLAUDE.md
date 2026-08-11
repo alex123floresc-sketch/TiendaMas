@@ -197,6 +197,31 @@ etc.) — no sirven como referencia histórica, hay que mirar el diff si hace fa
 - **CSRF**: los `th:action` con Spring Security lo inyectan solo; para llamadas AJAX hay
   que usar el meta `<meta name="_csrf">` / `<meta name="_csrf_header">` ya agregado en
   los layouts.
+- **Antes de usar un ícono de Semantic UI que no esté ya probado en este proyecto,
+  verificarlo contra el CSS real** (`curl https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/components/icon.min.css`
+  y buscar `icon.palabra1.palabra2`), no asumir que existe por analogía con Font
+  Awesome. Ya se encontraron y corrigieron 9 íconos inventados/inexistentes que se
+  renderizaban vacíos: `tshirt`, `cash register`, `box open`, `money bill wave`,
+  `receipt`, `sign in alternate`, `sign out alternate`, `store`, `user shield`
+  (reemplazados por `boxes`/`shopping bag`, `calculator`, `box`, `money bill
+  alternate`, `list`, `sign in`, `sign out`, `warehouse`, `user circle`
+  respectivamente). El usuario los detectó a simple vista porque el ícono
+  quedaba en blanco junto al texto del menú — señal a tener en cuenta para
+  detectar el mismo patrón de bug a futuro.
+- **Sidebar del panel admin (escritorio) es angosto por defecto** (solo íconos,
+  `--sidebar-collapsed-width: 72px`) y se expande a `--sidebar-width` (264px) con
+  `:hover`, flotando por encima del contenido (`position:fixed`, no empuja el
+  layout). El contenido (`.admin-main`) siempre tiene `margin-left` del ancho
+  colapsado. Los textos/labels que se ocultan cuando está colapsado llevan la
+  clase `.admin-sidebar-texto` (opacity 0/1 según `.admin-sidebar:hover`); el
+  `.capas-menu` (selector de sección) se oculta igual mientras está colapsado.
+  En mobile (`max-width:768px`) esto se anula por completo: el sidebar vuelve a
+  ser el panel deslizante de ancho completo de siempre (con el botón hamburguesa),
+  porque el touch no dispara `:hover` de forma confiable — ver el bloque
+  `@media (max-width:768px)` que fuerza `width` y `opacity` con `!important`.
+  Como cada click de navegación es una recarga de página completa (no es una
+  SPA), el sidebar vuelve a arrancar colapsado solo con cargar la página
+  siguiente — no hace falta JS para "volver a colapsar después de un click".
 
 ## Convenciones de colaboración con este usuario
 

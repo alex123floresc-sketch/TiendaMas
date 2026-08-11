@@ -22,7 +22,7 @@
     <div class="capas-menu">
       <a href="/dashboard" class="admin-brand">
         <span class="admin-brand-badge"><i class="shop icon"></i></span>
-        <span class="admin-brand-text">TiendaMas <small>Panel Administrador</small></span>
+        <span class="admin-brand-text admin-sidebar-texto">TiendaMas <small>Panel Administrador</small></span>
       </a>
       <button type="button" class="capas-menu-toggle" aria-label="Cambiar de sección" aria-expanded="false" aria-haspopup="true">
         <i class="chevron down icon"></i>
@@ -32,60 +32,60 @@
 
     <nav class="admin-sidebar-nav">
 
-      <div class="admin-nav-section-label">Catálogo</div>
-      <a href="/productos" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/productos')} ? 'seccion-actual'">
-        <i class="boxes icon"></i> Productos
+      <div class="admin-nav-section-label admin-sidebar-texto">Catálogo</div>
+      <a href="/productos" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/productos')} ? 'seccion-actual'" title="Productos">
+        <i class="boxes icon"></i> <span class="admin-sidebar-texto">Productos</span>
       </a>
-      <a href="/categorias" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/categorias')} ? 'seccion-actual'">
-        <i class="tags icon"></i> Categorías
-      </a>
-
-      <div class="admin-nav-section-label">Ventas</div>
-      <a href="/pedidos" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/pedidos')} ? 'seccion-actual'">
-        <i class="list icon"></i> Pedidos
-      </a>
-      <a href="/reportes" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/reportes')} ? 'seccion-actual'">
-        <i class="chart bar icon"></i> Reportes
-      </a>
-      <a href="/devoluciones" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/devoluciones')} ? 'seccion-actual'">
-        <i class="sync alternate icon"></i> Cambios y devoluciones
+      <a href="/categorias" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/categorias')} ? 'seccion-actual'" title="Categorías">
+        <i class="tags icon"></i> <span class="admin-sidebar-texto">Categorías</span>
       </a>
 
-      <div class="admin-nav-section-label">Marketing</div>
-      <a href="/suscriptores" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/suscriptores')} ? 'seccion-actual'">
-        <i class="envelope open icon"></i> Suscriptores
+      <div class="admin-nav-section-label admin-sidebar-texto">Ventas</div>
+      <a href="/pedidos" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/pedidos')} ? 'seccion-actual'" title="Pedidos">
+        <i class="list icon"></i> <span class="admin-sidebar-texto">Pedidos</span>
       </a>
-      <a href="/contenido" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/contenido')} ? 'seccion-actual'">
-        <i class="edit outline icon"></i> Contenido del sitio
+      <a href="/reportes" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/reportes')} ? 'seccion-actual'" title="Reportes">
+        <i class="chart bar icon"></i> <span class="admin-sidebar-texto">Reportes</span>
       </a>
-
-      <div class="admin-nav-section-label">Finanzas</div>
-      <a href="/gastos" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/gastos')} ? 'seccion-actual'">
-        <i class="money bill wave icon"></i> Gastos
-      </a>
-      <a href="/sueldos" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/sueldos')} ? 'seccion-actual'">
-        <i class="id badge icon"></i> Sueldos
+      <a href="/devoluciones" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/devoluciones')} ? 'seccion-actual'" title="Cambios y devoluciones">
+        <i class="sync alternate icon"></i> <span class="admin-sidebar-texto">Cambios y devoluciones</span>
       </a>
 
-      <div class="admin-nav-section-label">Personas</div>
-      <a href="/personas" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/personas')} ? 'seccion-actual'">
-        <i class="users icon"></i> Clientes
+      <div class="admin-nav-section-label admin-sidebar-texto">Marketing</div>
+      <a href="/suscriptores" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/suscriptores')} ? 'seccion-actual'" title="Suscriptores">
+        <i class="envelope open icon"></i> <span class="admin-sidebar-texto">Suscriptores</span>
       </a>
-      <a href="/usuarios" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/usuarios')} ? 'seccion-actual'">
-        <i class="user shield icon"></i> Usuarios
+      <a href="/contenido" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/contenido')} ? 'seccion-actual'" title="Contenido del sitio">
+        <i class="edit outline icon"></i> <span class="admin-sidebar-texto">Contenido del sitio</span>
+      </a>
+
+      <div class="admin-nav-section-label admin-sidebar-texto">Finanzas</div>
+      <a href="/gastos" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/gastos')} ? 'seccion-actual'" title="Gastos">
+        <i class="money bill alternate icon"></i> <span class="admin-sidebar-texto">Gastos</span>
+      </a>
+      <a href="/sueldos" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/sueldos')} ? 'seccion-actual'" title="Sueldos">
+        <i class="id badge icon"></i> <span class="admin-sidebar-texto">Sueldos</span>
+      </a>
+
+      <div class="admin-nav-section-label admin-sidebar-texto">Personas</div>
+      <a href="/personas" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/personas')} ? 'seccion-actual'" title="Clientes">
+        <i class="users icon"></i> <span class="admin-sidebar-texto">Clientes</span>
+      </a>
+      <a href="/usuarios" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/usuarios')} ? 'seccion-actual'" title="Usuarios">
+        <i class="user circle icon"></i> <span class="admin-sidebar-texto">Usuarios</span>
       </a>
 
     </nav>
 
     <div class="admin-sidebar-footer">
-      <a href="/pos" class="admin-nav-item">
-        <i class="cash register icon"></i> Punto de venta
+      <a href="/pos" class="admin-nav-item" title="Punto de venta">
+        <i class="calculator icon"></i> <span class="admin-sidebar-texto">Punto de venta</span>
       </a>
-      <a href="/perfil" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/perfil')} ? 'seccion-actual'">
-        <i class="user icon"></i> <span th:text="${usuarioAutenticado}">Usuario</span>
+      <a href="/perfil" class="admin-nav-item" th:classappend="${uri != null and uri.startsWith('/perfil')} ? 'seccion-actual'" title="Mi perfil">
+        <i class="user icon"></i> <span class="admin-sidebar-texto" th:text="${usuarioAutenticado}">Usuario</span>
       </a>
       <form th:action="@{/logout}" method="post" class="logout-link-form">
-        <button type="submit" class="logout-link-button"><i class="sign out alternate icon"></i> Salir</button>
+        <button type="submit" class="logout-link-button" title="Salir"><i class="sign out icon"></i> <span class="admin-sidebar-texto">Salir</span></button>
       </form>
     </div>
 
@@ -104,7 +104,7 @@
 
   <a href="/pos" class="capas-menu-item" th:if="${esAdmin or esVendedor}"
      th:classappend="${currentUri != null and currentUri.startsWith('/pos')} ? 'activo'">
-    <span class="capas-menu-item-icon"><i class="cash register icon"></i></span>
+    <span class="capas-menu-item-icon"><i class="calculator icon"></i></span>
     <span class="capas-menu-item-texto"><strong>Punto de venta</strong><small>Ventas rápidas en mostrador</small></span>
   </a>
 

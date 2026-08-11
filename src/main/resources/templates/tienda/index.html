@@ -26,7 +26,7 @@
         <div class="tienda-beneficio"><i class="truck icon"></i> Envío a todo el país</div>
         <div class="tienda-beneficio"><i class="sync alternate icon"></i> Cambios sin costo</div>
         <div class="tienda-beneficio"><i class="lock icon"></i> Pago 100% seguro</div>
-        <div class="tienda-beneficio"><i class="store icon"></i> Retiro gratis en tienda</div>
+        <div class="tienda-beneficio"><i class="warehouse icon"></i> Retiro gratis en tienda</div>
     </div>
 
     <!-- Apartado: categorías destacadas en tarjetas visuales -->
@@ -215,7 +215,7 @@
         </div>
 
         <div class="tienda-empty" th:if="${productos.isEmpty()}">
-            <i class="box open icon"></i>
+            <i class="box icon"></i>
             <h3 th:if="${q != null and !q.isBlank()}">No encontramos productos que coincidan con tu búsqueda</h3>
             <h3 th:unless="${q != null and !q.isBlank()}">No hay productos disponibles en esta categoría por ahora</h3>
             <p>Probá con otra palabra o mirá el catálogo completo.</p>

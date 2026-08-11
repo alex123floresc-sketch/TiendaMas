@@ -30,6 +30,7 @@ body {
 
 :root {
     --sidebar-width: 264px;
+    --sidebar-collapsed-width: 72px;
     --sidebar-bg: var(--color-navy-dark);
     --sidebar-text: #94A3B8;
     --topbar-height: 58px;
@@ -73,18 +74,41 @@ body {
     display: none;
 }
 
-/* --- Sidebar (menú lateral izquierdo) --- */
+/* --- Sidebar (menú lateral izquierdo) ---
+   En escritorio arranca angosto (solo íconos) para dejarle toda la pantalla al
+   contenido; al pasar el mouse por encima se expande y muestra las etiquetas,
+   flotando por encima del contenido (no lo empuja, así no hay salto de layout).
+   Como cada click es una navegación de página completa, el sidebar vuelve a
+   arrancar colapsado solo con volver a cargar la página siguiente. */
 .admin-sidebar {
     position: fixed;
     top: 0;
     left: 0;
-    width: var(--sidebar-width);
+    width: var(--sidebar-collapsed-width);
     height: 100vh;
     background: var(--sidebar-bg);
     display: flex;
     flex-direction: column;
     z-index: 120;
+    overflow-x: hidden;
     overflow-y: auto;
+    transition: width 0.2s ease, box-shadow 0.2s ease;
+}
+.admin-sidebar:hover {
+    width: var(--sidebar-width);
+    box-shadow: 6px 0 28px rgba(10, 18, 31, 0.35);
+}
+.admin-sidebar-texto {
+    opacity: 1;
+    transition: opacity 0.15s ease;
+    white-space: nowrap;
+}
+.admin-sidebar:not(:hover) .admin-sidebar-texto {
+    opacity: 0;
+}
+.admin-sidebar:not(:hover) .capas-menu {
+    opacity: 0;
+    pointer-events: none;
 }
 
 /* --- Marca --- */
@@ -422,9 +446,11 @@ body {
     font-weight: 600;
 }
 
-/* Contenido principal (a la derecha del sidebar) */
+/* Contenido principal (a la derecha del sidebar). El margen es el ancho COLAPSADO
+   a propósito: el sidebar expandido flota por encima (position:fixed) en vez de
+   empujar el contenido, para que mostrarlo con el mouse no reacomode la página. */
 .admin-main {
-    margin-left: var(--sidebar-width);
+    margin-left: var(--sidebar-collapsed-width);
 }
 .admin-content {
     padding: 40px;
@@ -3382,12 +3408,21 @@ body {
         display: flex;
     }
     .admin-sidebar {
+        /* En móvil el sidebar es el panel deslizante de siempre (ancho completo,
+           oculto/mostrado con el botón hamburguesa) — el modo angosto+hover de
+           escritorio no aplica porque el touch no tiene ":hover" confiable. */
+        width: var(--sidebar-width) !important;
         transform: translateX(-100%);
         transition: transform 0.25s ease;
         box-shadow: 0 0 30px rgba(0, 0, 0, 0.35);
     }
     .admin-sidebar.open {
         transform: translateX(0);
+    }
+    .admin-sidebar-texto,
+    .admin-sidebar .capas-menu {
+        opacity: 1!important;
+        pointer-events: auto !important;
     }
     .admin-sidebar-overlay {
         display: block;
