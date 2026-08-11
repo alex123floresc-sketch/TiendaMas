@@ -154,6 +154,24 @@ etc.) — no sirven como referencia histórica, hay que mirar el diff si hace fa
   cualquier página que use ese layout. **Usar siempre este patrón para cualquier listado
   horizontal de productos** — ya se unificó "también te puede interesar" del detalle de
   producto para no tener un grid estático distinto al resto.
+- Patrón de pestañas para páginas admin largas (usado en `reportes/index.html`):
+  `.reporte-tabs` (botones `.reporte-tab[data-tab]`, uno `.activo`) +
+  `.reporte-tab-panel#panel-<tab>` por sección, ocultos con `style="display:none"`
+  salvo el primero. El JS de cada página arma el listener de click que alterna
+  `.activo`/`display`. **Si un panel tiene un `<canvas>` de Chart.js, hay que crear
+  ese gráfico recién cuando el panel se muestra por primera vez** (lazy init, con una
+  bandera tipo `ventasGraficosListos`), nunca en `DOMContentLoaded` a ciegas: un
+  canvas dentro de un contenedor `display:none` mide 0×0 en el momento de crear el
+  `Chart`, y aunque el panel se muestre después el gráfico queda roto/en blanco.
+- **"tshirt icon" (y variantes) NO es un ícono válido en Semantic UI 2.5.0** — no
+  existe en su hoja de íconos (verificado contra el CSS real del CDN), así que se
+  renderiza vacío/invisible. Se usó por error en varios lugares para representar
+  "Productos" (sidebar admin, header de /productos, accesos rápidos, tarjeta de
+  reportes) y ya se corrigió a `boxes icon` (o `shopping bag icon` donde `boxes` ya
+  estaba tomado por otra tarjeta en la misma grilla). Antes de usar un ícono nuevo
+  que no esté ya probado en este proyecto, conviene verificarlo contra
+  `https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/components/icon.min.css`
+  en vez de asumir que existe por analogía con Font Awesome.
 
 ## Trampas ya encontradas (no las vuelvas a pisar)
 

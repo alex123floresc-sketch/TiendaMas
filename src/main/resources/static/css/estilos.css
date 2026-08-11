@@ -710,7 +710,9 @@ body {
 }
 
 /* --- Reportes: navegación rápida entre secciones (fija al hacer scroll en un reporte largo) --- */
-.reporte-nav {
+/* --- Reportes: pestañas (agrupan las secciones por tema en vez de mostrarlas
+   todas apiladas en una sola página larga) --- */
+.reporte-tabs {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
@@ -721,21 +723,36 @@ body {
     background: var(--color-cream);
     padding: 10px 0;
 }
-.reporte-nav a {
+.reporte-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     background: var(--color-white);
     border: 1px solid var(--color-beige-dark);
     border-radius: 999px;
-    padding: 6px 14px;
-    font-size: 0.82em;
+    padding: 8px 16px;
+    font-size: 0.85em;
     font-weight: 600;
     color: var(--color-text-muted);
-    text-decoration: none;
-    transition: border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease, transform 0.15s ease, background 0.15s ease;
 }
-.reporte-nav a:hover {
+.reporte-tab:hover {
     border-color: var(--color-blue);
     color: var(--color-blue);
     transform: translateY(-2px);
+}
+.reporte-tab.activo {
+    background: var(--color-blue);
+    border-color: var(--color-blue);
+    color: var(--color-white);
+}
+.reporte-tab-panel {
+    animation: reporteTabIn 0.18s ease;
+}
+@keyframes reporteTabIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* --- Reportes: títulos de sección consistentes --- */
@@ -750,7 +767,7 @@ body {
     border-top: 1px solid var(--color-beige-dark);
     scroll-margin-top: 20px;
 }
-.reporte-seccion-titulo:first-of-type {
+.reporte-tab-panel > .reporte-seccion-titulo:first-child {
     border-top: none;
     padding-top: 0;
     margin-top: 10px;
