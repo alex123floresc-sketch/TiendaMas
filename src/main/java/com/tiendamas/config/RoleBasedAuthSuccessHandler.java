@@ -22,8 +22,12 @@ public class RoleBasedAuthSuccessHandler implements AuthenticationSuccessHandler
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                          Authentication authentication) throws IOException, ServletException {
+        // SecurityConfig instala un RequestCache que solo guarda GETs seguros de repetir
+        // (ver su bean "requestCache"), así que acá alcanza con leerlo y limpiarlo siempre
+        // para que no quede pegado un destino viejo en logueos futuros.
         SavedRequest savedRequest = requestCache.getRequest(request, response);
         if (savedRequest != null) {
+            requestCache.removeRequest(request, response);
             response.sendRedirect(savedRequest.getRedirectUrl());
             return;
         }

@@ -7,6 +7,8 @@ import com.tiendamas.service.PersonaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,9 +58,24 @@ public class PersonaController {
     }
 
     @PostMapping
-    public String guardar(Persona persona) {
+    public String guardar(Persona persona, Authentication authentication) {
         personaService.guardar(persona);
-        return "redirect:/personas";
+        // Un VENDEDOR puede llegar acá desde el POS (registro rápido de cliente al vuelo),
+        // pero /personas (el listado) es solo de ADMIN: mandarlo ahí le daría un 403
+        // justo después de guardar con éxito.
+        if (esAdmin(authentication)) {
+            return "redirect:/personas";
+        }
+        return "redirect:/pos";
+    }
+
+    private boolean esAdmin(Authentication authentication) {
+        for (GrantedAuthority authority : authentication.getAuthorities()) {
+            if ("ROLE_ADMIN".equals(authority.getAuthority())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @PostMapping("/{id}")
