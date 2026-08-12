@@ -25,58 +25,138 @@
         </div>
     </div>
 
-    <div class="ui icon input list-search" th:unless="${gastos.isEmpty()}">
-        <i class="search icon"></i>
-        <input type="text" placeholder="Buscar por concepto, categoría o fecha..." aria-label="Buscar gastos"
-               oninput="filtrarTabla(this, 'tablaGastos')">
-    </div>
-    <div id="tablaGastosSinResultados" class="ui icon info message" style="display:none;">
-        <i class="search icon"></i>
-        <div class="content">No se encontraron gastos con ese criterio de búsqueda.</div>
-    </div>
+    <th:block th:unless="${gastos.isEmpty()}">
 
-    <table id="tablaGastos" class="ui celled striped table" th:unless="${gastos.isEmpty()}">
-        <thead>
-        <tr>
-            <th>Concepto</th>
-            <th>Categoría</th>
-            <th>Fecha</th>
-            <th class="right aligned">Monto</th>
-            <th>Recurrencia</th>
-            <th class="center aligned">Acciones</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="gasto : ${gastos}">
-            <td th:text="${gasto.concepto}" style="font-weight:bold;"></td>
-            <td><span class="ui teal tiny label" th:text="${gasto.categoria}"></span></td>
-            <td th:text="${gasto.fecha}"></td>
-            <td class="right aligned" th:text="'S/ ' + ${#numbers.formatDecimal(gasto.monto, 1, 2)}"></td>
-            <td>
-                <span th:if="${gasto.recurrente}" class="ui small label" th:text="${gasto.frecuencia}"></span>
-                <span th:unless="${gasto.recurrente}" class="hint" style="margin:0;">Único</span>
-            </td>
-            <td class="center aligned">
-                <div class="ui small buttons">
-                    <a th:href="@{/gastos/{id}/editar(id=${gasto.id})}" class="ui yellow button" title="Editar">
-                        <i class="edit icon"></i>
-                    </a>
-                    <form th:if="${gasto.recurrente}" th:action="@{/gastos/{id}/duplicar(id=${gasto.id})}" method="post" style="display:contents">
-                        <button type="submit" class="ui blue button" title="Repetir este mes">
-                            <i class="redo icon"></i>
-                        </button>
-                    </form>
-                    <form th:action="@{/gastos/{id}/eliminar(id=${gasto.id})}" method="post" style="display:contents"
-                          th:onsubmit="return confirm('¿Está seguro de eliminar este gasto?')">
-                        <button type="submit" class="ui red button" title="Eliminar">
-                            <i class="trash icon"></i>
-                        </button>
-                    </form>
+        <div class="ui stackable statistics reporte-stats-grid-4" style="margin-bottom: 30px;">
+            <div class="statistic reporte-stat-card peligro">
+                <i class="money bill alternate icon"></i>
+                <div class="value" th:text="'S/ ' + ${#numbers.formatDecimal(totalGastoMesActual, 1, 2)}"></div>
+                <div class="label">Gastado este mes</div>
+                <div class="reporte-stat-card-extra">
+                    <span></span>
+                    <span class="reporte-kpi-variacion" th:unless="${comparacionGastoMes.sinBase}"
+                          th:classappend="${comparacionGastoMes.subio} ? 'negativa' : (${comparacionGastoMes.bajo} ? 'positiva' : '')">
+                        <i th:class="${comparacionGastoMes.subio} ? 'arrow up icon' : (${comparacionGastoMes.bajo} ? 'arrow down icon' : 'minus icon')"></i>
+                        <span th:text="${#numbers.formatDecimal(comparacionGastoMes.variacionPorcentaje, 1, 1)} + '%'"></span>
+                    </span>
                 </div>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+            </div>
+            <div class="statistic reporte-stat-card ticket">
+                <i class="calculator icon"></i>
+                <div class="value" th:text="'S/ ' + ${#numbers.formatDecimal(gastoPromedio, 1, 2)}"></div>
+                <div class="label">Gasto promedio</div>
+                <div class="reporte-stat-card-extra">
+                    <span class="reporte-stat-card-sublabel">por registro, histórico</span>
+                </div>
+            </div>
+            <div class="statistic reporte-stat-card pedidos">
+                <i class="list icon"></i>
+                <div class="value" th:text="${cantidadGastos}"></div>
+                <div class="label">Gastos registrados</div>
+                <div class="reporte-stat-card-extra">
+                    <span class="reporte-stat-card-sublabel">histórico total</span>
+                </div>
+            </div>
+            <div class="statistic reporte-stat-card unidades">
+                <i class="redo icon"></i>
+                <div class="value" th:text="'S/ ' + ${#numbers.formatDecimal(totalRecurrente, 1, 2)}"></div>
+                <div class="label">En gastos recurrentes</div>
+                <div class="reporte-stat-card-extra">
+                    <span class="reporte-stat-card-sublabel">suma de los marcados como recurrentes</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="reporte-tabs">
+            <button type="button" class="reporte-tab activo" data-tab="resumen"><i class="tachometer alternate icon"></i> Resumen</button>
+            <button type="button" class="reporte-tab" data-tab="listado"><i class="list icon"></i> Listado</button>
+        </div>
+
+        <div class="reporte-tab-panel" id="panel-resumen">
+            <h2 class="reporte-seccion-titulo"><i class="tags icon"></i> Gastos por categoría</h2>
+            <div th:if="${#maps.isEmpty(gastosPorCategoria)}" class="ui info message">
+                <p>Aún no hay gastos categorizados.</p>
+            </div>
+            <table class="ui celled striped table" th:unless="${#maps.isEmpty(gastosPorCategoria)}">
+                <thead><tr><th>Categoría</th><th class="right aligned">Total gastado</th></tr></thead>
+                <tbody>
+                <tr th:each="entry : ${gastosPorCategoria}">
+                    <td th:text="${entry.key}" style="font-weight: bold;"></td>
+                    <td class="right aligned" th:text="'S/ ' + ${#numbers.formatDecimal(entry.value, 1, 2)}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="reporte-tab-panel" id="panel-listado" style="display:none">
+            <div class="ui icon input list-search">
+                <i class="search icon"></i>
+                <input type="text" placeholder="Buscar por concepto, categoría o fecha..." aria-label="Buscar gastos"
+                       oninput="filtrarTabla(this, 'tablaGastos')">
+            </div>
+            <div id="tablaGastosSinResultados" class="ui icon info message" style="display:none;">
+                <i class="search icon"></i>
+                <div class="content">No se encontraron gastos con ese criterio de búsqueda.</div>
+            </div>
+
+            <table id="tablaGastos" class="ui celled striped table">
+                <thead>
+                <tr>
+                    <th>Concepto</th>
+                    <th>Categoría</th>
+                    <th>Fecha</th>
+                    <th class="right aligned">Monto</th>
+                    <th>Recurrencia</th>
+                    <th class="center aligned">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="gasto : ${gastos}">
+                    <td th:text="${gasto.concepto}" style="font-weight:bold;"></td>
+                    <td><span class="ui teal tiny label" th:text="${gasto.categoria}"></span></td>
+                    <td th:text="${gasto.fecha}"></td>
+                    <td class="right aligned" th:text="'S/ ' + ${#numbers.formatDecimal(gasto.monto, 1, 2)}"></td>
+                    <td>
+                        <span th:if="${gasto.recurrente}" class="ui small label" th:text="${gasto.frecuencia}"></span>
+                        <span th:unless="${gasto.recurrente}" class="hint" style="margin:0;">Único</span>
+                    </td>
+                    <td class="center aligned">
+                        <div class="ui small buttons">
+                            <a th:href="@{/gastos/{id}/editar(id=${gasto.id})}" class="ui yellow button" title="Editar">
+                                <i class="edit icon"></i>
+                            </a>
+                            <form th:if="${gasto.recurrente}" th:action="@{/gastos/{id}/duplicar(id=${gasto.id})}" method="post" style="display:contents">
+                                <button type="submit" class="ui blue button" title="Repetir este mes">
+                                    <i class="redo icon"></i>
+                                </button>
+                            </form>
+                            <form th:action="@{/gastos/{id}/eliminar(id=${gasto.id})}" method="post" style="display:contents"
+                                  th:onsubmit="return confirm('¿Está seguro de eliminar este gasto?')">
+                                <button type="submit" class="ui red button" title="Eliminar">
+                                    <i class="trash icon"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </th:block>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.reporte-tab').forEach(function (boton) {
+            boton.addEventListener('click', function () {
+                const tab = boton.dataset.tab;
+                document.querySelectorAll('.reporte-tab').forEach(function (b) { b.classList.remove('activo'); });
+                document.querySelectorAll('.reporte-tab-panel').forEach(function (p) { p.style.display = 'none'; });
+                boton.classList.add('activo');
+                document.getElementById('panel-' + tab).style.display = '';
+            });
+        });
+    });
+    </script>
 </div>
 </body>
 </html>

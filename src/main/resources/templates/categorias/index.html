@@ -30,6 +30,19 @@
         </div>
     </div>
 
+    <div class="ui stackable statistics reporte-stats-grid-2" style="margin-bottom: 30px;" th:unless="${categoriasPrincipales.isEmpty()}">
+        <div class="statistic reporte-stat-card pedidos">
+            <i class="tags icon"></i>
+            <div class="value" th:text="${categoriasPrincipales.size()}"></div>
+            <div class="label">Categorías principales</div>
+        </div>
+        <div class="statistic reporte-stat-card clientes">
+            <i class="level up alternate icon"></i>
+            <div class="value" th:text="${totalSubcategorias}"></div>
+            <div class="label">Subcategorías</div>
+        </div>
+    </div>
+
     <table class="ui celled striped table" th:unless="${categoriasPrincipales.isEmpty()}">
         <thead>
         <tr>

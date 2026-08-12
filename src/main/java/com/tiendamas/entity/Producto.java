@@ -2,6 +2,7 @@ package com.tiendamas.entity;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +33,10 @@ public class Producto {
     @OrderBy("orden ASC")
     private List<ImagenProducto> imagenes = new ArrayList<>();
 
+    /** Productos creados antes de agregar este campo quedan en null (no cuentan como
+     *  "nuevos" retroactivamente en Reportes, que es el comportamiento correcto). */
+    private LocalDateTime fechaCreacion = LocalDateTime.now();
+
     public Producto() {}
 
     public Producto(String nombre, String descripcion, Double precio, Categoria categoria) {
@@ -58,6 +63,9 @@ public class Producto {
 
     public String getMarca() { return marca; }
     public void setMarca(String marca) { this.marca = marca; }
+
+    public LocalDateTime getFechaCreacion() { return fechaCreacion; }
+    public void setFechaCreacion(LocalDateTime fechaCreacion) { this.fechaCreacion = fechaCreacion; }
 
     public String getImagenUrl() { return imagenUrl; }
     public void setImagenUrl(String imagenUrl) { this.imagenUrl = imagenUrl; }

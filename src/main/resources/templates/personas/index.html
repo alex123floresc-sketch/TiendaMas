@@ -30,6 +30,27 @@
         </div>
     </div>
 
+    <div class="ui stackable statistics reporte-stats-grid" style="margin-bottom: 30px;" th:if="${personas != null and not #lists.isEmpty(personas)}">
+        <div class="statistic reporte-stat-card pedidos">
+            <i class="users icon"></i>
+            <div class="value" th:text="${personas.size()}"></div>
+            <div class="label">Clientes</div>
+        </div>
+        <div class="statistic reporte-stat-card ventas">
+            <i class="money bill alternate icon"></i>
+            <div class="value" th:text="'S/ ' + ${#numbers.formatDecimal(totalComprado, 1, 2)}"></div>
+            <div class="label">Total comprado</div>
+            <div class="reporte-stat-card-extra">
+                <span class="reporte-stat-card-sublabel">histórico total</span>
+            </div>
+        </div>
+        <div class="statistic reporte-stat-card ticket">
+            <i class="calculator icon"></i>
+            <div class="value" th:text="'S/ ' + ${#numbers.formatDecimal(ticketPromedioCliente, 1, 2)}"></div>
+            <div class="label">Promedio por cliente</div>
+        </div>
+    </div>
+
     <div class="ui icon input list-search" th:if="${personas != null and not #lists.isEmpty(personas)}">
         <i class="search icon"></i>
         <input type="text" placeholder="Buscar por nombre, email o teléfono..." aria-label="Buscar clientes"

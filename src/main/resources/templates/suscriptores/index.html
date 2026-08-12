@@ -19,7 +19,32 @@
         </div>
     </div>
 
-    <table class="ui celled striped table" th:unless="${suscriptores.isEmpty()}">
+    <th:block th:unless="${suscriptores.isEmpty()}">
+
+        <div class="ui stackable statistics reporte-stats-grid-2" style="margin-bottom: 30px;">
+            <div class="statistic reporte-stat-card pedidos">
+                <i class="envelope open icon"></i>
+                <div class="value" th:text="${suscriptores.size()}"></div>
+                <div class="label">Suscriptores</div>
+            </div>
+            <div class="statistic reporte-stat-card ventas">
+                <i class="user plus icon"></i>
+                <div class="value" th:text="${suscriptoresNuevos}"></div>
+                <div class="label">Nuevos (últimos 30 días)</div>
+            </div>
+        </div>
+
+        <div class="ui icon input list-search">
+            <i class="search icon"></i>
+            <input type="text" placeholder="Buscar por correo..." aria-label="Buscar suscriptores"
+                   oninput="filtrarTabla(this, 'tablaSuscriptores')">
+        </div>
+        <div id="tablaSuscriptoresSinResultados" class="ui icon info message" style="display:none;">
+            <i class="search icon"></i>
+            <div class="content">No se encontraron suscriptores con ese criterio de búsqueda.</div>
+        </div>
+
+    <table id="tablaSuscriptores" class="ui celled striped table">
         <thead>
         <tr>
             <th class="one wide">ID</th>
@@ -44,6 +69,7 @@
         </tr>
         </tbody>
     </table>
+    </th:block>
 </div>
 </body>
 </html>

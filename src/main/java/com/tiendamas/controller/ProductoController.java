@@ -17,7 +17,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/productos")
@@ -32,11 +34,37 @@ public class ProductoController {
     @Autowired
     private ImagenStorage imagenStorage;
 
+    private static final int STOCK_BAJO_UMBRAL = 5;
+
     @GetMapping
     public String listar(Model model) {
-        model.addAttribute("productos", productoService.obtenerTodos());
+        List<Producto> productos = productoService.obtenerTodos();
+        model.addAttribute("productos", productos);
+        model.addAllAttributes(calcularKpis(productos));
         model.addAttribute("titulo", "Productos");
         return "productos/index";
+    }
+
+    private Map<String, Object> calcularKpis(List<Producto> productos) {
+        double valorInventario = productos.stream()
+                .mapToDouble(p -> (p.getPrecio() != null ? p.getPrecio() : 0.0) * p.getStock())
+                .sum();
+        long sinStock = productos.stream().filter(p -> p.getStock() == 0).count();
+        long stockBajo = productos.stream().filter(p -> p.getStock() > 0 && p.getStock() <= STOCK_BAJO_UMBRAL).count();
+
+        Map<String, Integer> productosPorCategoria = new LinkedHashMap<>();
+        for (Producto p : productos) {
+            String categoriaNombre = p.getCategoria() != null ? p.getCategoria().getNombre() : "Sin categoría";
+            productosPorCategoria.merge(categoriaNombre, 1, Integer::sum);
+        }
+
+        Map<String, Object> datos = new LinkedHashMap<>();
+        datos.put("totalProductosCount", productos.size());
+        datos.put("valorInventario", valorInventario);
+        datos.put("productosSinStock", sinStock);
+        datos.put("productosStockBajo", stockBajo);
+        datos.put("productosPorCategoria", productosPorCategoria);
+        return datos;
     }
 
     @GetMapping("/nuevo")

@@ -24,7 +24,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/pedidos")
@@ -50,9 +52,35 @@ public class PedidoController {
 
     @GetMapping
     public String listar(Model model) {
-        model.addAttribute("pedidos", pedidoService.obtenerTodos());
+        List<Pedido> pedidos = pedidoService.obtenerTodos();
+        model.addAttribute("pedidos", pedidos);
+        model.addAllAttributes(calcularKpis(pedidos));
         model.addAttribute("titulo", "Ventas");
         return "pedidos/index";
+    }
+
+    /** KPIs simples del histórico completo (sin comparación de período: Reportes ya
+     *  cubre esa vista con filtro de fechas propio, duplicarla acá sería redundante). */
+    private Map<String, Object> calcularKpis(List<Pedido> pedidos) {
+        double totalVendido = pedidos.stream().mapToDouble(p -> p.getTotal() != null ? p.getTotal() : 0.0).sum();
+        double ticketPromedio = pedidos.isEmpty() ? 0.0 : totalVendido / pedidos.size();
+        long pedidosEnCurso = pedidos.stream()
+                .filter(p -> p.getEstado() == EstadoPedido.PENDIENTE || p.getEstado() == EstadoPedido.EN_CAMINO)
+                .count();
+
+        Map<String, Integer> pedidosPorEstado = new LinkedHashMap<>();
+        for (Pedido p : pedidos) {
+            String estadoNombre = p.getEstado() != null ? p.getEstado().getEtiqueta() : "Sin estado";
+            pedidosPorEstado.merge(estadoNombre, 1, Integer::sum);
+        }
+
+        Map<String, Object> datos = new LinkedHashMap<>();
+        datos.put("totalPedidosCount", pedidos.size());
+        datos.put("totalVendido", totalVendido);
+        datos.put("ticketPromedio", ticketPromedio);
+        datos.put("pedidosEnCurso", pedidosEnCurso);
+        datos.put("pedidosPorEstado", pedidosPorEstado);
+        return datos;
     }
 
     @GetMapping("/nuevo")

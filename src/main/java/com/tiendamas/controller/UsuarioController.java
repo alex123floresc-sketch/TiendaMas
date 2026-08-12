@@ -27,6 +27,9 @@ public class UsuarioController {
     public String listar(Model model) {
         List<Usuario> usuarios = usuarioService.obtenerTodos();
         model.addAttribute("usuarios", usuarios);
+        model.addAttribute("usuariosActivos", usuarios.stream().filter(Usuario::isActivo).count());
+        model.addAttribute("usuariosVendedores", usuarios.stream().filter(u -> u.getRol() == RolUsuario.VENDEDOR).count());
+        model.addAttribute("usuariosAdmins", usuarios.stream().filter(u -> u.getRol() == RolUsuario.ADMIN).count());
         model.addAttribute("titulo", "Usuarios");
         return "usuarios/index";
     }

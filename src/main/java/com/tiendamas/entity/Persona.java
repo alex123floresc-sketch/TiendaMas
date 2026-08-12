@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 public class Persona {
@@ -38,6 +39,11 @@ public class Persona {
 
     /** Puntos del programa de fidelización, acumulados con cada compra y canjeables por cupones. */
     private Integer puntosFidelidad = 0;
+
+    /** Los clientes creados antes de agregar este campo quedan en null y simplemente
+     *  no cuentan como "nuevos" en las comparaciones de Reportes — es el comportamiento
+     *  correcto, no un bug. */
+    private LocalDateTime fechaRegistro = LocalDateTime.now();
 
     public Persona() {
     }
@@ -124,6 +130,9 @@ public class Persona {
 
     public Integer getPuntosFidelidad() { return puntosFidelidad; }
     public void setPuntosFidelidad(Integer puntosFidelidad) { this.puntosFidelidad = puntosFidelidad; }
+
+    public LocalDateTime getFechaRegistro() { return fechaRegistro; }
+    public void setFechaRegistro(LocalDateTime fechaRegistro) { this.fechaRegistro = fechaRegistro; }
 
     @Transient
     public TipoComprobante getTipoComprobanteSugerido() {

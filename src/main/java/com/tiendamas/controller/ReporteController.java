@@ -230,6 +230,18 @@ public class ReporteController {
         ComparacionKpi comparacionUnidades = new ComparacionKpi(totalUnidades, unidadesAnterior);
         ComparacionKpi comparacionTicket = new ComparacionKpi(ticketPromedio, ticketAnterior);
 
+        // Clientes/productos "nuevos" del período, contra el mismo período anterior. Los
+        // registros creados antes de agregar fechaRegistro/fechaCreacion quedan en null y
+        // no cuentan como nuevos en ningún período — no altera el histórico existente.
+        List<Persona> todasLasPersonas = personaService.obtenerTodas();
+        long clientesNuevos = contarEnRango(todasLasPersonas.stream().map(Persona::getFechaRegistro), inicioActual, finActual);
+        long clientesNuevosAnterior = contarEnRango(todasLasPersonas.stream().map(Persona::getFechaRegistro), inicioAnterior, finAnterior);
+        ComparacionKpi comparacionClientes = new ComparacionKpi(clientesNuevos, clientesNuevosAnterior);
+
+        long productosNuevos = contarEnRango(productos.stream().map(Producto::getFechaCreacion), inicioActual, finActual);
+        long productosNuevosAnterior = contarEnRango(productos.stream().map(Producto::getFechaCreacion), inicioAnterior, finAnterior);
+        ComparacionKpi comparacionProductos = new ComparacionKpi(productosNuevos, productosNuevosAnterior);
+
         List<Map.Entry<String, Integer>> masVendidos = unidadesPorProducto.entrySet().stream()
                 .sorted((a, b) -> b.getValue() - a.getValue())
                 .limit(TOP_PRODUCTOS_LIMITE)
@@ -273,6 +285,8 @@ public class ReporteController {
         datos.put("comparacionPedidos", comparacionPedidos);
         datos.put("comparacionUnidades", comparacionUnidades);
         datos.put("comparacionTicket", comparacionTicket);
+        datos.put("comparacionClientes", comparacionClientes);
+        datos.put("comparacionProductos", comparacionProductos);
         datos.put("diasPeriodoComparado", diasPeriodo);
         datos.put("masVendidos", masVendidos);
         datos.put("ventasPorCategoria", ventasPorCategoria);
@@ -288,6 +302,14 @@ public class ReporteController {
         datos.put("resumenSemanal", resumenSemanal);
         datos.put("resumenMensualVentas", resumenMensualVentas);
         return datos;
+    }
+
+    private long contarEnRango(Stream<LocalDateTime> fechas, LocalDate desde, LocalDate hasta) {
+        return fechas
+                .filter(f -> f != null)
+                .map(LocalDateTime::toLocalDate)
+                .filter(f -> !f.isBefore(desde) && !f.isAfter(hasta))
+                .count();
     }
 
     private List<Pedido> filtrarPorFecha(List<Pedido> pedidos, LocalDate desde, LocalDate hasta) {

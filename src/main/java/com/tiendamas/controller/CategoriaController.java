@@ -28,7 +28,9 @@ public class CategoriaController {
         if (lista == null) {
             lista = new ArrayList<>();
         }
+        long subcategorias = lista.stream().mapToLong(c -> c.getSubcategorias().size()).sum();
         model.addAttribute("categoriasPrincipales", lista);
+        model.addAttribute("totalSubcategorias", subcategorias);
         model.addAttribute("titulo", "Categorías");
         return "categorias/index";
     }

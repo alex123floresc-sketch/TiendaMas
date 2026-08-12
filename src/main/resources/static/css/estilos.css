@@ -734,6 +734,11 @@ body {
 .reporte-btn-pdf {
     margin-left: auto !important;
 }
+.reporte-rango-rapido {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
 
 /* --- Reportes: navegación rápida entre secciones (fija al hacer scroll en un reporte largo) --- */
 /* --- Reportes: pestañas (agrupan las secciones por tema en vez de mostrarlas
@@ -814,6 +819,25 @@ body {
 .ui.statistics.reporte-stats-grid .statistic {
     margin: 0 !important;
 }
+/* Variantes de la misma grilla para páginas con otra cantidad fija de tarjetas KPI
+   (gastos, sueldos, pedidos, productos, devoluciones, personas, usuarios, etc.) —
+   mismo criterio de columnas fijas, nunca auto-fit, ver comentario arriba. */
+.ui.statistics.reporte-stats-grid-2 {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+.ui.statistics.reporte-stats-grid-2 .statistic {
+    margin: 0 !important;
+}
+.ui.statistics.reporte-stats-grid-4 {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+.ui.statistics.reporte-stats-grid-4 .statistic {
+    margin: 0 !important;
+}
 .reporte-stat-card {
     background: var(--color-white);
     border-radius: 10px;
@@ -841,6 +865,8 @@ body {
 .reporte-stat-card.clientes .icon { color: #0EA5E9; }
 .reporte-stat-card.productos { border-left-color: var(--color-navy); }
 .reporte-stat-card.productos .icon { color: var(--color-navy); }
+.reporte-stat-card.peligro { border-left-color: #EF4444; }
+.reporte-stat-card.peligro .icon { color: #EF4444; }
 
 /* Fila inferior de cada tarjeta: valor auxiliar + variación vs. período anterior */
 .reporte-stat-card-extra {
@@ -3488,8 +3514,12 @@ body {
     .admin-content {
         padding: 20px;
     }
-    .ui.statistics.reporte-stats-grid {
+    .ui.statistics.reporte-stats-grid,
+    .ui.statistics.reporte-stats-grid-4 {
         grid-template-columns: repeat(2, 1fr);
+    }
+    .ui.statistics.reporte-stats-grid-2 {
+        grid-template-columns: repeat(1, 1fr);
     }
     .container {
         padding: 20px;

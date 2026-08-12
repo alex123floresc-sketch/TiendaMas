@@ -38,6 +38,29 @@
         </div>
     </div>
 
+    <div class="ui stackable statistics reporte-stats-grid-4" style="margin-bottom: 30px;" th:if="${usuarios != null and not #lists.isEmpty(usuarios)}">
+        <div class="statistic reporte-stat-card productos">
+            <i class="user circle icon"></i>
+            <div class="value" th:text="${usuarios.size()}"></div>
+            <div class="label">Usuarios</div>
+        </div>
+        <div class="statistic reporte-stat-card ventas">
+            <i class="check circle icon"></i>
+            <div class="value" th:text="${usuariosActivos}"></div>
+            <div class="label">Activos</div>
+        </div>
+        <div class="statistic reporte-stat-card clientes">
+            <i class="calculator icon"></i>
+            <div class="value" th:text="${usuariosVendedores}"></div>
+            <div class="label">Vendedores</div>
+        </div>
+        <div class="statistic reporte-stat-card ticket">
+            <i class="shield alternate icon"></i>
+            <div class="value" th:text="${usuariosAdmins}"></div>
+            <div class="label">Administradores</div>
+        </div>
+    </div>
+
     <table class="ui celled striped table" th:if="${usuarios != null and not #lists.isEmpty(usuarios)}">
         <thead>
         <tr>

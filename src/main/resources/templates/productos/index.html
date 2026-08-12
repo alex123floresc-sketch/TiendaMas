@@ -30,86 +30,157 @@
         </div>
     </div>
 
-    <div class="list-search-row" th:unless="${productos.isEmpty()}">
-        <div class="ui icon input list-search">
-            <i class="search icon"></i>
-            <input type="text" id="buscarProductosInput" placeholder="Buscar por nombre, marca, código o categoría..." aria-label="Buscar productos"
-                   autocomplete="off" oninput="filtrarTabla(this, 'tablaProductos')">
-        </div>
-        <button type="button" class="ui icon button list-search-scan-btn" title="Escanear código de barras con la cámara" onclick="abrirEscanerBusqueda()">
-            <i class="camera icon"></i>
-        </button>
-    </div>
-    <div id="scanFlashBusqueda" class="pos-scan-flash"></div>
-    <div id="tablaProductosSinResultados" class="ui icon info message" style="display:none;">
-        <i class="search icon"></i>
-        <div class="content">No se encontraron productos con ese criterio de búsqueda.</div>
-    </div>
+    <th:block th:unless="${productos.isEmpty()}">
 
-    <div id="modalCamaraBusqueda" class="ui modal">
-        <div class="header">Escanear código de barras</div>
-        <div class="content">
-            <div id="readerBusqueda" style="width:100%"></div>
-        </div>
-        <div class="actions">
-            <button type="button" class="ui button" onclick="cerrarEscanerBusqueda()">Cerrar</button>
-        </div>
-    </div>
-
-    <table id="tablaProductos" class="ui celled striped table" th:unless="${productos.isEmpty()}">
-        <thead>
-        <tr>
-            <th class="one wide">ID</th>
-            <th class="one wide">Imagen</th>
-            <th class="three wide">Nombre</th>
-            <th class="four wide">Tallas / colores</th>
-            <th class="one wide">Precio</th>
-            <th class="one wide">Stock</th>
-            <th class="two wide">Categoría</th>
-            <th class="three wide center aligned">Acciones</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="producto : ${productos}">
-            <td th:text="${producto.id}"></td>
-            <td>
-                <div class="producto-thumb">
-                    <img th:if="${producto.imagenPrincipal != null}" th:src="@{${producto.imagenPrincipal}}" alt="Imagen del producto">
-                    <i th:unless="${producto.imagenPrincipal != null}" class="image icon"></i>
+        <div class="ui stackable statistics reporte-stats-grid-4" style="margin-bottom: 30px;">
+            <div class="statistic reporte-stat-card productos">
+                <i class="boxes icon"></i>
+                <div class="value" th:text="${totalProductosCount}"></div>
+                <div class="label">Productos</div>
+                <div class="reporte-stat-card-extra">
+                    <span class="reporte-stat-card-sublabel">en el catálogo</span>
                 </div>
-            </td>
-            <td>
-                <div style="font-weight: bold;" th:text="${producto.nombre}"></div>
-                <div class="hint" th:if="${producto.marca != null and !producto.marca.isEmpty()}" th:text="${producto.marca}"></div>
-            </td>
-            <td>
-                <span th:if="${producto.variantes.isEmpty()}" class="hint">Sin tallas cargadas</span>
-                <span class="ui tiny label" th:each="v : ${producto.variantes}"
-                      th:classappend="${v.stock != null and v.stock > 0} ? '' : 'grey'"
-                      th:text="${v.talla != null ? v.talla.etiqueta : '?'} + (${v.color != null and !v.color.isEmpty()} ? ' · ' + ${v.color} : '') + ' (' + ${v.stock} + ')'"></span>
-            </td>
-            <td th:text="'S/ ' + ${#numbers.formatDecimal(producto.precio, 1, 2)}" style="font-weight: bold; color: #21ba45;"></td>
-            <td th:text="${producto.stock}" class="center aligned"></td>
-            <td>
-                <span class="ui teal tiny label" th:text="${producto.categoria.nombre}"></span>
-            </td>
-            <td class="center aligned">
-                <div class="ui small buttons">
-                    <a th:href="@{/productos/{id}/editar(id=${producto.id})}" class="ui yellow button" title="Editar">
-                        <i class="edit icon"></i>
-                    </a>
-                    <form th:action="@{/productos/{id}/eliminar(id=${producto.id})}" method="post"
-                          style="display:contents" th:onsubmit="return confirm('¿Está seguro de eliminar este producto?')">
-                        <button type="submit" class="ui red button" title="Eliminar">
-                            <i class="trash icon"></i>
-                        </button>
-                    </form>
+            </div>
+            <div class="statistic reporte-stat-card ventas">
+                <i class="money bill alternate icon"></i>
+                <div class="value" th:text="'S/ ' + ${#numbers.formatDecimal(valorInventario, 1, 2)}"></div>
+                <div class="label">Valor de inventario</div>
+                <div class="reporte-stat-card-extra">
+                    <span class="reporte-stat-card-sublabel">precio × stock, todas las variantes</span>
                 </div>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+            </div>
+            <div class="statistic reporte-stat-card peligro">
+                <i class="times circle icon"></i>
+                <div class="value" th:text="${productosSinStock}"></div>
+                <div class="label">Sin stock</div>
+                <div class="reporte-stat-card-extra">
+                    <span class="reporte-stat-card-sublabel">stock total en cero</span>
+                </div>
+            </div>
+            <div class="statistic reporte-stat-card unidades">
+                <i class="warning sign icon"></i>
+                <div class="value" th:text="${productosStockBajo}"></div>
+                <div class="label">Stock bajo</div>
+                <div class="reporte-stat-card-extra">
+                    <span class="reporte-stat-card-sublabel">5 unidades o menos</span>
+                </div>
+            </div>
+        </div>
 
+        <div class="reporte-tabs">
+            <button type="button" class="reporte-tab activo" data-tab="resumen"><i class="tachometer alternate icon"></i> Resumen</button>
+            <button type="button" class="reporte-tab" data-tab="listado"><i class="list icon"></i> Listado</button>
+        </div>
+
+        <div class="reporte-tab-panel" id="panel-resumen">
+            <h2 class="reporte-seccion-titulo"><i class="tags icon"></i> Productos por categoría</h2>
+            <table class="ui celled striped table">
+                <thead><tr><th>Categoría</th><th class="right aligned">Cantidad de productos</th></tr></thead>
+                <tbody>
+                <tr th:each="entry : ${productosPorCategoria}">
+                    <td th:text="${entry.key}" style="font-weight: bold;"></td>
+                    <td class="right aligned" th:text="${entry.value}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="reporte-tab-panel" id="panel-listado" style="display:none">
+            <div class="list-search-row">
+                <div class="ui icon input list-search">
+                    <i class="search icon"></i>
+                    <input type="text" id="buscarProductosInput" placeholder="Buscar por nombre, marca, código o categoría..." aria-label="Buscar productos"
+                           autocomplete="off" oninput="filtrarTabla(this, 'tablaProductos')">
+                </div>
+                <button type="button" class="ui icon button list-search-scan-btn" title="Escanear código de barras con la cámara" onclick="abrirEscanerBusqueda()">
+                    <i class="camera icon"></i>
+                </button>
+            </div>
+            <div id="scanFlashBusqueda" class="pos-scan-flash"></div>
+            <div id="tablaProductosSinResultados" class="ui icon info message" style="display:none;">
+                <i class="search icon"></i>
+                <div class="content">No se encontraron productos con ese criterio de búsqueda.</div>
+            </div>
+
+            <div id="modalCamaraBusqueda" class="ui modal">
+                <div class="header">Escanear código de barras</div>
+                <div class="content">
+                    <div id="readerBusqueda" style="width:100%"></div>
+                </div>
+                <div class="actions">
+                    <button type="button" class="ui button" onclick="cerrarEscanerBusqueda()">Cerrar</button>
+                </div>
+            </div>
+
+            <table id="tablaProductos" class="ui celled striped table">
+                <thead>
+                <tr>
+                    <th class="one wide">ID</th>
+                    <th class="one wide">Imagen</th>
+                    <th class="three wide">Nombre</th>
+                    <th class="four wide">Tallas / colores</th>
+                    <th class="one wide">Precio</th>
+                    <th class="one wide">Stock</th>
+                    <th class="two wide">Categoría</th>
+                    <th class="three wide center aligned">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="producto : ${productos}">
+                    <td th:text="${producto.id}"></td>
+                    <td>
+                        <div class="producto-thumb">
+                            <img th:if="${producto.imagenPrincipal != null}" th:src="@{${producto.imagenPrincipal}}" alt="Imagen del producto">
+                            <i th:unless="${producto.imagenPrincipal != null}" class="image icon"></i>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="font-weight: bold;" th:text="${producto.nombre}"></div>
+                        <div class="hint" th:if="${producto.marca != null and !producto.marca.isEmpty()}" th:text="${producto.marca}"></div>
+                    </td>
+                    <td>
+                        <span th:if="${producto.variantes.isEmpty()}" class="hint">Sin tallas cargadas</span>
+                        <span class="ui tiny label" th:each="v : ${producto.variantes}"
+                              th:classappend="${v.stock != null and v.stock > 0} ? '' : 'grey'"
+                              th:text="${v.talla != null ? v.talla.etiqueta : '?'} + (${v.color != null and !v.color.isEmpty()} ? ' · ' + ${v.color} : '') + ' (' + ${v.stock} + ')'"></span>
+                    </td>
+                    <td th:text="'S/ ' + ${#numbers.formatDecimal(producto.precio, 1, 2)}" style="font-weight: bold; color: #21ba45;"></td>
+                    <td th:text="${producto.stock}" class="center aligned"></td>
+                    <td>
+                        <span class="ui teal tiny label" th:text="${producto.categoria.nombre}"></span>
+                    </td>
+                    <td class="center aligned">
+                        <div class="ui small buttons">
+                            <a th:href="@{/productos/{id}/editar(id=${producto.id})}" class="ui yellow button" title="Editar">
+                                <i class="edit icon"></i>
+                            </a>
+                            <form th:action="@{/productos/{id}/eliminar(id=${producto.id})}" method="post"
+                                  style="display:contents" th:onsubmit="return confirm('¿Está seguro de eliminar este producto?')">
+                                <button type="submit" class="ui red button" title="Eliminar">
+                                    <i class="trash icon"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </th:block>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.reporte-tab').forEach(function (boton) {
+        boton.addEventListener('click', function () {
+            const tab = boton.dataset.tab;
+            document.querySelectorAll('.reporte-tab').forEach(function (b) { b.classList.remove('activo'); });
+            document.querySelectorAll('.reporte-tab-panel').forEach(function (p) { p.style.display = 'none'; });
+            boton.classList.add('activo');
+            document.getElementById('panel-' + tab).style.display = '';
+        });
+    });
+});
+</script>
 <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
 <script>
     let html5QrCodeBusqueda = null;

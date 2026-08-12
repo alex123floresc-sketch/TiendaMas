@@ -29,55 +29,135 @@
         </div>
     </div>
 
-    <div class="ui icon input list-search" th:unless="${sueldos.isEmpty()}">
-        <i class="search icon"></i>
-        <input type="text" placeholder="Buscar por empleado, periodo o estado..." aria-label="Buscar sueldos"
-               oninput="filtrarTabla(this, 'tablaSueldos')">
-    </div>
-    <div id="tablaSueldosSinResultados" class="ui icon info message" style="display:none;">
-        <i class="search icon"></i>
-        <div class="content">No se encontraron sueldos con ese criterio de búsqueda.</div>
-    </div>
+    <th:block th:unless="${sueldos.isEmpty()}">
 
-    <table id="tablaSueldos" class="ui celled striped table" th:unless="${sueldos.isEmpty()}">
-        <thead>
-        <tr>
-            <th>Empleado</th>
-            <th>Periodo</th>
-            <th>Fecha de pago</th>
-            <th class="right aligned">Monto</th>
-            <th>Estado</th>
-            <th class="center aligned">Acciones</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="sueldo : ${sueldos}">
-            <td style="font-weight:bold;" th:text="${sueldo.usuario.nombre + ' ' + sueldo.usuario.apellido}"></td>
-            <td th:text="${sueldo.periodo}"></td>
-            <td th:text="${sueldo.fechaPago}"></td>
-            <td class="right aligned" th:text="'S/ ' + ${#numbers.formatDecimal(sueldo.monto, 1, 2)}"></td>
-            <td>
-                <span class="ui label" th:classappend="${sueldo.estado.name() == 'PAGADO'} ? 'green' : 'yellow'"
-                      th:text="${sueldo.estado}"></span>
-            </td>
-            <td class="center aligned">
-                <div class="ui small buttons">
-                    <form th:if="${sueldo.estado.name() == 'PENDIENTE'}" th:action="@{/sueldos/{id}/pagar(id=${sueldo.id})}" method="post" style="display:contents">
-                        <button type="submit" class="ui green button" title="Marcar como pagado">
-                            <i class="check icon"></i>
-                        </button>
-                    </form>
-                    <form th:action="@{/sueldos/{id}/eliminar(id=${sueldo.id})}" method="post" style="display:contents"
-                          th:onsubmit="return confirm('¿Está seguro de eliminar este registro de sueldo?')">
-                        <button type="submit" class="ui red button" title="Eliminar">
-                            <i class="trash icon"></i>
-                        </button>
-                    </form>
+        <div class="ui stackable statistics reporte-stats-grid-4" style="margin-bottom: 30px;">
+            <div class="statistic reporte-stat-card ventas">
+                <i class="money bill alternate icon"></i>
+                <div class="value" th:text="'S/ ' + ${#numbers.formatDecimal(pagadoMesActual, 1, 2)}"></div>
+                <div class="label">Pagado este mes</div>
+                <div class="reporte-stat-card-extra">
+                    <span></span>
+                    <span class="reporte-kpi-variacion" th:unless="${comparacionSueldoMes.sinBase}"
+                          th:classappend="${comparacionSueldoMes.subio} ? 'positiva' : (${comparacionSueldoMes.bajo} ? 'negativa' : '')">
+                        <i th:class="${comparacionSueldoMes.subio} ? 'arrow up icon' : (${comparacionSueldoMes.bajo} ? 'arrow down icon' : 'minus icon')"></i>
+                        <span th:text="${#numbers.formatDecimal(comparacionSueldoMes.variacionPorcentaje, 1, 1)} + '%'"></span>
+                    </span>
                 </div>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+            </div>
+            <div class="statistic reporte-stat-card peligro">
+                <i class="hourglass half icon"></i>
+                <div class="value" th:text="'S/ ' + ${#numbers.formatDecimal(totalPendiente, 1, 2)}"></div>
+                <div class="label">Pendiente de pago</div>
+                <div class="reporte-stat-card-extra">
+                    <span class="reporte-stat-card-sublabel" th:text="${empleadosPendientes} + ' registro(s)'"></span>
+                </div>
+            </div>
+            <div class="statistic reporte-stat-card pedidos">
+                <i class="users icon"></i>
+                <div class="value" th:text="${empleadosPendientes}"></div>
+                <div class="label">Pagos pendientes</div>
+                <div class="reporte-stat-card-extra">
+                    <span class="reporte-stat-card-sublabel">registros en estado pendiente</span>
+                </div>
+            </div>
+            <div class="statistic reporte-stat-card ticket">
+                <i class="calculator icon"></i>
+                <div class="value" th:text="'S/ ' + ${#numbers.formatDecimal(sueldoPromedio, 1, 2)}"></div>
+                <div class="label">Sueldo promedio</div>
+                <div class="reporte-stat-card-extra">
+                    <span class="reporte-stat-card-sublabel">por registro, histórico</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="reporte-tabs">
+            <button type="button" class="reporte-tab activo" data-tab="resumen"><i class="tachometer alternate icon"></i> Resumen</button>
+            <button type="button" class="reporte-tab" data-tab="listado"><i class="list icon"></i> Listado</button>
+        </div>
+
+        <div class="reporte-tab-panel" id="panel-resumen">
+            <h2 class="reporte-seccion-titulo"><i class="id badge icon"></i> Sueldos por empleado</h2>
+            <div th:if="${#maps.isEmpty(sueldosPorEmpleado)}" class="ui info message">
+                <p>Aún no hay sueldos registrados.</p>
+            </div>
+            <table class="ui celled striped table" th:unless="${#maps.isEmpty(sueldosPorEmpleado)}">
+                <thead><tr><th>Empleado</th><th class="right aligned">Total (histórico)</th></tr></thead>
+                <tbody>
+                <tr th:each="entry : ${sueldosPorEmpleado}">
+                    <td th:text="${entry.key}" style="font-weight: bold;"></td>
+                    <td class="right aligned" th:text="'S/ ' + ${#numbers.formatDecimal(entry.value, 1, 2)}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="reporte-tab-panel" id="panel-listado" style="display:none">
+            <div class="ui icon input list-search">
+                <i class="search icon"></i>
+                <input type="text" placeholder="Buscar por empleado, periodo o estado..." aria-label="Buscar sueldos"
+                       oninput="filtrarTabla(this, 'tablaSueldos')">
+            </div>
+            <div id="tablaSueldosSinResultados" class="ui icon info message" style="display:none;">
+                <i class="search icon"></i>
+                <div class="content">No se encontraron sueldos con ese criterio de búsqueda.</div>
+            </div>
+
+            <table id="tablaSueldos" class="ui celled striped table">
+                <thead>
+                <tr>
+                    <th>Empleado</th>
+                    <th>Periodo</th>
+                    <th>Fecha de pago</th>
+                    <th class="right aligned">Monto</th>
+                    <th>Estado</th>
+                    <th class="center aligned">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="sueldo : ${sueldos}">
+                    <td style="font-weight:bold;" th:text="${sueldo.usuario.nombre + ' ' + sueldo.usuario.apellido}"></td>
+                    <td th:text="${sueldo.periodo}"></td>
+                    <td th:text="${sueldo.fechaPago}"></td>
+                    <td class="right aligned" th:text="'S/ ' + ${#numbers.formatDecimal(sueldo.monto, 1, 2)}"></td>
+                    <td>
+                        <span class="ui label" th:classappend="${sueldo.estado.name() == 'PAGADO'} ? 'green' : 'yellow'"
+                              th:text="${sueldo.estado}"></span>
+                    </td>
+                    <td class="center aligned">
+                        <div class="ui small buttons">
+                            <form th:if="${sueldo.estado.name() == 'PENDIENTE'}" th:action="@{/sueldos/{id}/pagar(id=${sueldo.id})}" method="post" style="display:contents">
+                                <button type="submit" class="ui green button" title="Marcar como pagado">
+                                    <i class="check icon"></i>
+                                </button>
+                            </form>
+                            <form th:action="@{/sueldos/{id}/eliminar(id=${sueldo.id})}" method="post" style="display:contents"
+                                  th:onsubmit="return confirm('¿Está seguro de eliminar este registro de sueldo?')">
+                                <button type="submit" class="ui red button" title="Eliminar">
+                                    <i class="trash icon"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </th:block>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.reporte-tab').forEach(function (boton) {
+            boton.addEventListener('click', function () {
+                const tab = boton.dataset.tab;
+                document.querySelectorAll('.reporte-tab').forEach(function (b) { b.classList.remove('activo'); });
+                document.querySelectorAll('.reporte-tab-panel').forEach(function (p) { p.style.display = 'none'; });
+                boton.classList.add('activo');
+                document.getElementById('panel-' + tab).style.display = '';
+            });
+        });
+    });
+    </script>
 </div>
 </body>
 </html>

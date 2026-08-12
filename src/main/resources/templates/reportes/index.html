@@ -13,7 +13,7 @@
     </h1>
 
     <!-- Filtro de fechas + exportar PDF -->
-    <form th:action="@{/reportes}" method="get" class="reporte-filtro-form">
+    <form th:action="@{/reportes}" method="get" class="reporte-filtro-form" id="formFiltroReportes">
         <div class="reporte-filtro-campo">
             <label for="desde">Desde</label>
             <input type="date" id="desde" name="desde" th:value="${desde}">
@@ -22,12 +22,45 @@
             <label for="hasta">Hasta</label>
             <input type="date" id="hasta" name="hasta" th:value="${hasta}">
         </div>
+        <div class="reporte-filtro-campo">
+            <label>Rango rápido</label>
+            <div class="reporte-rango-rapido">
+                <button type="button" class="ui tiny button" data-rango="hoy">Hoy</button>
+                <button type="button" class="ui tiny button" data-rango="7d">7 días</button>
+                <button type="button" class="ui tiny button" data-rango="30d">30 días</button>
+                <button type="button" class="ui tiny button" data-rango="mes">Este mes</button>
+                <button type="button" class="ui tiny button" data-rango="anio">Este año</button>
+            </div>
+        </div>
         <button type="submit" class="ui primary button"><i class="filter icon"></i> Filtrar</button>
         <a th:if="${desde != null or hasta != null}" th:href="@{/reportes}" class="ui button">Ver todo el histórico</a>
         <a th:href="@{/reportes/pdf(desde=${desde}, hasta=${hasta})}" class="ui teal button reporte-btn-pdf" target="_blank">
             <i class="file pdf icon"></i> Exportar PDF
         </a>
     </form>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        function formatoFecha(d) {
+            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        }
+        document.querySelectorAll('[data-rango]').forEach(function (boton) {
+            boton.addEventListener('click', function () {
+                const hoy = new Date();
+                let desde = new Date();
+                switch (boton.dataset.rango) {
+                    case 'hoy': break;
+                    case '7d': desde.setDate(hoy.getDate() - 6); break;
+                    case '30d': desde.setDate(hoy.getDate() - 29); break;
+                    case 'mes': desde = new Date(hoy.getFullYear(), hoy.getMonth(), 1); break;
+                    case 'anio': desde = new Date(hoy.getFullYear(), 0, 1); break;
+                }
+                document.getElementById('desde').value = formatoFecha(desde);
+                document.getElementById('hasta').value = formatoFecha(hoy);
+                document.getElementById('formFiltroReportes').submit();
+            });
+        });
+    });
+    </script>
     <div class="ui info message" th:if="${desde != null or hasta != null}">
         <i class="info circle icon"></i>
         Los totales y tablas de abajo corresponden al rango elegido. Las tendencias (financiero, ventas por semana/mes) y las recomendaciones de reabastecimiento siempre muestran el período fijo indicado en cada gráfico, sin importar este filtro.
@@ -107,7 +140,12 @@
                 <div class="value" th:text="${#numbers.formatDecimal(totalClientes, 1, 0)}"></div>
                 <div class="label">Clientes</div>
                 <div class="reporte-stat-card-extra">
-                    <span class="reporte-stat-card-sublabel">registrados en total</span>
+                    <span class="reporte-stat-card-sublabel" th:text="${#numbers.formatDecimal(comparacionClientes.valorActual, 1, 0)} + ' nuevos'"></span>
+                    <span class="reporte-kpi-variacion" th:unless="${comparacionClientes.sinBase}"
+                          th:classappend="${comparacionClientes.subio} ? 'positiva' : (${comparacionClientes.bajo} ? 'negativa' : '')">
+                        <i th:class="${comparacionClientes.subio} ? 'arrow up icon' : (${comparacionClientes.bajo} ? 'arrow down icon' : 'minus icon')"></i>
+                        <span th:text="${#numbers.formatDecimal(comparacionClientes.variacionPorcentaje, 1, 1)} + '%'"></span>
+                    </span>
                 </div>
             </div>
             <div class="statistic reporte-stat-card productos">
@@ -115,7 +153,12 @@
                 <div class="value" th:text="${#numbers.formatDecimal(totalProductos, 1, 0)}"></div>
                 <div class="label">Productos</div>
                 <div class="reporte-stat-card-extra">
-                    <span class="reporte-stat-card-sublabel">en el catálogo</span>
+                    <span class="reporte-stat-card-sublabel" th:text="${#numbers.formatDecimal(comparacionProductos.valorActual, 1, 0)} + ' nuevos'"></span>
+                    <span class="reporte-kpi-variacion" th:unless="${comparacionProductos.sinBase}"
+                          th:classappend="${comparacionProductos.subio} ? 'positiva' : (${comparacionProductos.bajo} ? 'negativa' : '')">
+                        <i th:class="${comparacionProductos.subio} ? 'arrow up icon' : (${comparacionProductos.bajo} ? 'arrow down icon' : 'minus icon')"></i>
+                        <span th:text="${#numbers.formatDecimal(comparacionProductos.variacionPorcentaje, 1, 1)} + '%'"></span>
+                    </span>
                 </div>
             </div>
         </div>

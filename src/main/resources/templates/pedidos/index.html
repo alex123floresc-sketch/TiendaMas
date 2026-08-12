@@ -30,68 +30,143 @@
         </div>
     </div>
 
-    <div class="ui icon input list-search" th:unless="${pedidos.isEmpty()}">
-        <i class="search icon"></i>
-        <input type="text" placeholder="Buscar por cliente, fecha o total..." aria-label="Buscar ventas"
-               oninput="filtrarTabla(this, 'tablaPedidos')">
-    </div>
-    <div id="tablaPedidosSinResultados" class="ui icon info message" style="display:none;">
-        <i class="search icon"></i>
-        <div class="content">No se encontraron ventas con ese criterio de búsqueda.</div>
-    </div>
+    <th:block th:unless="${pedidos.isEmpty()}">
 
-    <table id="tablaPedidos" class="ui celled striped table" th:unless="${pedidos.isEmpty()}">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Cliente</th>
-            <th>Fecha</th>
-            <th>Canal</th>
-            <th>Items</th>
-            <th>Total</th>
-            <th>Estado</th>
-            <th class="center aligned">Acciones</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="pedido : ${pedidos}">
-            <td th:text="${pedido.id}"></td>
-            <td th:text="${pedido.persona.nombre + ' ' + pedido.persona.apellido}" style="font-weight: bold;"></td>
-            <td th:text="${pedido.fechaTexto}"></td>
-            <td th:text="${pedido.canal != null ? pedido.canal.etiqueta : '—'}"></td>
-            <td>
-                <div class="ui label" th:text="${pedido.detalles.size()}"></div>
-            </td>
-            <td th:text="'$' + ${pedido.total}" style="color: #21ba45; font-weight: bold;"></td>
-            <td>
-                <form th:if="${pedido.canal != null and pedido.canal.name() == 'ONLINE'}"
-                      th:action="@{/pedidos/{id}/estado(id=${pedido.id})}" method="post" style="display:contents">
-                    <select name="estado" class="ui small dropdown" onchange="this.form.submit()">
-                        <option value="PENDIENTE" th:selected="${pedido.estado != null and pedido.estado.name() == 'PENDIENTE'}">Pendiente</option>
-                        <option value="EN_CAMINO" th:selected="${pedido.estado != null and pedido.estado.name() == 'EN_CAMINO'}">En camino</option>
-                        <option value="ENTREGADO" th:selected="${pedido.estado != null and pedido.estado.name() == 'ENTREGADO'}">Entregado</option>
-                        <option value="CANCELADO" th:selected="${pedido.estado != null and pedido.estado.name() == 'CANCELADO'}">Cancelado</option>
-                    </select>
-                </form>
-                <span class="ui label green" th:unless="${pedido.canal != null and pedido.canal.name() == 'ONLINE'}"
-                      th:text="${pedido.estado != null ? pedido.estado.etiqueta : 'Entregado'}"></span>
-            </td>
-            <td class="center aligned">
-                <div class="ui small buttons">
-                    <a th:href="@{/pedidos/{id}(id=${pedido.id})}" class="ui info button" title="Ver">
-                        <i class="eye icon"></i>
-                    </a>
-                    <form th:action="@{/pedidos/{id}/eliminar(id=${pedido.id})}" method="post"
-                          style="display:contents" th:onsubmit="return confirm('¿Está seguro de eliminar este pedido?')">
-                        <button type="submit" class="ui red button" title="Eliminar">
-                            <i class="trash icon"></i>
-                        </button>
-                    </form>
+        <div class="ui stackable statistics reporte-stats-grid-4" style="margin-bottom: 30px;">
+            <div class="statistic reporte-stat-card pedidos">
+                <i class="list icon"></i>
+                <div class="value" th:text="${totalPedidosCount}"></div>
+                <div class="label">Pedidos</div>
+                <div class="reporte-stat-card-extra">
+                    <span class="reporte-stat-card-sublabel">histórico total</span>
                 </div>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+            </div>
+            <div class="statistic reporte-stat-card ventas">
+                <i class="money bill alternate icon"></i>
+                <div class="value" th:text="'S/ ' + ${#numbers.formatDecimal(totalVendido, 1, 2)}"></div>
+                <div class="label">Total vendido</div>
+                <div class="reporte-stat-card-extra">
+                    <span class="reporte-stat-card-sublabel">histórico total</span>
+                </div>
+            </div>
+            <div class="statistic reporte-stat-card ticket">
+                <i class="ticket alternate icon"></i>
+                <div class="value" th:text="'S/ ' + ${#numbers.formatDecimal(ticketPromedio, 1, 2)}"></div>
+                <div class="label">Ticket promedio</div>
+                <div class="reporte-stat-card-extra">
+                    <span class="reporte-stat-card-sublabel">por pedido</span>
+                </div>
+            </div>
+            <div class="statistic reporte-stat-card unidades">
+                <i class="truck icon"></i>
+                <div class="value" th:text="${pedidosEnCurso}"></div>
+                <div class="label">Pedidos en curso</div>
+                <div class="reporte-stat-card-extra">
+                    <span class="reporte-stat-card-sublabel">pendientes o en camino</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="reporte-tabs">
+            <button type="button" class="reporte-tab activo" data-tab="resumen"><i class="tachometer alternate icon"></i> Resumen</button>
+            <button type="button" class="reporte-tab" data-tab="listado"><i class="list icon"></i> Listado</button>
+        </div>
+
+        <div class="reporte-tab-panel" id="panel-resumen">
+            <h2 class="reporte-seccion-titulo"><i class="tasks icon"></i> Pedidos por estado</h2>
+            <div th:if="${#maps.isEmpty(pedidosPorEstado)}" class="ui info message">
+                <p>Aún no hay pedidos registrados.</p>
+            </div>
+            <table class="ui celled striped table" th:unless="${#maps.isEmpty(pedidosPorEstado)}">
+                <thead><tr><th>Estado</th><th class="right aligned">Pedidos</th></tr></thead>
+                <tbody>
+                <tr th:each="entry : ${pedidosPorEstado}">
+                    <td th:text="${entry.key}" style="font-weight: bold;"></td>
+                    <td class="right aligned" th:text="${entry.value}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="reporte-tab-panel" id="panel-listado" style="display:none">
+            <div class="ui icon input list-search">
+                <i class="search icon"></i>
+                <input type="text" placeholder="Buscar por cliente, fecha o total..." aria-label="Buscar ventas"
+                       oninput="filtrarTabla(this, 'tablaPedidos')">
+            </div>
+            <div id="tablaPedidosSinResultados" class="ui icon info message" style="display:none;">
+                <i class="search icon"></i>
+                <div class="content">No se encontraron ventas con ese criterio de búsqueda.</div>
+            </div>
+
+            <table id="tablaPedidos" class="ui celled striped table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Fecha</th>
+                    <th>Canal</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Estado</th>
+                    <th class="center aligned">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="pedido : ${pedidos}">
+                    <td th:text="${pedido.id}"></td>
+                    <td th:text="${pedido.persona.nombre + ' ' + pedido.persona.apellido}" style="font-weight: bold;"></td>
+                    <td th:text="${pedido.fechaTexto}"></td>
+                    <td th:text="${pedido.canal != null ? pedido.canal.etiqueta : '—'}"></td>
+                    <td>
+                        <div class="ui label" th:text="${pedido.detalles.size()}"></div>
+                    </td>
+                    <td th:text="'$' + ${pedido.total}" style="color: #21ba45; font-weight: bold;"></td>
+                    <td>
+                        <form th:if="${pedido.canal != null and pedido.canal.name() == 'ONLINE'}"
+                              th:action="@{/pedidos/{id}/estado(id=${pedido.id})}" method="post" style="display:contents">
+                            <select name="estado" class="ui small dropdown" onchange="this.form.submit()">
+                                <option value="PENDIENTE" th:selected="${pedido.estado != null and pedido.estado.name() == 'PENDIENTE'}">Pendiente</option>
+                                <option value="EN_CAMINO" th:selected="${pedido.estado != null and pedido.estado.name() == 'EN_CAMINO'}">En camino</option>
+                                <option value="ENTREGADO" th:selected="${pedido.estado != null and pedido.estado.name() == 'ENTREGADO'}">Entregado</option>
+                                <option value="CANCELADO" th:selected="${pedido.estado != null and pedido.estado.name() == 'CANCELADO'}">Cancelado</option>
+                            </select>
+                        </form>
+                        <span class="ui label green" th:unless="${pedido.canal != null and pedido.canal.name() == 'ONLINE'}"
+                              th:text="${pedido.estado != null ? pedido.estado.etiqueta : 'Entregado'}"></span>
+                    </td>
+                    <td class="center aligned">
+                        <div class="ui small buttons">
+                            <a th:href="@{/pedidos/{id}(id=${pedido.id})}" class="ui info button" title="Ver">
+                                <i class="eye icon"></i>
+                            </a>
+                            <form th:action="@{/pedidos/{id}/eliminar(id=${pedido.id})}" method="post"
+                                  style="display:contents" th:onsubmit="return confirm('¿Está seguro de eliminar este pedido?')">
+                                <button type="submit" class="ui red button" title="Eliminar">
+                                    <i class="trash icon"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </th:block>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.reporte-tab').forEach(function (boton) {
+            boton.addEventListener('click', function () {
+                const tab = boton.dataset.tab;
+                document.querySelectorAll('.reporte-tab').forEach(function (b) { b.classList.remove('activo'); });
+                document.querySelectorAll('.reporte-tab-panel').forEach(function (p) { p.style.display = 'none'; });
+                boton.classList.add('activo');
+                document.getElementById('panel-' + tab).style.display = '';
+            });
+        });
+    });
+    </script>
 </div>
 </body>
 </html>

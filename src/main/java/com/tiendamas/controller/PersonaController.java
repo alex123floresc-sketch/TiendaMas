@@ -44,8 +44,13 @@ public class PersonaController {
             totalPorPersona.merge(pedido.getPersona().getId(), total, Double::sum);
         }
 
+        double totalComprado = totalPorPersona.values().stream().mapToDouble(Double::doubleValue).sum();
+        double ticketPromedioCliente = lista.isEmpty() ? 0.0 : totalComprado / lista.size();
+
         model.addAttribute("personas", lista);
         model.addAttribute("totalPorPersona", totalPorPersona);
+        model.addAttribute("totalComprado", totalComprado);
+        model.addAttribute("ticketPromedioCliente", ticketPromedioCliente);
         model.addAttribute("titulo", "Clientes");
         return "personas/index";
     }
