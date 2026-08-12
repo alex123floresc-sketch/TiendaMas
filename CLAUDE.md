@@ -214,6 +214,18 @@ etc.) — no sirven como referencia histórica, hay que mirar el diff si hace fa
 - **CSRF**: los `th:action` con Spring Security lo inyectan solo; para llamadas AJAX hay
   que usar el meta `<meta name="_csrf">` / `<meta name="_csrf_header">` ya agregado en
   los layouts.
+- **No combinar `th:fragment(param)` parametrizado con `th:each` que pase ese mismo
+  ítem como argumento, sobre todo si es el mismo archivo (`~{::nombreFragmento(...)}`).**
+  Probado en Thymeleaf 3.1.5 (`devoluciones/index.html`, 2026-08-11): tanto
+  `<tr th:each="s : ${lista}" th:replace="~{::filaSolicitud(${s})}">` (mismo tag) como
+  envolverlo en `<th:block th:each="s : ...">` con el `th:replace` en un `<tr>` interno
+  fallan igual — el parámetro llega `null` al fragmento (`SpelEvaluationException:
+  Property or field 'x' cannot be found on null`), sin importar si el parámetro del
+  fragmento se llama igual que la variable de iteración o distinto. No vale la pena
+  perseguir la causa exacta: **directamente no usar `th:fragment` para filas de tabla
+  repetidas — duplicar el `<tr>...</tr>` donde haga falta**, que es además el patrón que
+  ya usa el resto de las páginas de listado del admin (gastos, pedidos, sueldos,
+  productos) sin problemas.
 - **"A veces al loguearme me manda un error" — causa raíz real encontrada (2026-08-11):**
   cuando un POST llega con el token CSRF vencido (típicamente porque la sesión expiró
   mientras el usuario tenía un formulario abierto), Spring lo trata como "hace falta
@@ -381,10 +393,25 @@ Ya hecho en esta pasada de rediseño:
   a cambio de que el admin pueda editar todo sin tocar código. Si en el futuro se
   quiere más fidelidad ahí, habría que volver a estructurar esas claves en vez de
   texto libre.
+- **Listados del admin al estilo Reportes** (2026-08-11): Gastos, Pedidos, Sueldos,
+  Productos y Devoluciones ganaron tarjetas KPI (`.reporte-stats-grid-2`/`-4`, nuevas
+  variantes de la grilla de Reportes para otra cantidad de tarjetas) + pestañas
+  Resumen/Listado (mismo patrón `.reporte-tabs`/`.reporte-tab-panel` de Reportes,
+  replicado con su propio JS de toggle en cada página en vez de compartir uno global).
+  Categorías/Personas/Usuarios/Suscriptores solo suman tarjetas KPI sin pestañas (muy
+  poco contenido para justificarlas). Gasto/Sueldo comparan mes actual vs. mes anterior
+  con `ComparacionKpi`; el resto son conteos/sumas simples sin comparación (no existe
+  un helper reusable para el cálculo de "período anterior de igual duración" que usa
+  Reportes — está inline en `ReporteController`, reimplementarlo en 9 controllers no
+  valía la pena). Reportes sumó botones de rango rápido (Hoy/7d/30d/Este mes/Este año)
+  y comparación de variación también en las tarjetas Clientes/Productos (antes eran
+  las únicas 2 sin badge) — para eso `Persona`/`Producto` ganaron `fechaRegistro`/
+  `fechaCreacion` (los registros viejos quedan `null`, no cuentan como "nuevos"
+  retroactivamente, es lo correcto). Ver la entrada de "Trampas ya encontradas" sobre
+  `th:fragment` parametrizado + `th:each` para el problema real que se pisó armando
+  Devoluciones.
 
 Pendiente (próximos pasos naturales si no hay redirección):
-- Pasada visual sobre el resto del panel admin: listados/formularios de productos,
-  pedidos, categorías, personas, usuarios, gastos, sueldos, reportes
 - Pasada visual sobre POS (bloqueada hasta ahora por flakiness del login automatizado
   en esa pantalla puntual — probar primero con curl/verificación server-side)
 - Revisar consistencia de `border-radius` y `box-shadow` en `estilos.css` (deuda de
@@ -393,3 +420,8 @@ Pendiente (próximos pasos naturales si no hay redirección):
   para editar" se cubrió para el contenido de marketing/textos fijos (arriba). La
   gestión de productos/categorías/pedidos/cupones/etc. ya existía de antes en el
   admin — no se tocó, solo se confirmó que ya cumple ese pedido.
+- Ideas nuevas sugeridas al usuario (2026-08-11, ninguna implementada todavía): CRUD de
+  cupones de descuento manual (hoy solo existen los que genera el canje de fidelidad,
+  no hay `CuponController`), alertas globales de stock bajo/devoluciones pendientes en
+  el sidebar, registro de actividad/auditoría, exportar catálogo a Excel/CSV, vista de
+  sueldos por vencer.
