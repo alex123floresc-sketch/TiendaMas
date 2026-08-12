@@ -145,7 +145,8 @@
                               th:text="${v.talla != null ? v.talla.etiqueta : '?'} + (${v.color != null and !v.color.isEmpty()} ? ' · ' + ${v.color} : '') + ' (' + ${v.stock} + ')'"></span>
                     </td>
                     <td th:text="'S/ ' + ${#numbers.formatDecimal(producto.precio, 1, 2)}" style="font-weight: bold; color: #21ba45;"></td>
-                    <td th:text="${producto.stock}" class="center aligned"></td>
+                    <td class="center aligned" th:text="${producto.stock}"
+                        th:classappend="${producto.stock == 0} ? 'stock-cero' : (${producto.stock <= 5} ? 'stock-bajo' : '')"></td>
                     <td>
                         <span class="ui teal tiny label" th:text="${producto.categoria.nombre}"></span>
                     </td>

@@ -258,32 +258,35 @@ body {
     font-size: 0.78em;
 }
 /* --- Reseñas de productos --- */
-.tienda-resena-cabecera {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 14px;
-    margin-bottom: 20px;
-}
-.tienda-resena-cabecera .ui.header {
-    margin-bottom: 0;
+/* Layout apilado y centrado (título > resumen > formulario > lista): la versión
+   anterior ponía el título a la izquierda y el resumen a la derecha con
+   space-between, lo que se veía descompensado según el ancho disponible. */
+.tienda-resena-titulo {
+    text-align: center;
+    margin-bottom: 20px !important;
 }
 .tienda-resena-resumen {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 14px;
+    gap: 6px;
     background: var(--color-beige);
-    border-radius: 10px;
-    padding: 8px 18px;
+    border-radius: 12px;
+    padding: 22px 34px;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto 26px;
+    text-align: center;
 }
 .tienda-resena-promedio {
-    font-size: 28px;
+    font-size: 40px;
     font-weight: 800;
+    line-height: 1;
     color: var(--color-navy);
 }
 .tienda-resena-estrellas {
     display: inline-flex;
+    justify-content: center;
     gap: 2px;
 }
 .tienda-resena-estrellas .icon,
@@ -298,8 +301,16 @@ body {
 .tienda-resena-form {
     background: var(--color-beige);
     border-radius: 10px;
-    padding: 18px;
-    margin-bottom: 20px;
+    padding: 20px;
+    margin: 0 auto 22px;
+    max-width: 480px;
+}
+.tienda-resena-form .field > label {
+    text-align: center;
+}
+.tienda-resena-form button[type=submit] {
+    display: block;
+    margin: 0 auto;
 }
 .tienda-resena-input-estrellas {
     display: flex;
@@ -307,6 +318,7 @@ body {
     justify-content: flex-end;
     gap: 4px;
     width: fit-content;
+    margin: 0 auto;
 }
 .tienda-resena-input-estrellas input {
     display: none;
@@ -316,7 +328,10 @@ body {
     font-size: 26px;
     cursor: pointer;
     margin: 0 !important;
-    transition: color 0.1s ease;
+    transition: color 0.1s ease, transform 0.1s ease;
+}
+.tienda-resena-input-estrellas label:hover .icon {
+    transform: scale(1.15);
 }
 .tienda-resena-input-estrellas label:hover .icon,
 .tienda-resena-input-estrellas label:hover ~ label .icon,
@@ -324,14 +339,42 @@ body {
 .tienda-resena-input-estrellas label:has(input:checked) ~ label .icon {
     color: #F2B400;
 }
+.tienda-resena-hint-centrado {
+    text-align: center;
+}
 .tienda-resena-lista {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 14px;
 }
 .tienda-resena-item {
-    border-top: 1px solid var(--color-beige-dark);
-    padding-top: 14px;
+    display: flex;
+    gap: 14px;
+    border: 1px solid var(--color-beige-dark);
+    border-radius: 10px;
+    padding: 16px 18px;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.tienda-resena-item:hover {
+    border-color: var(--color-blue-light);
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+}
+.tienda-resena-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--color-navy);
+    color: var(--color-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    flex-shrink: 0;
+    text-transform: uppercase;
+}
+.tienda-resena-item-body {
+    flex: 1;
+    min-width: 0;
 }
 .tienda-resena-item-header {
     display: flex;
@@ -339,6 +382,9 @@ body {
     gap: 10px;
     flex-wrap: wrap;
     margin-bottom: 6px;
+}
+.tienda-resena-item-header .hint {
+    margin-left: auto;
 }
 .tienda-resena-item-header .tienda-resena-estrellas .icon {
     font-size: 14px;
@@ -558,6 +604,20 @@ body {
 .ui.celled.table th {
     border-left-color: var(--color-beige-dark);
 }
+.ui.table tbody tr {
+    transition: background-color 0.12s ease;
+}
+.ui.table tbody tr:hover {
+    background-color: var(--color-beige) !important;
+}
+.stock-cero {
+    color: #DC2626 !important;
+    font-weight: 700;
+}
+.stock-bajo {
+    color: #DB9A55 !important;
+    font-weight: 700;
+}
 
 /* Mensajes */
 .ui.warning.message {
@@ -572,11 +632,26 @@ body {
     box-shadow: 0 0 0 1px var(--color-blue-light) inset;
 }
 
-/* Formularios */
+/* Formularios: hover + foco consistentes en toda la app (antes solo había
+   cambio de color en :focus, sin ninguna reacción al pasar el cursor). */
+.ui.form input:not([type=file]):not([type=checkbox]):not([type=radio]),
+.ui.form textarea,
+.ui.form select,
+.ui.selection.dropdown {
+    transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+.ui.form input:not([type=file]):not([type=checkbox]):not([type=radio]):hover,
+.ui.form textarea:hover,
+.ui.selection.dropdown:hover {
+    border-color: var(--color-blue-light) !important;
+}
 .ui.form input:focus,
+.ui.form textarea:focus,
 .ui.form select:focus,
-.ui.selection.dropdown:focus {
+.ui.selection.dropdown:focus,
+.ui.selection.dropdown.active {
     border-color: var(--color-blue) !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
 }
 .ui.form .field.required > label:after {
     color: var(--color-blue);
@@ -847,6 +922,11 @@ body {
     display: flex !important;
     flex-direction: column;
     gap: 4px;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.reporte-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12);
 }
 .reporte-stat-card .icon {
     font-size: 1.1em;
@@ -1022,6 +1102,10 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.25s ease;
+}
+.producto-thumb:hover img {
+    transform: scale(1.15);
 }
 .producto-imagen-preview {
     width: 140px;
@@ -1035,11 +1119,19 @@ body {
     justify-content: center;
     color: var(--color-blue-light);
     margin-bottom: 10px;
+    transition: border-color 0.2s ease;
+}
+.producto-imagen-preview:hover {
+    border-color: var(--color-blue-light);
 }
 .producto-imagen-preview img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.3s ease;
+}
+.producto-imagen-preview:hover img {
+    transform: scale(1.08);
 }
 .producto-galeria {
     display: flex;
@@ -1055,12 +1147,20 @@ body {
     overflow: hidden;
     background: var(--color-cream);
     border: 1px solid var(--color-beige-dark);
+    transition: border-color 0.2s ease;
+}
+.producto-galeria-item:hover {
+    border-color: var(--color-blue-light);
 }
 .producto-galeria-item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
+    transition: transform 0.3s ease;
+}
+.producto-galeria-item:hover img {
+    transform: scale(1.1);
 }
 .producto-galeria-item form {
     position: absolute;

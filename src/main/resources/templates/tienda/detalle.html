@@ -88,19 +88,15 @@
     </div>
 
     <div id="resenas" class="ui segment reveal" style="margin-top: 24px;">
-        <div class="tienda-resena-cabecera">
-            <h3 class="ui header"><i class="star icon"></i> Reseñas de clientes</h3>
+        <h3 class="ui header tienda-resena-titulo"><i class="star icon"></i> Reseñas de clientes</h3>
 
-            <div class="tienda-resena-resumen">
-                <div class="tienda-resena-promedio" th:text="${#numbers.formatDecimal(promedioResenas, 1, 1)}">0.0</div>
-                <div>
-                    <div class="tienda-resena-estrellas">
-                        <i class="star icon" th:each="i : ${#numbers.sequence(1, 5)}"
-                           th:classappend="${i <= T(java.lang.Math).round(promedioResenas)} ? '' : 'outline'"></i>
-                    </div>
-                    <div class="hint" th:text="${#lists.size(resenas)} + ${#lists.size(resenas) == 1 ? ' reseña' : ' reseñas'}">0 reseñas</div>
-                </div>
+        <div class="tienda-resena-resumen">
+            <div class="tienda-resena-promedio" th:text="${#numbers.formatDecimal(promedioResenas, 1, 1)}">0.0</div>
+            <div class="tienda-resena-estrellas">
+                <i class="star icon" th:each="i : ${#numbers.sequence(1, 5)}"
+                   th:classappend="${i <= T(java.lang.Math).round(promedioResenas)} ? '' : 'outline'"></i>
             </div>
+            <div class="hint" th:text="${#lists.size(resenas)} + ${#lists.size(resenas) == 1 ? ' reseña' : ' reseñas'}">0 reseñas</div>
         </div>
 
         <div class="ui negative message" th:if="${resenaError != null}">
@@ -124,22 +120,25 @@
             </div>
             <button type="submit" class="ui primary button">Publicar reseña</button>
         </form>
-        <p class="hint" th:if="${yaReseno}"><i class="check circle icon"></i> Ya dejaste tu reseña sobre este producto. ¡Gracias!</p>
+        <p class="hint tienda-resena-hint-centrado" th:if="${yaReseno}"><i class="check circle icon"></i> Ya dejaste tu reseña sobre este producto. ¡Gracias!</p>
 
         <div class="tienda-resena-lista" th:if="${not #lists.isEmpty(resenas)}">
             <div class="tienda-resena-item" th:each="r : ${resenas}">
-                <div class="tienda-resena-item-header">
-                    <strong th:text="${r.persona.nombre}"></strong>
-                    <span class="tienda-resena-estrellas">
-                        <i class="star icon" th:each="i : ${#numbers.sequence(1, 5)}"
-                           th:classappend="${i <= r.calificacion} ? '' : 'outline'"></i>
-                    </span>
-                    <span class="hint" th:text="${r.fechaTexto}"></span>
+                <div class="tienda-resena-avatar" th:text="${#strings.toUpperCase(#strings.substring(r.persona.nombre, 0, 1))}"></div>
+                <div class="tienda-resena-item-body">
+                    <div class="tienda-resena-item-header">
+                        <strong th:text="${r.persona.nombre}"></strong>
+                        <span class="tienda-resena-estrellas">
+                            <i class="star icon" th:each="i : ${#numbers.sequence(1, 5)}"
+                               th:classappend="${i <= r.calificacion} ? '' : 'outline'"></i>
+                        </span>
+                        <span class="hint" th:text="${r.fechaTexto}"></span>
+                    </div>
+                    <p th:if="${r.comentario != null}" th:text="${r.comentario}"></p>
                 </div>
-                <p th:if="${r.comentario != null}" th:text="${r.comentario}"></p>
             </div>
         </div>
-        <p class="hint" th:if="${#lists.isEmpty(resenas)}">Todavía no hay reseñas para este producto.</p>
+        <p class="hint tienda-resena-hint-centrado" th:if="${#lists.isEmpty(resenas)}">Todavía no hay reseñas para este producto.</p>
     </div>
 
     <div class="tienda-carrusel-seccion reveal" th:if="${relacionados != null and not #lists.isEmpty(relacionados)}"
